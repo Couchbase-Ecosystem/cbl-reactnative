@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "expo-example",
+    "slug": "expo-example",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/images/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.couchbase.rn.expo-example"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.couchbase.rn.expexample"
+    },
+    "plugins": [
+      "expo-router",
+      "./cbl-reactnative-plugin.js"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
