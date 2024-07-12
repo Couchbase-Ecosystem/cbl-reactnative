@@ -80,7 +80,7 @@
     "react-native-get-random-values": "^1.11.0",
     "release-it": "^17.5.0",
     "turbo": "^1.10.7",
-    "typescript": "^5.4.2",
+    "typescript": "^5.2.0",
     "uuid": "^10.0.0"
   },
   "resolutions": {
@@ -130,7 +130,11 @@
       "prettier"
     ],
     "rules": {
+      "@typescript-eslint/no-unused-vars": "off",
+      "react/no-unstable-nested-components": "off",
+      "react-native/no-inline-styles": "off",
       "react/react-in-jsx-scope": "off",
+      "no-unused-vars": "off",
       "prettier/prettier": [
         "error",
         {

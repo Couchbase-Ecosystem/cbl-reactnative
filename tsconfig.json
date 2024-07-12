@@ -3,7 +3,7 @@
     "rootDir": ".",
     "paths": {
       "cbl-reactnative": [
-        "./src/index", 
+        "./src/index",
         "./src/cblite-js/cblite/index"
       ]
     },
@@ -31,7 +31,7 @@
   },
   "exclude": [
     "src/cblite-js/cblite/src/util/uuid-ionic.ts",
-    "/example",
-    "/expo-example",
+    "example",
+    "expo-example",
   ]
 }

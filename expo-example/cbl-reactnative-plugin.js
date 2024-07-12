@@ -20,23 +20,23 @@ function modifyXcodeProject(config) {
 
 // Function to modify Podfile properties to include the native module podspec
 function includeNativeModulePod(config) {
-  return withPodfileProperties(config, async (config) => {
+  return withPodfileProperties(config, async (podConfig) => {
     // Assuming the path to the podspec is relative to the iOS directory in the Expo app
     // Adjust the path as necessary based on your project structure
     const podspecPath = `../../cbl-reactnative.podspec`;
-    config.modResults.podfileProperties.pod(
+    podConfig.modResults.podfileProperties.pod(
       `'cbl-reactnative', :path => '${podspecPath}'`
     );
-    return config;
+    return podConfig;
   });
 }
 
 module.exports = (config) => {
-  config = withProjectBuildGradle(config, async (config) => {
-    return modifyAndroidBuildGradle(config);
+  config = withProjectBuildGradle(config, async (gradleConfig) => {
+    return modifyAndroidBuildGradle(gradleConfig);
   });
-  config = withXcodeProject(config, async (config) => {
-    return modifyXcodeProject(config);
+  config = withXcodeProject(config, async (xcodeConfig) => {
+    return modifyXcodeProject(xcodeConfig);
   });
   return config;
 };
