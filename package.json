@@ -1,9 +1,9 @@
 {
   "name": "cbl-reactnative",
   "version": "0.1.0",
-  "description": "Test Description",
-  "source": "./src/index.tsx",
+  "description": "Couchbase Lite Enterprise for React Native",
   "main": "./lib/commonjs/index.cjs",
+  "source": "./src/index.tsx",
   "module": "./lib/module/index.mjs",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -32,13 +32,14 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "yarn workspace cbl-reactnative-example",
+    "build": "./uuid-fix.sh && bob build",
+    "example": "./uuid-fix.sh && yarn workspace cbl-reactnative-example",
     "test": "jest",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "./uuid-fix.sh && tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
-    "prepare": "bob build",
-    "release": "release-it"
+    "prepare": "./uuid-fix.sh && bob build",
+    "release": "./uuid-fix.sh && release-it"
   },
   "keywords": [
     "react-native",
@@ -47,22 +48,25 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/biozal/cbl-reactnative.git"
+    "url": "git+https://github.com/Couchbase-Ecosystem/cbl-reactnative.git"
   },
-  "author": "Aaron LaBeau <alabeau@gmail.com> (https://github.com/biozal)",
-  "license": "MIT",
+  "author": "Dev Experience/Ecosystem Team @ Couchbase",
+  "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/biozal/cbl-reactnative/issues"
+    "url": "https://github.com/Couchbase-Ecosystem/cbl-reactnative/issues"
   },
-  "homepage": "https://github.com/biozal/cbl-reactnative#readme",
+  "homepage": "https://github.com/Couchbase-Ecosystem/cbl-reactnative#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
+    "uuid": "^10.0.0",
+    "react-native-get-random-values": "^1.11.0",
+    "chai": "^5.1.0",
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
     "@react-native/eslint-config": "^0.73.1",
-    "@release-it/conventional-changelog": "^5.0.0",
+    "@release-it/conventional-changelog": "^8.0.1",
     "@types/jest": "^29.5.5",
     "@types/react": "^18.2.44",
     "commitlint": "^17.0.2",
@@ -75,9 +79,11 @@
     "react": "18.2.0",
     "react-native": "0.74.3",
     "react-native-builder-bob": "^0.25.0",
-    "release-it": "^15.0.0",
+    "release-it": "^17.5.0",
     "turbo": "^1.10.7",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
   },
   "resolutions": {
     "@types/react": "^18.2.44"

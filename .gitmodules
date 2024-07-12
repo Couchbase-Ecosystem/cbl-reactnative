@@ -1,0 +1,3 @@
+[submodule "src/cblite-js"]
+	path = src/cblite-js
+	url = git@github.com:Couchbase-Ecosystem/cblite-js.git
