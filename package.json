@@ -33,11 +33,11 @@
   ],
   "scripts": {
     "build": "./uuid-fix.sh && bob build",
-    "example": "./uuid-fix.sh && yarn workspace cbl-reactnative-example",
+    "example": "./uuid-fix.sh && yarn workspace expo-example",
     "test": "jest",
     "typecheck": "./uuid-fix.sh && tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build lib",
+    "clean": "del-cli android/build expo-example/android/build expo-example/android/app/build expo-example/ios/build lib",
     "prepare": "./uuid-fix.sh && bob build",
     "release": "./uuid-fix.sh && release-it"
   },
@@ -60,15 +60,13 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "uuid": "^10.0.0",
-    "react-native-get-random-values": "^1.11.0",
-    "chai": "^5.1.0",
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",
     "@react-native/eslint-config": "^0.73.1",
     "@release-it/conventional-changelog": "^8.0.1",
     "@types/jest": "^29.5.5",
     "@types/react": "^18.2.44",
+    "chai": "^5.1.0",
     "commitlint": "^17.0.2",
     "del-cli": "^5.1.0",
     "eslint": "^8.51.0",
@@ -79,11 +77,11 @@
     "react": "18.2.0",
     "react-native": "0.74.3",
     "react-native-builder-bob": "^0.25.0",
+    "react-native-get-random-values": "^1.11.0",
     "release-it": "^17.5.0",
     "turbo": "^1.10.7",
-    "typescript": "^5.4.2"
-  },
-  "dependencies": {
+    "typescript": "^5.4.2",
+    "uuid": "^10.0.0"
   },
   "resolutions": {
     "@types/react": "^18.2.44"
