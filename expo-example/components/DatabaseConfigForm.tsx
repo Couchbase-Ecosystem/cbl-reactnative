@@ -41,6 +41,8 @@ export default function DatabaseConfigForm({
         placeholderTextColor={placeholderTextColor}
         onChangeText={(newText) => setFileLocation(newText)}
         defaultValue={fileLocation}
+        multiline={true}
+        numberOfLines={4}
       />
       <TextInput
         style={[styles.textInput, { color: textColor }]}

@@ -1,3 +1,6 @@
 [submodule "src/cblite-js"]
 	path = src/cblite-js
 	url = git@github.com:Couchbase-Ecosystem/cblite-js.git
+[submodule "ios/cbl-js-swift"]
+	path = ios/cbl-js-swift
+	url = git@github.com:Couchbase-Ecosystem/cbl-js-swift.git

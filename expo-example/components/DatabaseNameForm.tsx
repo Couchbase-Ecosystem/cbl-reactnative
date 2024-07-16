@@ -18,6 +18,7 @@ export default function DatabaseNameForm({
     <>
       <DatabaseHeaderView />
       <TextInput
+        autoCapitalize="none"
         style={[styles.textInput, { color: textColor }]}
         placeholder="Database Name"
         placeholderTextColor={placeholderTextColor}
