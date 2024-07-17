@@ -45,6 +45,8 @@ class CblReactnative: NSObject {
                 let hashConfig = AnyHashable(config)
                 try DatabaseManager.shared.open(databaseName, databaseConfig: hashConfig as? [AnyHashable : Any])
                 resolve(nil)
+            } catch let error as NSError {
+                reject("DATABASE_ERROR", error.localizedDescription, nil)
             } catch {
                 reject("DATABASE_ERROR", error.localizedDescription, nil)
             }
@@ -68,6 +70,8 @@ class CblReactnative: NSObject {
                 }
                 try DatabaseManager.shared.close(databaseName)
                 resolve(nil)
+            } catch let error as NSError {
+                reject("DATABASE_ERROR", error.localizedDescription, nil)
             } catch {
                 reject("DATABASE_ERROR", error.localizedDescription, nil)
             }
@@ -91,7 +95,10 @@ class CblReactnative: NSObject {
                 }
                 try DatabaseManager.shared.delete(databaseName)
                 resolve(nil)
-            } catch {
+            } catch let error as NSError {
+                reject("DATABASE_ERROR", error.localizedDescription, nil)
+            }
+            catch {
                 reject("DATABASE_ERROR", error.localizedDescription, nil)
             }
         }
