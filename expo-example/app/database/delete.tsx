@@ -2,11 +2,12 @@ import React, { useContext, useLayoutEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
-import DatabaseNameForm from '@/components/DatabaseNameForm';
-import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
+import DatabaseNameActionForm from '@/components/DatabaseNameActionForm';
 import ResultListView from '@/components/ResultsListView';
 import deleteDatabase from '@/service/database/deleteDatabase';
 import DatabaseContext from '@/providers/DatabaseContext';
+
+import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
 
 export default function DatabaseDeleteScreen() {
   const { databases, setDatabases } = useContext(DatabaseContext)!;
@@ -14,20 +15,7 @@ export default function DatabaseDeleteScreen() {
   const [resultMessage, setResultsMessage] = useState<string[]>([]);
   const navigation = useNavigation();
   const styles = useStyleScheme();
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: 'Database Open',
-      headerBackTitle: 'Back',
-      headerRight: () => (
-        <MaterialCommunityIcons
-          name="refresh"
-          size={24}
-          color="#428cff"
-          onPress={reset}
-        />
-      ),
-    });
-  }, [navigation]);
+  useNavigationBarTitleResetOption('Delete Database', navigation, reset);
 
   function reset() {
     setDatabaseName('');
@@ -45,7 +33,11 @@ export default function DatabaseDeleteScreen() {
       ]);
     } else {
       try {
-        const results = await deleteDatabase(databases, databaseName);
+        const results = await deleteDatabase(
+          databases,
+          setDatabases,
+          databaseName
+        );
         setResultsMessage((prev) => [...prev, results]);
       } catch (error) {
         setResultsMessage((prev) => [...prev, '' + error]);
@@ -55,9 +47,10 @@ export default function DatabaseDeleteScreen() {
 
   return (
     <View style={styles.container}>
-      <DatabaseNameForm
+      <DatabaseNameActionForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
+        handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />
     </View>

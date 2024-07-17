@@ -9,7 +9,9 @@ export default async function open(
   encryptionKey: string
 ) {
   if (databaseName in databases) {
-    throw new Error('Error: Database already in Context');
+    let database = databases[databaseName];
+    await database.open();
+    return 'Database opened successfully';
   } else {
     let database: Database;
     //calculate the database configuration required to create and open a database
