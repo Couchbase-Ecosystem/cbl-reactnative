@@ -2,7 +2,6 @@ import React from 'react';
 import { TextInput, useColorScheme } from 'react-native';
 import { useStyleScheme, useThemeColor } from '@/components/Themed';
 import { usePlaceholderTextColor } from '@/hooks/usePlaceholderTextColor';
-import HeaderToolbarView from '@/components/HeaderToolbarView';
 import { DatabaseConfigFormProps } from '@/types/databaseConfigFormProps.type';
 
 export default function DatabaseConfigForm({
@@ -10,41 +9,28 @@ export default function DatabaseConfigForm({
   setFileLocation,
   encryptionKey,
   setEncryptionKey,
-  handleLocationPress,
-  handleUpdatePressed,
 }: DatabaseConfigFormProps) {
   const scheme = useColorScheme();
   const styles = useStyleScheme();
   const textColor = useThemeColor({ light: 'black', dark: 'white' }, 'text');
   const placeholderTextColor = usePlaceholderTextColor(scheme);
-  const icons = [
-    {
-      iconName: 'folder-open',
-      onPress: handleLocationPress,
-    },
-    {
-      iconName: 'play',
-      onPress: handleUpdatePressed,
-    },
-  ];
 
   return (
     <>
-      <HeaderToolbarView
-        name="Database Configuration"
-        iconName="database-cog"
-        icons={icons}
-      />
       <TextInput
-        style={[styles.textInput, { color: textColor }]}
+        autoCapitalize="none"
+        style={[
+          styles.textInput,
+          { color: textColor, height: undefined, minHeight: 20 },
+        ]}
         placeholder="File Location"
         placeholderTextColor={placeholderTextColor}
         onChangeText={(newText) => setFileLocation(newText)}
         defaultValue={fileLocation}
         multiline={true}
-        numberOfLines={4}
       />
       <TextInput
+        autoCapitalize="none"
         style={[styles.textInput, { color: textColor }]}
         placeholder="Encryption Key"
         placeholderTextColor={placeholderTextColor}

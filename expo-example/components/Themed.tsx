@@ -74,9 +74,19 @@ export function BaseStyles() {
       height: 40,
       paddingStart: 16,
     },
+    selectTextDescription: {
+      paddingTop: 10,
+      paddingLeft: 4,
+      paddingBottom: 4,
+      fontSize: 18,
+    },
     link: {
       padding: 10,
       fontSize: 16,
+    },
+    selectContainer: {
+      paddingTop: 10,
+      paddingBottom: 8,
     },
   });
 }
@@ -99,6 +109,10 @@ export function LightStyles() {
       ...baseStyles.link,
       color: '#000',
     },
+    select: {
+      borderColor: '#333',
+      // Add more style adjustments for dark/light mode
+    },
   });
 }
 
@@ -119,6 +133,10 @@ export function DarkStyles() {
     link: {
       ...baseStyles.link,
       color: '#fff',
+    },
+    select: {
+      borderColor: '#FFF',
+      // Add more style adjustments for dark/light mode
     },
   });
 }

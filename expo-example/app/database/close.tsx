@@ -32,7 +32,8 @@ export default function DatabaseCloseScreen() {
         const results = await close(databases, databaseName);
         setResultsMessage((prev) => [...prev, results]);
       } catch (error) {
-        setResultsMessage((prev) => [...prev, '' + error]);
+        // @ts-ignore
+        setResultsMessage((prev) => [...prev, error]);
       }
     }
   };

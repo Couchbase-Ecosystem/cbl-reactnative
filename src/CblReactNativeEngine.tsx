@@ -44,13 +44,11 @@ import {
   ScopesResult,
 } from './cblite-js/cblite/core-types';
 
-import {
-  Collection,
-  EngineLocator,
-  ReplicatorStatus,
-  Result,
-  Scope,
-} from 'cbl-reactnative';
+import { Collection } from './cblite-js/cblite/src/collection';
+import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
+import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
+import { Result } from './cblite-js/cblite/src/result';
+import { Scope } from './cblite-js/cblite/src/scope';
 
 export class CblReactNativeEngine implements ICoreEngine {
   private static readonly LINKING_ERROR =
@@ -179,7 +177,17 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   database_ChangeEncryptionKey(args: DatabaseEncryptionKeyArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_ChangeEncryptionKey(
+        args.name,
+        args.newKey
+      ).then(
+        () => resolve(),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   database_Close(args: DatabaseArgs): Promise<void> {
@@ -258,7 +266,15 @@ export class CblReactNativeEngine implements ICoreEngine {
   database_PerformMaintenance(
     args: DatabasePerformMaintenanceArgs
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    const numValue = args.maintenanceType.valueOf();
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_PerformMaintenance(numValue, args.name).then(
+        () => resolve(),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   database_PurgeDocument(args: DatabasePurgeDocumentArgs): Promise<void> {
@@ -276,7 +292,25 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   database_SetLogLevel(args: DatabaseSetLogLevelArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_SetLogLevel(args.domain, args.logLevel).then(
+        () => resolve(),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
+  }
+
+  logging_SetLogLevel(args: DatabaseSetLogLevelArgs): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_SetLogLevel(args.domain, args.logLevel).then(
+        () => resolve(),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   document_GetBlobContent(
