@@ -1,25 +1,33 @@
-import React, { useContext, useLayoutEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
-import DatabaseNameActionForm from '@/components/DatabaseNameActionForm';
+import DatabaseNameDirectoryActionForm from '@/components/DatabaseNameDirectoryActionForm';
 import ResultListView from '@/components/ResultsListView';
-import close from '@/service/database/close';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
+import doesExist from '@/service/database/exists';
+import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
-export default function DatabaseCloseScreen() {
+export default function DatabaseExistsScreen() {
   const { databases } = useContext(DatabaseContext)!;
   const [databaseName, setDatabaseName] = useState<string>('');
+  const [fileLocation, setFileLocation] = useState<string>('');
   const [resultMessage, setResultsMessage] = useState<string[]>([]);
   const navigation = useNavigation();
   const styles = useStyleScheme();
-  useNavigationBarTitleResetOption('Close Database', navigation, reset);
+  useNavigationBarTitleResetOption('Does Database Exists', navigation, reset);
 
   function reset() {
     setDatabaseName('');
+    setFileLocation('');
     setResultsMessage([]);
   }
+
+  const getDefaultDirectory = async () => {
+    const defaultDirectory = await getFileDefaultPath();
+    setFileLocation(defaultDirectory);
+  };
 
   const update = async () => {
     if (databaseName === '') {
@@ -29,8 +37,8 @@ export default function DatabaseCloseScreen() {
       ]);
     } else {
       try {
-        const results = await close(databases, databaseName);
-        setResultsMessage((prev) => [...prev, results]);
+        const results = await doesExist(databaseName, fileLocation);
+        setResultsMessage((prev) => [...prev, `Does Exists: <${results}>`]);
       } catch (error) {
         // @ts-ignore
         setResultsMessage((prev) => [...prev, error.message]);
@@ -40,9 +48,12 @@ export default function DatabaseCloseScreen() {
 
   return (
     <View style={styles.container}>
-      <DatabaseNameActionForm
+      <DatabaseNameDirectoryActionForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
+        fileLocation={fileLocation}
+        setFileLocation={setFileLocation}
+        handleLocationPress={getDefaultDirectory}
         handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />

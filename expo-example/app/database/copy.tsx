@@ -1,15 +1,12 @@
-import React, { useContext, useLayoutEffect, useState } from 'react';
-import { TextInput, useColorScheme, View } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { useColorScheme, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme, useThemeColor } from '@/components/Themed';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
-import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
-import DatabaseConfigForm from '@/components/DatabaseConfigForm';
 import ResultListView from '@/components/ResultsListView';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
-import HeaderRunActionView from '@/components/HeaderRunActionView';
 import { usePlaceholderTextColor } from '@/hooks/usePlaceholderTextColor';
 import DatabaseCopyActionForm from '@/components/DatabaseCopyActionForm';
 import copy from '@/service/database/copy';
@@ -54,7 +51,8 @@ export default function DatabaseCopyScreen() {
         );
         setResultsMessage((prev) => [...prev, '' + results]);
       } catch (error) {
-        setResultsMessage((prev) => [...prev, '' + error]);
+        // @ts-ignore
+        setResultsMessage((prev) => [...prev, error.message]);
       }
     }
   };

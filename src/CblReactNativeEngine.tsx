@@ -51,6 +51,9 @@ import { Result } from './cblite-js/cblite/src/result';
 import { Scope } from './cblite-js/cblite/src/scope';
 
 export class CblReactNativeEngine implements ICoreEngine {
+  _defaultCollectionName = '_default';
+  _defaultScopeName = '_default';
+
   private static readonly LINKING_ERROR =
     `The package 'cbl-reactnative' doesn't seem to be linked. Make sure: \n\n` +
     Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -72,10 +75,6 @@ export class CblReactNativeEngine implements ICoreEngine {
     EngineLocator.registerEngine(EngineLocator.key, this);
   }
 
-  multiply(a: number, b: number): Promise<number> {
-    return this.CblReactNative.multiply(a, b);
-  }
-
   collection_AddChangeListener(
     args: CollectionChangeListenerArgs,
     lcb: ListenerCallback
@@ -91,7 +90,20 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_CreateCollection(args: CollectionArgs): Promise<Collection> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_CreateCollection(
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (result: Collection) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_CreateIndex(args: CollectionCreateIndexArgs): Promise<void> {
@@ -99,7 +111,20 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_DeleteCollection(args: CollectionArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_DeleteCollection(
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_DeleteDocument(args: CollectionDeleteDocumentArgs): Promise<void> {
@@ -117,11 +142,36 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_GetCollection(args: CollectionArgs): Promise<Collection> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetCollection(
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (result: Collection) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetCollections(args: ScopeArgs): Promise<CollectionsResult> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetCollections(
+        args.name,
+        args.scopeName
+      ).then(
+        (result: CollectionsResult) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetCount(args: CollectionArgs): Promise<{ count: number }> {
@@ -129,7 +179,16 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_GetDefault(args: DatabaseArgs): Promise<Collection> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetDefault(args.name).then(
+        (result: Collection) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetDocument(
@@ -205,8 +264,18 @@ export class CblReactNativeEngine implements ICoreEngine {
     return Promise.resolve(undefined);
   }
 
+  /**
+   * @deprecated This function will be removed in future versions. Use collection_CreateIndex instead.
+   */
   database_CreateIndex(args: DatabaseCreateIndexArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    const colArgs: CollectionCreateIndexArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+      indexName: args.indexName,
+      index: args.index,
+    };
+    return this.collection_CreateIndex(colArgs);
   }
 
   database_Delete(args: DatabaseArgs): Promise<void> {
@@ -220,32 +289,107 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  database_DeleteDocument(args: DatabaseDeleteDocumentArgs): Promise<void> {
-    return Promise.resolve(undefined);
+  database_DeleteWithPath(args: DatabaseExistsArgs): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_DeleteWithPath(
+        args.directory,
+        args.databaseName
+      ).then(
+        () => resolve(),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
+  /**
+   * @deprecated This will be removed in future versions. Use collection_DeleteDocument instead.
+   */
+  database_DeleteDocument(args: DatabaseDeleteDocumentArgs): Promise<void> {
+    const colArgs: CollectionDeleteDocumentArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+      docId: args.docId,
+      concurrencyControl: args.concurrencyControl,
+    };
+    return this.collection_DeleteDocument(colArgs);
+  }
+
+  /**
+   * @deprecated This function will be removed in future versions. Use collection_DeleteIndex instead.
+   */
   database_DeleteIndex(args: DatabaseDeleteIndexArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    const colArgs: CollectionDeleteIndexArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+      indexName: args.indexName,
+    };
+    return this.collection_DeleteIndex(colArgs);
   }
 
   database_Exists(args: DatabaseExistsArgs): Promise<{ exists: boolean }> {
-    return Promise.resolve({ exists: false });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_Exists(
+        args.databaseName,
+        args.directory
+      ).then(
+        (result: boolean) => resolve({ exists: result }),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
+  /**
+   * @deprecated This will be removed in future versions. Use collection_GetCount instead.
+   */
   database_GetCount(args: DatabaseArgs): Promise<{ count: number }> {
-    return Promise.resolve({ count: 0 });
+    const colArgs: CollectionArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+    };
+    return this.collection_GetCount(colArgs);
   }
 
+  /**
+   * @deprecated This will be removed in future versions. Use collection_GetDocument instead.
+   */
   database_GetDocument(args: DatabaseGetDocumentArgs): Promise<DocumentResult> {
-    return Promise.resolve(undefined);
+    const colArgs: CollectionGetDocumentArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+      docId: args.docId,
+    };
+    return this.collection_GetDocument(colArgs);
   }
 
+  /**
+   * @deprecated This function will be removed in future versions. Use collection_GetIndexes instead.
+   */
   database_GetIndexes(args: DatabaseArgs): Promise<{ indexes: string[] }> {
-    return Promise.resolve({ indexes: [] });
+    const colArgs: CollectionArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+    };
+    return this.collection_GetIndexes(colArgs);
   }
 
   database_GetPath(args: DatabaseArgs): Promise<{ path: string }> {
-    return Promise.resolve({ path: '' });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_GetPath(args.name).then(
+        (result: string) => resolve({ path: result }),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   database_Open(args: DatabaseOpenArgs): Promise<void> {
@@ -277,18 +421,52 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
+  /**
+   * @deprecated This will be removed in future versions. Use collection_PurgeDocument instead.
+   */
   database_PurgeDocument(args: DatabasePurgeDocumentArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    const colArgs: CollectionPurgeDocumentArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+      docId: args.docId,
+    };
+    return this.collection_PurgeDocument(colArgs);
   }
 
+  /**
+   * @deprecated This function will be removed in future versions. Use collection_Save instead.
+   */
   database_Save(args: DatabaseSaveArgs): Promise<{ _id: string }> {
-    return Promise.resolve({ _id: '' });
+    const colArgs: CollectionSaveArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+      id: args.id,
+      document: args.document,
+      concurrencyControl: args.concurrencyControl,
+    };
+    return this.collection_Save(colArgs);
   }
 
   database_SetFileLoggingConfig(
     args: DatabaseSetFileLoggingConfigArgs
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_SetFileLoggingConfig(
+        args.name,
+        args.config.directory,
+        args.config.level,
+        args.config.maxSize,
+        args.config.maxRotateCount,
+        args.config.usePlaintext
+      ).then(
+        () => resolve(),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   database_SetLogLevel(args: DatabaseSetLogLevelArgs): Promise<void> {
@@ -313,10 +491,20 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
+  /**
+   * @deprecated This will be removed in future versions. Use collection_GetBlobContent instead.
+   */
   document_GetBlobContent(
     args: DocumentGetBlobContentArgs
   ): Promise<{ data: ArrayBuffer }> {
-    return Promise.resolve({ data: undefined });
+    const colArgs: CollectionDocumentGetBlobContentArgs = {
+      name: args.name,
+      collectionName: this._defaultCollectionName,
+      scopeName: this._defaultScopeName,
+      documentId: args.documentId,
+      key: args.key,
+    };
+    return this.collection_GetBlobContent(colArgs);
   }
 
   file_GetDefaultPath(): Promise<{ path: string }> {
@@ -416,14 +604,41 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   scope_GetDefault(args: DatabaseArgs): Promise<Scope> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.scope_GetDefault(args.name).then(
+        (result: Scope) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   scope_GetScope(args: ScopeArgs): Promise<Scope> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.scope_GetScope(args.name, args.scopeName).then(
+        (result: Scope) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   scope_GetScopes(args: DatabaseArgs): Promise<ScopesResult> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.scope_GetScopes(args.name).then(
+        (result: ScopesResult) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 }

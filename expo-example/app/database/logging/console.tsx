@@ -9,7 +9,8 @@ import { useLogDomainAsValues } from '@/hooks/useLogDomain';
 import HeaderRunActionView from '@/components/HeaderRunActionView';
 import SelectKeyValue from '@/components/SelectKeyValue';
 import { useLogLevelAsValues } from '@/hooks/useLogLevel';
-import setConsoleLog from '@/service/database/setConsoleLog';
+import setConsoleLog from '@/service/log/setConsoleLog';
+import { Divider } from '@gluestack-ui/themed';
 
 export default function LoggingConsoleScreen() {
   const { databases } = useContext(DatabaseContext)!;
@@ -50,7 +51,7 @@ export default function LoggingConsoleScreen() {
         placeholder="Log Domain"
         items={logDomains}
       />
-
+      <Divider style={{ marginTop: 10, marginLeft: 4 }} />
       <SelectKeyValue
         headerTitle="Select a Log Level"
         onSelectChange={setSelectedLogLevel}

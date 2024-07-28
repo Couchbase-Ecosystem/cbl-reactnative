@@ -70,15 +70,26 @@ export function BaseStyles() {
       padding: 10,
       borderBottomWidth: 1,
     },
+    dividerTextInput: {
+      marginTop: 15,
+      marginBottom: 5,
+      marginLeft: 8,
+    },
+    dividerCollectionFormTextInput: {
+      marginTop: 5,
+      marginBottom: 5,
+      marginLeft: 8,
+    },
     textInput: {
       height: 40,
-      paddingStart: 16,
+      paddingStart: 8,
+      fontSize: 16,
     },
     selectTextDescription: {
-      paddingTop: 10,
+      paddingTop: 8,
       paddingLeft: 4,
       paddingBottom: 4,
-      fontSize: 18,
+      fontSize: 16,
     },
     link: {
       padding: 10,

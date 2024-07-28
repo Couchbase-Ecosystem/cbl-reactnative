@@ -1,23 +1,27 @@
-import React, { useContext, useLayoutEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
-import DatabaseNameActionForm from '@/components/DatabaseNameActionForm';
 import ResultListView from '@/components/ResultsListView';
-import close from '@/service/database/close';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
+import DatabaseScopeCollectionActionForm from '@/components/DatabaseScopeCollectionActionForm';
+import get from '@/service/collection/get';
 
-export default function DatabaseCloseScreen() {
+export default function CollectionGetScreen() {
   const { databases } = useContext(DatabaseContext)!;
   const [databaseName, setDatabaseName] = useState<string>('');
+  const [scopeName, setScopeName] = useState<string>('');
+  const [collectionName, setCollectionName] = useState<string>('');
   const [resultMessage, setResultsMessage] = useState<string[]>([]);
   const navigation = useNavigation();
   const styles = useStyleScheme();
-  useNavigationBarTitleResetOption('Close Database', navigation, reset);
+  useNavigationBarTitleResetOption('Get Collection', navigation, reset);
 
   function reset() {
     setDatabaseName('');
+    setScopeName('');
+    setCollectionName('');
     setResultsMessage([]);
   }
 
@@ -29,8 +33,16 @@ export default function DatabaseCloseScreen() {
       ]);
     } else {
       try {
-        const results = await close(databases, databaseName);
-        setResultsMessage((prev) => [...prev, results]);
+        const collection = await get(
+          databases,
+          databaseName,
+          scopeName,
+          collectionName
+        );
+        setResultsMessage((prev) => [
+          ...prev,
+          `Found Collection: <${collection.fullName()}> in Datbase <${databaseName}>`,
+        ]);
       } catch (error) {
         // @ts-ignore
         setResultsMessage((prev) => [...prev, error.message]);
@@ -40,9 +52,13 @@ export default function DatabaseCloseScreen() {
 
   return (
     <View style={styles.container}>
-      <DatabaseNameActionForm
-        setDatabaseName={setDatabaseName}
+      <DatabaseScopeCollectionActionForm
         databaseName={databaseName}
+        setDatabaseName={setDatabaseName}
+        scopeName={scopeName}
+        setScopeName={setScopeName}
+        collectionName={collectionName}
+        setCollectionName={setCollectionName}
         handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />

@@ -2,9 +2,9 @@ import React from 'react';
 import HeaderToolbarView from '@/components/HeaderToolbarView';
 import DatabaseConfigForm from '@/components/DatabaseConfigForm';
 import { DatabaseCopyActionFormProps } from '@/types/databaseCopyActionFormProps.type';
-import { TextInput, useColorScheme } from 'react-native';
-import { useStyleScheme, useThemeColor } from '@/components/Themed';
-import { usePlaceholderTextColor } from '@/hooks/usePlaceholderTextColor';
+import { StyledTextInput } from '@/components/StyledTextInput';
+import { Divider } from '@gluestack-ui/themed';
+import { useStyleScheme } from '@/components/Themed';
 
 export default function DatabaseCopyActionForm({
   newDatabaseName,
@@ -16,10 +16,7 @@ export default function DatabaseCopyActionForm({
   handleLocationPress,
   handleUpdatePressed,
 }: DatabaseCopyActionFormProps) {
-  const scheme = useColorScheme();
   const styles = useStyleScheme();
-  const textColor = useThemeColor({ light: 'black', dark: 'white' }, 'text');
-  const placeholderTextColor = usePlaceholderTextColor(scheme);
   const icons = [
     {
       iconName: 'folder-open',
@@ -38,13 +35,17 @@ export default function DatabaseCopyActionForm({
         iconName="database-edit"
         icons={icons}
       />
-      <TextInput
+      <StyledTextInput
         autoCapitalize="none"
-        style={[styles.textInput, { color: textColor }]}
         placeholder="New Database Name"
-        placeholderTextColor={placeholderTextColor}
         onChangeText={(newText) => setNewDatabaseName(newText)}
         defaultValue={newDatabaseName}
+      />
+      <Divider
+        style={{
+          marginTop: 5,
+          marginLeft: 8,
+        }}
       />
       <DatabaseConfigForm
         fileLocation={fileLocation}

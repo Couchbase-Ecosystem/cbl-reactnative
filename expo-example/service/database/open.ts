@@ -9,7 +9,7 @@ export default async function open(
   encryptionKey: string
 ) {
   if (databaseName in databases) {
-    let database = databases[databaseName];
+    const database = databases[databaseName];
     await database.open();
     return 'Database opened successfully';
   } else {
