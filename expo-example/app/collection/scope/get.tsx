@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
