@@ -19,6 +19,16 @@ export function useDocumentNavigationSections() {
         },
         {
           id: 6,
+          title: 'Set Image Blob in Document',
+          path: '/document/blob/setImage',
+        },
+        {
+          id: 7,
+          title: 'Get Image Blob from Document',
+          path: '/document/blob/getImage',
+        },
+        {
+          id: 8,
           title: 'Listen to Document Changes',
           path: '/document/change',
         },

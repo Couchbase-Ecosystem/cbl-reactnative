@@ -41,7 +41,7 @@ public class DataAdapter {
         var isError = false
         let args = CollectionArgs()
         
-        var scopeArgsResults = self.adaptScopeArgs(name: name, scopeName: scopeName, reject: reject)
+        let scopeArgsResults = self.adaptScopeArgs(name: name, scopeName: scopeName, reject: reject)
         if (scopeArgsResults.0) {
             return (true, args)
         }
@@ -55,6 +55,22 @@ public class DataAdapter {
             isError = true
             reject("DATABASE_ERROR", errorCollectionName, nil)
         }
+        return (isError, args)
+    }
+    
+    public func adaptDocumentArgs(docId:NSString,  concurrencyControlValue: NSNumber?, reject: @escaping RCTPromiseRejectBlock) -> (Bool, DocumentArgs){
+        let isError = false
+        let args = DocumentArgs()
+        let documentArgs = self.adaptNonEmptyString(value: docId, propertyName: "docId", reject: reject)
+        if documentArgs.0 {
+            return (documentArgs.0, args)
+        }
+        if let ccv =  concurrencyControlValue {
+            if let uint8Value = UInt8(exactly: ccv) {
+                args.concurrencyControlValue = ConcurrencyControl(rawValue: uint8Value)
+            }
+        }
+        args.documentId = documentArgs.1
         return (isError, args)
     }
     
