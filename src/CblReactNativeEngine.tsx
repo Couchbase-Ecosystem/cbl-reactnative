@@ -50,6 +50,9 @@ import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Result } from './cblite-js/cblite/src/result';
 import { Scope } from './cblite-js/cblite/src/scope';
 
+import { v4 as uuidv4 } from 'uuid';
+import 'react-native-get-random-values';
+
 export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
   _defaultScopeName = '_default';
@@ -640,5 +643,9 @@ export class CblReactNativeEngine implements ICoreEngine {
         }
       );
     });
+  }
+
+  getUUID(): string {
+    return uuidv4().toString();
   }
 }
