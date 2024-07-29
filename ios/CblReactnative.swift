@@ -109,9 +109,9 @@ class CblReactnative: NSObject {
                     return
                 }
                 if let collections = try DatabaseManager.shared.collections(args.scopeName, databaseName: args.databaseName){
-                    let dict = DataAdapter.shared.adaptCollectionsToNSDictionaryString(collections, databaseName: name)
+                    let collectionsArray = DataAdapter.shared.adaptCollectionsToNSDictionaryString(collections, databaseName: name)
                     let results:NSDictionary = [
-                        "collections": dict ]
+                        "collections": collectionsArray ]
                     DispatchQueue.main.async {
                         resolve(results)
                     }
@@ -624,8 +624,8 @@ class CblReactnative: NSObject {
                     return
                 }
                 if let scopes = try DatabaseManager.shared.scopes(databaseName){
-                    let dict = DataAdapter.shared.adaptScopesToNSDictionary(scopes,  databaseName: name)
-                    let results:NSDictionary = ["scopes": dict]
+                    let scopesArray = DataAdapter.shared.adaptScopesToNSDictionary(scopes,  databaseName: name)
+                    let results:NSDictionary = ["scopes": scopesArray]
                     DispatchQueue.main.async {
                         resolve(results)
                     }

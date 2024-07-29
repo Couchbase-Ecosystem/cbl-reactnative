@@ -39,7 +39,7 @@ public class DataAdapter {
     
     public func adaptCollectionArgs(name:NSString, collectionName: NSString, scopeName: NSString, reject: @escaping RCTPromiseRejectBlock) -> (Bool, CollectionArgs){
         var isError = false
-        var args = CollectionArgs()
+        let args = CollectionArgs()
         
         var scopeArgsResults = self.adaptScopeArgs(name: name, scopeName: scopeName, reject: reject)
         if (scopeArgsResults.0) {
@@ -60,7 +60,7 @@ public class DataAdapter {
     
     public func adaptScopeArgs(name:NSString, scopeName: NSString, reject: @escaping RCTPromiseRejectBlock) -> (Bool, ScopeArgs){
         var isError = false
-        var args = ScopeArgs()
+        let args = ScopeArgs()
         args.databaseName = String(name)
         args.scopeName = String(scopeName)
         // Check the database name
@@ -89,18 +89,16 @@ public class DataAdapter {
         return dict
     }
     
-    public func adaptCollectionsToNSDictionaryString(_ collections: [Collection]?, databaseName: NSString) -> NSDictionary {
-        var data = NSMutableDictionary()
+    public func adaptCollectionsToNSDictionaryString(_ collections: [Collection]?, databaseName: NSString) -> NSArray {
+        let data = NSMutableArray()
         if let cols = collections {
             for collection in cols {
                 let dict = self.adaptCollectionToNSDictionary(collection, databaseName: databaseName)
-                dict.forEach{ key, value in
-                    data[key] = value
-                }
+                data.add(dict)
             }
         }
-        let result = data.copy() as! NSDictionary
-        return  result
+        let result = data.copy() as! NSArray
+        return result
     }
     
     public func adaptScopeToNSDictionary(_ scope: Scope, databaseName: NSString) -> NSDictionary {
@@ -112,18 +110,16 @@ public class DataAdapter {
         
     }
     
-    public func adaptScopesToNSDictionary(_ scopes: [Scope]?, databaseName: NSString) -> NSDictionary {
-        var data = NSMutableDictionary()
-        if let uwScopes = scopes {
-            for scope in uwScopes {
+    public func adaptScopesToNSDictionary(_ scopes: [Scope]?, databaseName: NSString) -> NSArray {
+        let data = NSMutableArray()
+        if let unwrappedScopes = scopes {
+            for scope in unwrappedScopes {
                 let dict = self.adaptScopeToNSDictionary(scope, databaseName: databaseName)
-                dict.forEach{ key, value in
-                    data[key] = value
-                }
+                data.add(dict)
             }
         }
-        let result = data.copy() as! NSDictionary
-        return  result
+        let result = data.copy() as! NSArray
+        return result
     }
     
     public func adaptDatabaseName(name:NSString, reject: @escaping RCTPromiseRejectBlock) -> (Bool,String){
