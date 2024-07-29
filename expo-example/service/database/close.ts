@@ -5,10 +5,10 @@ export default async function close(
   databaseName: string
 ) {
   if (databaseName in databases) {
-    throw new Error('Error: Database already in Context');
-  } else {
-    let database = databases[databaseName];
+    const database = databases[databaseName];
     await database.close();
     return 'Database closed successfully';
+  } else {
+    throw new Error('Error: Database not in Context, open Database first');
   }
 }

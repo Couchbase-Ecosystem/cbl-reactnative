@@ -4,17 +4,24 @@ export function useDatabaseNavigationSections() {
       title: 'Database API',
       icon: 'database',
       data: [
-        { id: 1, title: 'Open Database', path: '/database/open' },
-        { id: 2, title: 'Close Database', path: '/database/close' },
-        { id: 3, title: 'Copy Database', path: '/database/copy' },
-        { id: 4, title: 'Delete Database', path: '/database/delete' },
+        { id: 1, title: 'Open', path: '/database/open' },
+        { id: 2, title: 'Close', path: '/database/close' },
+        { id: 3, title: 'Copy', path: '/database/copy' },
+        { id: 4, title: 'Delete', path: '/database/delete' },
         {
           id: 5,
+          title: 'Delete by Path',
+          path: '/database/deletePath',
+        },
+        { id: 6, title: 'Get Path', path: '/database/path' },
+        { id: 7, title: 'Does Exists', path: '/database/exists' },
+        {
+          id: 8,
           title: 'Change Encryption Key',
           path: '/database/changeEncryption',
         },
         {
-          id: 6,
+          id: 9,
           title: 'Perform Maintenance',
           path: '/database/maintenance',
         },
@@ -24,13 +31,12 @@ export function useDatabaseNavigationSections() {
       title: 'Logging API',
       icon: 'cellphone-text',
       data: [
-        { id: 7, title: 'Console Logging', path: '/database/logging/console' },
-        { id: 8, title: 'File Logging', path: '/database/logging/file' },
         {
-          id: 9,
-          title: 'Custom Logging',
-          path: '/database/logging/custom',
+          id: 10,
+          title: 'Set Console',
+          path: '/database/logging/console',
         },
+        { id: 11, title: 'Set File', path: '/database/logging/file' },
       ],
     },
   ];

@@ -5,10 +5,11 @@ import { useStyleScheme } from '@/components/Themed';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
 import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
-import DatabaseConfigForm from '@/components/DatabaseConfigForm';
+import DatabaseConfigActionForm from '@/components/DatabaseConfigActionForm';
 import ResultListView from '@/components/ResultsListView';
 import open from '@/service/database/open';
 import DatabaseContext from '@/providers/DatabaseContext';
+import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
 
 export default function DatabaseOpenScreen() {
   const { databases, setDatabases } = useContext(DatabaseContext)!;
@@ -18,20 +19,7 @@ export default function DatabaseOpenScreen() {
   const [resultMessage, setResultsMessage] = useState<string[]>([]);
   const navigation = useNavigation();
   const styles = useStyleScheme();
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: 'Database Open',
-      headerBackTitle: 'Back',
-      headerRight: () => (
-        <MaterialCommunityIcons
-          name="refresh"
-          size={24}
-          color="#428cff"
-          onPress={reset}
-        />
-      ),
-    });
-  }, [navigation]);
+  useNavigationBarTitleResetOption('Open Database', navigation, reset);
 
   function reset() {
     setDatabaseName('');
@@ -71,7 +59,7 @@ export default function DatabaseOpenScreen() {
       setFileLocation(path);
     } catch (error) {
       // @ts-ignore
-      setResult(error.message);
+      setResultsMessage((prev) => [...prev, error]);
     }
   };
 
@@ -81,7 +69,7 @@ export default function DatabaseOpenScreen() {
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
       />
-      <DatabaseConfigForm
+      <DatabaseConfigActionForm
         setFileLocation={setFileLocation}
         fileLocation={fileLocation}
         setEncryptionKey={setEncryptionKey}

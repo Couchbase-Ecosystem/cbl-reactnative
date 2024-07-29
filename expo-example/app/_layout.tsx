@@ -1,5 +1,7 @@
 import 'expo-dev-client';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { GluestackUIProvider } from '@gluestack-ui/themed';
+import { config } from '@gluestack-ui/config';
 import {
   DarkTheme,
   DefaultTheme,
@@ -56,11 +58,18 @@ function RootLayoutNav() {
 
   return (
     <DatabaseProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-      </ThemeProvider>
+      <GluestackUIProvider
+        colorMode={colorScheme === 'dark' ? 'dark' : 'light'}
+        config={config}
+      >
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+        </ThemeProvider>
+      </GluestackUIProvider>
     </DatabaseProvider>
   );
 }

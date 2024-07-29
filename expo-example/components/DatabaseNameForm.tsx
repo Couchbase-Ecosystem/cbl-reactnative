@@ -1,9 +1,10 @@
 import DatabaseHeaderView from '@/components/DatabaseHeaderView';
-import { TextInput, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import React from 'react';
 import { useStyleScheme, useThemeColor } from '@/components/Themed';
 import { usePlaceholderTextColor } from '@/hooks/usePlaceholderTextColor';
 import { DatabaseNameFormProps } from '@/types/databaseNameFormProps.type';
+import { StyledTextInput } from '@/components/StyledTextInput';
 
 export default function DatabaseNameForm({
   databaseName,
@@ -17,11 +18,9 @@ export default function DatabaseNameForm({
   return (
     <>
       <DatabaseHeaderView />
-      <TextInput
+      <StyledTextInput
         autoCapitalize="none"
-        style={[styles.textInput, { color: textColor }]}
         placeholder="Database Name"
-        placeholderTextColor={placeholderTextColor}
         onChangeText={(newText) => setDatabaseName(newText)}
         defaultValue={databaseName}
       />

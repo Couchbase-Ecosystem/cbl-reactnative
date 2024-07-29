@@ -70,13 +70,34 @@ export function BaseStyles() {
       padding: 10,
       borderBottomWidth: 1,
     },
+    dividerTextInput: {
+      marginTop: 15,
+      marginBottom: 5,
+      marginLeft: 8,
+    },
+    dividerCollectionFormTextInput: {
+      marginTop: 5,
+      marginBottom: 5,
+      marginLeft: 8,
+    },
     textInput: {
       height: 40,
-      paddingStart: 16,
+      paddingStart: 8,
+      fontSize: 16,
+    },
+    selectTextDescription: {
+      paddingTop: 8,
+      paddingLeft: 4,
+      paddingBottom: 4,
+      fontSize: 16,
     },
     link: {
       padding: 10,
       fontSize: 16,
+    },
+    selectContainer: {
+      paddingTop: 10,
+      paddingBottom: 8,
     },
   });
 }
@@ -99,6 +120,10 @@ export function LightStyles() {
       ...baseStyles.link,
       color: '#000',
     },
+    select: {
+      borderColor: '#333',
+      // Add more style adjustments for dark/light mode
+    },
   });
 }
 
@@ -119,6 +144,10 @@ export function DarkStyles() {
     link: {
       ...baseStyles.link,
       color: '#fff',
+    },
+    select: {
+      borderColor: '#FFF',
+      // Add more style adjustments for dark/light mode
     },
   });
 }

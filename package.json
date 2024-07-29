@@ -32,13 +32,13 @@
     "!**/.*"
   ],
   "scripts": {
-    "example": "./uuid-fix.sh && yarn workspace expo-example",
+    "example": "yarn workspace expo-example",
     "test": "jest",
-    "typecheck": "./uuid-fix.sh && tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build expo-example/android/build expo-example/android/app/build expo-example/ios/build lib",
-    "build": "./uuid-fix.sh && bob build",
-    "release": "./uuid-fix.sh && release-it"
+    "build": "bob build",
+    "release": "release-it"
   },
   "keywords": [
     "react-native",

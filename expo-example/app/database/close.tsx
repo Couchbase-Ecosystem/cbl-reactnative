@@ -2,11 +2,11 @@ import React, { useContext, useLayoutEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
-import DatabaseNameForm from '@/components/DatabaseNameForm';
-import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
+import DatabaseNameActionForm from '@/components/DatabaseNameActionForm';
 import ResultListView from '@/components/ResultsListView';
 import close from '@/service/database/close';
 import DatabaseContext from '@/providers/DatabaseContext';
+import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
 
 export default function DatabaseCloseScreen() {
   const { databases } = useContext(DatabaseContext)!;
@@ -14,20 +14,7 @@ export default function DatabaseCloseScreen() {
   const [resultMessage, setResultsMessage] = useState<string[]>([]);
   const navigation = useNavigation();
   const styles = useStyleScheme();
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: 'Database Open',
-      headerBackTitle: 'Back',
-      headerRight: () => (
-        <MaterialCommunityIcons
-          name="refresh"
-          size={24}
-          color="#428cff"
-          onPress={reset}
-        />
-      ),
-    });
-  }, [navigation]);
+  useNavigationBarTitleResetOption('Close Database', navigation, reset);
 
   function reset() {
     setDatabaseName('');
@@ -35,9 +22,6 @@ export default function DatabaseCloseScreen() {
   }
 
   const update = async () => {
-    // validate that the database name isn't blank
-    // and see if the database is in context, if so throw error
-    // otherwise get a pointer to the database, open it, and add to the context
     if (databaseName === '') {
       setResultsMessage((prev) => [
         ...prev,
@@ -48,16 +32,18 @@ export default function DatabaseCloseScreen() {
         const results = await close(databases, databaseName);
         setResultsMessage((prev) => [...prev, results]);
       } catch (error) {
-        setResultsMessage((prev) => [...prev, '' + error]);
+        // @ts-ignore
+        setResultsMessage((prev) => [...prev, error.message]);
       }
     }
   };
 
   return (
     <View style={styles.container}>
-      <DatabaseNameForm
+      <DatabaseNameActionForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
+        handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />
     </View>

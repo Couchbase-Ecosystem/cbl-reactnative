@@ -9,29 +9,39 @@ export function useCollectionNavigationSections() {
           title: 'Get Default Scope',
           path: '/collection/scope/default',
         },
-        { id: 2, title: 'List Scopes', path: '/collection/scope/list' },
         {
-          id: 3,
+          id: 2,
+          title: 'Get Scope',
+          path: '/collection/scope/get',
+        },
+        { id: 3, title: 'List Scopes', path: '/collection/scope/list' },
+        {
+          id: 4,
           title: 'Get Default Collection',
           path: '/collection/default',
         },
         {
-          id: 4,
+          id: 5,
           title: 'Create Collection',
           path: '/collection/create',
         },
         {
-          id: 5,
-          title: 'Delete Collection',
-          path: '/collection/delete',
-        },
-        {
           id: 6,
-          title: 'List Collection',
-          path: '/collection/list',
+          title: 'Get Collection',
+          path: '/collection/get',
         },
         {
           id: 7,
+          title: 'Delete Collection',
+          path: '/collection/deleteCollection',
+        },
+        {
+          id: 8,
+          title: 'List Collections',
+          path: '/collection/list',
+        },
+        {
+          id: 9,
           title: 'Listen to Changes in Collection',
           path: '/collection/change',
         },
@@ -41,19 +51,19 @@ export function useCollectionNavigationSections() {
       title: 'Index API',
       icon: 'magnify',
       data: [
-        { id: 9, title: 'Create Index', path: '/collection/indexing/create' },
+        { id: 10, title: 'Create Index', path: '/collection/indexing/create' },
         {
-          id: 10,
+          id: 11,
           title: 'Create Full-Text Search Index',
           path: '/collection/indexing/createFts',
         },
         {
-          id: 11,
+          id: 12,
           title: 'Delete Index',
           path: '/collection/indexing/delete',
         },
         {
-          id: 12,
+          id: 13,
           title: 'List Indexes',
           path: '/collection/indexing/list',
         },
