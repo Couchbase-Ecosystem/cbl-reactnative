@@ -39,4 +39,4 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
-apply from: "../../android/build.gradle"apply from: "../../android/build.gradle"apply from: "../../android/build.gradle"
+apply from: "../../android/build.gradle"

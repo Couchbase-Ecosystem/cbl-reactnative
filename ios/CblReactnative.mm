@@ -23,7 +23,7 @@ RCT_EXTERN_METHOD(collection_DeleteDocument:
   fromDatabaseWithName:(NSString *) name
   fromScopeWithName:(NSString *) scopeName
   FromCollectionWithName:(NSString *) collectionName
-  withOptionalConcurrencyControl:(NSNumber *) concurrencyControlValue
+  withOptionalConcurrencyControl:(nonnull NSNumber *) concurrencyControlValue
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
@@ -99,7 +99,7 @@ RCT_EXTERN_METHOD(collection_Save:
   fromDatabaseWithName:(NSString *) name
   fromScopeWithName:(NSString *) scopeName
   fromCollectionWithName:(NSString *) collectionName
-  withOptionalConcurrencyControl:(NSNumber *) concurrencyControlValue
+  withOptionalConcurrencyControl:(nonnull NSNumber *) concurrencyControlValue
   withResolver:(RCTPromiseResolveBlock) resolve
   withRejecter:(RCTPromiseRejectBlock) reject)
 

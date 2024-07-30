@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStyleScheme } from '@/components/Themed';
-import { DatabaseScopeCollectionFormProps } from '@/types/DatabaseScopeCollectionFormProps.type';
+import { DatabaseScopeCollectionFormProps } from '@/types/databaseScopeCollectionFormProps.type';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
 

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import DatabaseNameActionForm from '@/components/DatabaseNameActionForm';
@@ -42,13 +42,13 @@ export default function ScopeDefaultScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <DatabaseNameActionForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
         handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />
-    </View>
+    </SafeAreaView>
   );
 }

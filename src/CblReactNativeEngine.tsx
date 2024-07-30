@@ -50,8 +50,7 @@ import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Result } from './cblite-js/cblite/src/result';
 import { Scope } from './cblite-js/cblite/src/scope';
 
-import { v4 as uuidv4 } from 'uuid';
-import 'react-native-get-random-values';
+import uuid from 'react-native-uuid';
 
 export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
@@ -134,7 +133,7 @@ export class CblReactNativeEngine implements ICoreEngine {
     const concurrencyControl =
       args.concurrencyControl !== null
         ? (args.concurrencyControl as number)
-        : null;
+        : -9999;
 
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_DeleteDocument(
@@ -322,9 +321,9 @@ export class CblReactNativeEngine implements ICoreEngine {
     const concurrencyControl =
       args.concurrencyControl !== null
         ? (args.concurrencyControl as number)
-        : null;
+        : -9999;
     return new Promise((resolve, reject) => {
-      this.CblReactNative.collection_GetBlobContent(
+      this.CblReactNative.collection_Save(
         args.document,
         args.id,
         args.name,
@@ -772,6 +771,6 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   getUUID(): string {
-    return uuidv4().toString();
+    return uuid.v4().toString();
   }
 }

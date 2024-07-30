@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   StyleSheet,
+  SafeAreaView,
 } from 'react-native';
 import { Switch, Divider } from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
@@ -99,97 +100,101 @@ export default function LoggingFileScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container}>
-      <DatabaseNameForm
-        setDatabaseName={setDatabaseName}
-        databaseName={databaseName}
-      />
-      <HeaderToolbarView
-        name="File Information"
-        iconName="file-compare"
-        icons={icons}
-      />
-      <TextInput
-        autoCapitalize="none"
-        style={[
-          styles.textInput,
-          { color: textColor, height: undefined, minHeight: 80 },
-        ]}
-        placeholder="Log Directory Path"
-        placeholderTextColor={placeholderTextColor}
-        onChangeText={(newText) => setPath(newText)}
-        defaultValue={path}
-        multiline={true}
-      />
-      <Divider style={{ marginTop: 10, marginBottom: 10 }} />
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ paddingLeft: 6, fontSize: 16 }}>Use Plain Text</Text>
-        <Switch
-          style={{ paddingRight: 16 }}
-          value={usePlainText}
-          onValueChange={setUsePlainText}
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.container}>
+        <DatabaseNameForm
+          setDatabaseName={setDatabaseName}
+          databaseName={databaseName}
         />
-      </View>
+        <HeaderToolbarView
+          name="File Information"
+          iconName="file-compare"
+          icons={icons}
+        />
+        <TextInput
+          autoCapitalize="none"
+          style={[
+            styles.textInput,
+            { color: textColor, height: undefined, minHeight: 80 },
+          ]}
+          placeholder="Log Directory Path"
+          placeholderTextColor={placeholderTextColor}
+          onChangeText={(newText) => setPath(newText)}
+          defaultValue={path}
+          multiline={true}
+        />
+        <Divider style={{ marginTop: 10, marginBottom: 10 }} />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Text style={{ paddingLeft: 6, fontSize: 16 }}>Use Plain Text</Text>
+          <Switch
+            style={{ paddingRight: 16 }}
+            value={usePlainText}
+            onValueChange={setUsePlainText}
+          />
+        </View>
 
-      <Divider style={{ marginTop: 10 }} />
+        <Divider style={{ marginTop: 10 }} />
 
-      <SelectKeyValue
-        headerTitle="Select a Log Level"
-        onSelectChange={setSelectedLogLevel}
-        placeholder="Log Level"
-        items={logLevels}
-      />
+        <SelectKeyValue
+          headerTitle="Select a Log Level"
+          onSelectChange={setSelectedLogLevel}
+          placeholder="Log Level"
+          items={logLevels}
+        />
 
-      <Divider style={{ marginTop: 12, marginBottom: 12 }} />
+        <Divider style={{ marginTop: 12, marginBottom: 12 }} />
 
-      <Text style={{ paddingLeft: 6, fontSize: 16 }}>Max Rotate Count</Text>
-      <TextInput
-        keyboardType="numeric"
-        style={[
-          styles.textInput,
-          {
-            color: textColor,
-            height: undefined,
-            minHeight: 30,
-            fontSize: 16,
-          },
-        ]}
-        placeholder="0"
-        placeholderTextColor={placeholderTextColor}
-        onChangeText={(maxRotateCount) => setMaxRotateCount(maxRotateCount)}
-        defaultValue={maxRotateCount.toString()}
-      />
+        <Text style={{ paddingLeft: 6, fontSize: 16 }}>Max Rotate Count</Text>
+        <TextInput
+          keyboardType="numeric"
+          style={[
+            styles.textInput,
+            {
+              color: textColor,
+              height: undefined,
+              minHeight: 30,
+              fontSize: 16,
+            },
+          ]}
+          placeholder="0"
+          placeholderTextColor={placeholderTextColor}
+          onChangeText={(maxRotateCount) => setMaxRotateCount(maxRotateCount)}
+          defaultValue={maxRotateCount.toString()}
+        />
 
-      <Divider style={{ marginTop: 12, marginBottom: 12 }} />
+        <Divider style={{ marginTop: 12, marginBottom: 12 }} />
 
-      <Text style={{ paddingLeft: 6, fontSize: 16 }}>Max Size (in bytes)</Text>
-      <TextInput
-        keyboardType="numeric"
-        style={[
-          styles.textInput,
-          {
-            color: textColor,
-            height: undefined,
-            minHeight: 30,
-            fontSize: 16,
-          },
-        ]}
-        placeholder="0"
-        placeholderTextColor={placeholderTextColor}
-        onChangeText={(maxSize) => setMaxSize(maxSize)}
-        defaultValue={maxSize}
-      />
+        <Text style={{ paddingLeft: 6, fontSize: 16 }}>
+          Max Size (in bytes)
+        </Text>
+        <TextInput
+          keyboardType="numeric"
+          style={[
+            styles.textInput,
+            {
+              color: textColor,
+              height: undefined,
+              minHeight: 30,
+              fontSize: 16,
+            },
+          ]}
+          placeholder="0"
+          placeholderTextColor={placeholderTextColor}
+          onChangeText={(maxSize) => setMaxSize(maxSize)}
+          defaultValue={maxSize}
+        />
 
-      <Divider style={{ marginTop: 12, marginBottom: 12 }} />
+        <Divider style={{ marginTop: 12, marginBottom: 12 }} />
 
-      <ResultListView messages={resultMessage} />
-    </ScrollView>
+        <ResultListView messages={resultMessage} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

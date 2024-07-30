@@ -8,27 +8,29 @@ import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleReset
 import DatabaseScopeCollectionForm from '@/components/DatabaseScopeCollectionForm';
 import HeaderView from '@/components/HeaderView';
 import DocumentIdActionForm from '@/components/DocumentIdActionForm';
-import deleteDocument from '@/service/document/deleteDocument';
+//import get from '@/service/document/get';
 
-export default function DeleteDocumentScreen() {
+export default function DocumentGetBlobScreen() {
   //database stuff
   const { databases } = useContext(DatabaseContext)!;
   const [databaseName, setDatabaseName] = useState<string>('');
   const [scopeName, setScopeName] = useState<string>('');
   const [collectionName, setCollectionName] = useState<string>('');
   const [documentId, setDocumentId] = useState<string>('');
+  const [key, setKey] = useState<string>('');
   //results
   const [resultMessage, setResultsMessage] = useState<string[]>([]);
   //drawing stuff
   const navigation = useNavigation();
   const styles = useStyleScheme();
-  useNavigationBarTitleResetOption('Delete Document', navigation, reset);
+  useNavigationBarTitleResetOption('Get Document Text Blob', navigation, reset);
 
   function reset() {
     setDatabaseName('');
     setScopeName('');
     setCollectionName('');
     setDocumentId('');
+    setKey('');
     setResultsMessage([]);
   }
 
@@ -47,14 +49,25 @@ export default function DeleteDocumentScreen() {
           ]);
           return;
         }
-        const resultMessage = await deleteDocument(
+        /*
+        const doc = await get(
           databases,
           databaseName,
           scopeName,
           collectionName,
           documentId
         );
-        setResultsMessage((prev) => [...prev, '' + resultMessage]);
+        if (doc !== undefined && doc !== null) {
+          const json = JSON.stringify(doc.toDictionary());
+          const resultsMessage = `Document <${documentId}> found with JSON: ${json}`;
+          setResultsMessage((prev) => [...prev, resultsMessage]);
+        } else {
+          setResultsMessage((prev) => [
+            ...prev,
+            'Error: Document could not be retrieved',
+          ]);
+        }
+         */
       } catch (error) {
         // @ts-ignore
         setResultsMessage((prev) => [...prev, error.message]);

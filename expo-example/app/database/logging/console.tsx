@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import ResultListView from '@/components/ResultsListView';
@@ -39,7 +39,7 @@ export default function LoggingConsoleScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <HeaderRunActionView
         name="Console Log"
         iconName="file-compare"
@@ -59,6 +59,6 @@ export default function LoggingConsoleScreen() {
         items={logLevels}
       />
       <ResultListView messages={resultMessage} />
-    </View>
+    </SafeAreaView>
   );
 }

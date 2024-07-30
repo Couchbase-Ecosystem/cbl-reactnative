@@ -91,13 +91,13 @@ class CblReactnative: NSObject {
         }
     }
     
-    @objc(collection_DeleteDocument:fromDatabaseWithName:fromScopeWithName:fromCollectionWithName:withOptionalConcurrencyControl:withResolver:withRejecter:)
+    @objc(collection_DeleteDocument:fromDatabaseWithName:fromScopeWithName:FromCollectionWithName:withOptionalConcurrencyControl:withResolver:withRejecter:)
     func collection_DeleteDocument(
         docId: NSString,
         name: NSString,
         scopeName: NSString,
         collectionName: NSString,
-        concurrencyControlValue: NSNumber?,
+        concurrencyControlValue: NSNumber,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock
     ) -> Void {
@@ -449,7 +449,7 @@ class CblReactnative: NSObject {
         name: NSString,
         scopeName: NSString,
         collectionName: NSString,
-        concurrencyControlValue: NSNumber?,
+        concurrencyControlValue: NSNumber,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock
     ) -> Void {

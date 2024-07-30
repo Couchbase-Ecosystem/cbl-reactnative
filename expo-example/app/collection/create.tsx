@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import ResultListView from '@/components/ResultsListView';
@@ -51,7 +51,7 @@ export default function CollectionCreateScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <DatabaseScopeCollectionActionForm
         databaseName={databaseName}
         setDatabaseName={setDatabaseName}
@@ -62,6 +62,6 @@ export default function CollectionCreateScreen() {
         handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />
-    </View>
+    </SafeAreaView>
   );
 }

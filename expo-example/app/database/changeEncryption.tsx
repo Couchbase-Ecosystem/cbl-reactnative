@@ -1,5 +1,5 @@
-import React, { useContext, useLayoutEffect, useState } from 'react';
-import { TextInput, useColorScheme, View } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { SafeAreaView, TextInput, useColorScheme } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme, useThemeColor } from '@/components/Themed';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
@@ -50,7 +50,7 @@ export default function ChangeEncryptionScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <DatabaseNameForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
@@ -69,6 +69,6 @@ export default function ChangeEncryptionScreen() {
         defaultValue={encryptionKey}
       />
       <ResultListView messages={resultMessage} />
-    </View>
+    </SafeAreaView>
   );
 }
