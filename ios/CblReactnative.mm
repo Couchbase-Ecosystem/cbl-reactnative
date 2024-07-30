@@ -193,7 +193,6 @@ RCT_EXTERN_METHOD(scope_GetDefault:
 RCT_EXTERN_METHOD(scope_GetScope:
   (NSString *)scopeName
   fromDatabaseWithName:(NSString *)name
-  withScopeName:(NSString *)scopeName
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
