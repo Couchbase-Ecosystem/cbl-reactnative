@@ -7,7 +7,7 @@ export default async function setBlob(
   key: string,
   blobText: string
 ): Promise<Document> {
-  const bufferText = Buffer.from(blobText, 'base64');
+  const bufferText = Buffer.from(blobText, 'utf-8');
   const blob = new Blob('text/plain', bufferText);
   const doc = await collection.document(documentId);
   const mutableDoc = MutableDocument.fromDocument(doc);

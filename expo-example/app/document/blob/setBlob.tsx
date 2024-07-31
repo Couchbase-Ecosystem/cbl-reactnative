@@ -22,9 +22,7 @@ export default function DocumentSetBlobScreen() {
     documentId: string
   ): Promise<string[]> {
     try {
-      const encoder = new TextEncoder();
-      const blob = new Blob('text/plain', encoder.encode(blobText));
-      const mutDoc = await setBlob(collection, documentId, key, blob);
+      const mutDoc = await setBlob(collection, documentId, key, blobText);
       if (
         mutDoc !== undefined &&
         mutDoc !== null &&
