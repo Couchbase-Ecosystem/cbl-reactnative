@@ -662,7 +662,20 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   query_Execute(args: QueryExecuteArgs): Promise<Result> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.query_Execute(
+        args.query,
+        args.parameters,
+        args.name
+      ).then(
+        (result: Result) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   query_Explain(args: QueryExecuteArgs): Promise<Result> {
