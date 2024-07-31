@@ -24,13 +24,13 @@ export function useDocumentNavigationSections() {
         },
         {
           id: 7,
-          title: 'Set Blob in Document',
-          path: '/document/blob/setImage',
+          title: 'Set Blob',
+          path: '/document/blob/setBlob',
         },
         {
           id: 8,
-          title: 'Get Blob from Document',
-          path: '/document/blob/getImage',
+          title: 'Get Blob',
+          path: '/document/blob/getBlob',
         },
         {
           id: 9,

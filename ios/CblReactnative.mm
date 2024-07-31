@@ -182,6 +182,11 @@ RCT_EXTERN_METHOD(database_SetLogLevel:(NSString *)domain
     withResolver:(RCTPromiseResolveBlock)resolve
     withRejecter:(RCTPromiseRejectBlock)reject)
 
+// MARK: - SQL++ Query Functions
+
+RCT_EXTERN_METHOD(database_GetPath:(NSString *)name
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
 
 // MARK: - Scope Functions
 
