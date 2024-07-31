@@ -1,8 +1,8 @@
 export function useCollectionNavigationSections() {
   const sections = [
     {
-      title: 'Collection API',
-      icon: 'bookshelf',
+      title: 'Scopes API',
+      icon: 'file-cabinet',
       data: [
         {
           id: 1,
@@ -15,6 +15,12 @@ export function useCollectionNavigationSections() {
           path: '/collection/scope/get',
         },
         { id: 3, title: 'List Scopes', path: '/collection/scope/list' },
+      ],
+    },
+    {
+      title: 'Collections API',
+      icon: 'bookshelf',
+      data: [
         {
           id: 4,
           title: 'Get Default Collection',

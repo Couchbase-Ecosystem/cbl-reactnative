@@ -3,6 +3,7 @@ import { useStyleScheme } from '@/components/Themed';
 import { DatabaseScopeCollectionFormProps } from '@/types/databaseScopeCollectionFormProps.type';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
+import HeaderView from '@/components/HeaderView';
 
 export default function DatabaseScopeCollectionForm({
   databaseName,
@@ -23,7 +24,7 @@ export default function DatabaseScopeCollectionForm({
         onChangeText={(newText) => setDatabaseName(newText)}
         defaultValue={databaseName}
       />
-      <Divider style={styles.dividerCollectionFormTextInput} />
+      <HeaderView name="Collection Information" iconName="bookshelf" />
       <StyledTextInput
         autoCapitalize="none"
         placeholder="Scope Name"

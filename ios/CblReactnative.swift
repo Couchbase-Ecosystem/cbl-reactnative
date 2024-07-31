@@ -502,8 +502,9 @@ class CblReactnative: NSObject {
                 if isError || isDocumentError {
                     return
                 }
+                let strExpiration = String(expiration)
                 let formatter =  ISO8601DateFormatter()
-                if let date = formatter.date(from: expiration as String) {
+                if let date = formatter.date(from: strExpiration) {
                     try CollectionManager.shared.setDocumentExpiration(
                         documentId,
                         expiration: date,

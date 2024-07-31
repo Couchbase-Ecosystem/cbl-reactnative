@@ -1,110 +1,45 @@
-import React, { useContext, useState } from 'react';
-import { SafeAreaView, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme } from '@/components/Themed';
-import ResultListView from '@/components/ResultsListView';
-import DatabaseContext from '@/providers/DatabaseContext';
-import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
-import DatabaseScopeCollectionForm from '@/components/DatabaseScopeCollectionForm';
-import HeaderView from '@/components/HeaderView';
-import DocumentIdActionForm from '@/components/DocumentIdActionForm';
+import React, { useState } from 'react';
+import setExpirationDate from '@/service/document/setExpirationDate';
+import { Collection } from 'cbl-reactnative';
+import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer';
 import { StyledTextInput } from '@/components/StyledTextInput';
-//import get from '@/service/document/get';
+import { Divider } from '@gluestack-ui/themed';
 
 export default function GetDocumentExpirationScreen() {
-  //database stuff
-  const { databases } = useContext(DatabaseContext)!;
-  const [databaseName, setDatabaseName] = useState<string>('');
-  const [scopeName, setScopeName] = useState<string>('');
-  const [collectionName, setCollectionName] = useState<string>('');
-  const [documentId, setDocumentId] = useState<string>('');
   const [expiration, setExpiration] = useState<string>('');
-  //results
-  const [resultMessage, setResultsMessage] = useState<string[]>([]);
-  //drawing stuff
-  const navigation = useNavigation();
-  const styles = useStyleScheme();
-  useNavigationBarTitleResetOption(
-    'Set Document Expiration',
-    navigation,
-    reset
-  );
 
   function reset() {
-    setDatabaseName('');
-    setScopeName('');
-    setCollectionName('');
-    setDocumentId('');
     setExpiration('');
-    setResultsMessage([]);
   }
 
-  const update = async () => {
-    if (databaseName === '') {
-      setResultsMessage((prev) => [
-        ...prev,
-        'Error: Database name is required',
-      ]);
-    } else {
-      try {
-        if (documentId === '') {
-          setResultsMessage((prev) => [
-            ...prev,
-            'Error: Document ID is required',
-          ]);
-          return;
-        }
-        /*
-        const doc = await get(
-          databases,
-          databaseName,
-          scopeName,
-          collectionName,
-          documentId
-        );
-        if (doc !== undefined && doc !== null) {
-          const json = JSON.stringify(doc.toDictionary());
-          const resultsMessage = `Document <${documentId}> found with JSON: ${json}`;
-          setResultsMessage((prev) => [...prev, resultsMessage]);
-        } else {
-          setResultsMessage((prev) => [
-            ...prev,
-            'Error: Document could not be retrieved',
-          ]);
-        }
-         */
-      } catch (error) {
-        // @ts-ignore
-        setResultsMessage((prev) => [...prev, error.message]);
-      }
+  async function update(
+    collection: Collection,
+    documentId: string
+  ): Promise<string[]> {
+    try {
+      await setExpirationDate(collection, documentId, expiration);
+      return [
+        `Successfully set expiration to <${expiration}> for Document with ID: <${documentId}> in Collection <${collection.fullName()}> in Database <${collection.database.getName()}>`,
+      ];
+    } catch (error) {
+      // @ts-ignore
+      return [error.message];
     }
-  };
+  }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.container}>
-        <HeaderView name="Collection" iconName="bookshelf" />
-        <DatabaseScopeCollectionForm
-          databaseName={databaseName}
-          setDatabaseName={setDatabaseName}
-          scopeName={scopeName}
-          setScopeName={setScopeName}
-          collectionName={collectionName}
-          setCollectionName={setCollectionName}
-        />
-        <DocumentIdActionForm
-          documentId={documentId}
-          setDocumentId={setDocumentId}
-          handleUpdatePressed={update}
-        />
-        <StyledTextInput
-          autoCapitalize="none"
-          placeholder="Expiration in ISO8601 Format"
-          onChangeText={(newText) => setExpiration(newText)}
-          defaultValue={expiration}
-        />
-        <ResultListView messages={resultMessage} />
-      </ScrollView>
-    </SafeAreaView>
+    <CBLDocumentIdCollectionActionContainer
+      screenTitle="Set Document Expiration"
+      handleUpdatePressed={update}
+      handleResetPressed={reset}
+    >
+      <Divider style={{ marginTop: 5, marginBottom: 10, marginLeft: 8 }} />
+      <StyledTextInput
+        autoCapitalize="none"
+        placeholder="Expiration in ISO8601 Format"
+        onChangeText={(newText) => setExpiration(newText)}
+        defaultValue={expiration}
+      />
+    </CBLDocumentIdCollectionActionContainer>
   );
 }

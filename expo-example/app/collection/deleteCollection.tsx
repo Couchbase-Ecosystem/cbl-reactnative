@@ -1,67 +1,28 @@
-import React, { useContext, useState } from 'react';
-import { SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme } from '@/components/Themed';
-import ResultListView from '@/components/ResultsListView';
-import DatabaseContext from '@/providers/DatabaseContext';
-import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
-import DatabaseScopeCollectionActionForm from '@/components/DatabaseScopeCollectionActionForm';
+import React from 'react';
+import { Collection } from 'cbl-reactnative';
 import deleteCollection from '@/service/collection/delete';
+import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
 
 export default function CollectionDeleteScreen() {
-  const { databases } = useContext(DatabaseContext)!;
-  const [databaseName, setDatabaseName] = useState<string>('');
-  const [scopeName, setScopeName] = useState<string>('');
-  const [collectionName, setCollectionName] = useState<string>('');
-  const [resultMessage, setResultsMessage] = useState<string[]>([]);
-  const navigation = useNavigation();
-  const styles = useStyleScheme();
-  useNavigationBarTitleResetOption('Delete Collection', navigation, reset);
+  function reset() {}
 
-  function reset() {
-    setDatabaseName('');
-    setScopeName('');
-    setCollectionName('');
-    setResultsMessage([]);
+  async function update(collection: Collection) {
+    try {
+      await deleteCollection(collection);
+      return [
+        `Deleted Collection: <${collection.fullName()} in Database: <${collection.database.getName()}>`,
+      ];
+    } catch (error) {
+      // @ts-ignore
+      return [error.message];
+    }
   }
 
-  const update = async () => {
-    if (databaseName === '') {
-      setResultsMessage((prev) => [
-        ...prev,
-        'Error: Database name is required',
-      ]);
-    } else {
-      try {
-        await deleteCollection(
-          databases,
-          databaseName,
-          scopeName,
-          collectionName
-        );
-        setResultsMessage((prev) => [
-          ...prev,
-          `Deleted Collection: <${scopeName}.${collectionName}> in Database: <${databaseName}>`,
-        ]);
-      } catch (error) {
-        // @ts-ignore
-        setResultsMessage((prev) => [...prev, error.message]);
-      }
-    }
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
-      <DatabaseScopeCollectionActionForm
-        databaseName={databaseName}
-        setDatabaseName={setDatabaseName}
-        scopeName={scopeName}
-        setScopeName={setScopeName}
-        collectionName={collectionName}
-        setCollectionName={setCollectionName}
-        handleUpdatePressed={update}
-      />
-      <ResultListView messages={resultMessage} />
-    </SafeAreaView>
+    <CBLCollectionActionContainer
+      handleUpdatePressed={update}
+      handleResetPressed={reset}
+      screenTitle="Delete Collection"
+    />
   );
 }

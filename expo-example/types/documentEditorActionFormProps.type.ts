@@ -3,5 +3,4 @@ export type DocumentEditorActionFormProps = {
   setDocumentId: (arg: string) => void;
   document: string;
   setDocument: (arg: string) => void;
-  handleUpdatePressed: () => void;
 };

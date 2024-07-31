@@ -1,5 +1,4 @@
 import HeaderView from '@/components/HeaderView';
-import HeaderRunActionView from '@/components/HeaderRunActionView';
 import React, { useState } from 'react';
 import { DocumentEditorActionFormProps } from '@/types/documentEditorActionFormProps.type';
 import { StyledTextInput } from '@/components/StyledTextInput';
@@ -14,7 +13,6 @@ export default function DocumentEditorActionForm({
   setDocumentId,
   document,
   setDocument,
-  handleUpdatePressed,
 }: DocumentEditorActionFormProps) {
   const [selectKey, setSelectKey] = useState(0);
 
@@ -35,23 +33,20 @@ export default function DocumentEditorActionForm({
 
   return (
     <>
-      <HeaderRunActionView
-        name="Document Information"
-        iconName="file-document-edit-outline"
-        handleUpdatePressed={handleUpdatePressed}
-      />
+      <HeaderView name="Document Information" iconName="file-document" />
       <StyledTextInput
+        style={{ marginBottom: 5 }}
         autoCapitalize="none"
-        placeholder="Document ID"
-        onChangeText={(newText) => setDocumentId(newText)}
+        placeholder="Document Id"
+        onChangeText={(documentIdText) => setDocumentId(documentIdText)}
         defaultValue={documentId}
       />
-      <Divider style={styles.dividerCollectionFormTextInput} />
+      <Divider style={{ marginTop: 5, marginBottom: 10, marginLeft: 8 }} />
       <StyledTextInput
         autoCapitalize="none"
         style={[
           styles.textInput,
-          { height: undefined, minHeight: 120, marginTop: 5 },
+          { height: undefined, minHeight: 120, marginTop: 5, marginBottom: 15 },
         ]}
         placeholder="JSON Document"
         onChangeText={(newText) => setDocument(newText)}
