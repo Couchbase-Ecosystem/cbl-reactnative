@@ -1,15 +1,21 @@
-import { Collection, Database } from 'cbl-reactnative';
+import { Collection } from 'cbl-reactnative';
 
 export default async function deleteCollection(
-  databases: Record<string, Database>,
-  databaseName: string,
-  scopeName: string,
-  collectionName: string
+  collection: Collection
 ): Promise<void> {
-  if (databaseName in databases) {
-    const database = databases[databaseName];
+  const database = collection.database;
+  const collectionName = collection.name;
+  const scopeName = collection.scope?.name;
+  if (
+    database !== null &&
+    collectionName.length > 0 &&
+    scopeName !== null &&
+    scopeName.length > 0
+  ) {
     await database.deleteCollection(collectionName, scopeName);
   } else {
-    throw new Error('Error: Database not in Context, open Database first');
+    throw new Error(
+      `Error: couldn't retrieve database, collection name or scope name from provided collection`
+    );
   }
 }

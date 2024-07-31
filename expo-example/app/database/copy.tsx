@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { SafeAreaView, useColorScheme } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme, useThemeColor } from '@/components/Themed';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
@@ -68,7 +68,7 @@ export default function DatabaseCopyScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <DatabaseNameForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
@@ -84,6 +84,6 @@ export default function DatabaseCopyScreen() {
         handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />
-    </View>
+    </SafeAreaView>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import ResultListView from '@/components/ResultsListView';
@@ -59,7 +59,7 @@ export default function PerformMaintenanceScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <DatabaseNameForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
@@ -77,6 +77,6 @@ export default function PerformMaintenanceScreen() {
       />
 
       <ResultListView messages={resultMessage} />
-    </View>
+    </SafeAreaView>
   );
 }

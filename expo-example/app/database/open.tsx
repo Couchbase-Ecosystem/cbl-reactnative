@@ -1,9 +1,8 @@
-import React, { useContext, useLayoutEffect, useState } from 'react';
-import { View } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
-import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 import DatabaseConfigActionForm from '@/components/DatabaseConfigActionForm';
 import ResultListView from '@/components/ResultsListView';
@@ -64,7 +63,7 @@ export default function DatabaseOpenScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <DatabaseNameForm
         setDatabaseName={setDatabaseName}
         databaseName={databaseName}
@@ -78,6 +77,6 @@ export default function DatabaseOpenScreen() {
         handleUpdatePressed={update}
       />
       <ResultListView messages={resultMessage} />
-    </View>
+    </SafeAreaView>
   );
 }

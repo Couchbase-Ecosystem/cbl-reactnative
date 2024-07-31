@@ -50,8 +50,7 @@ import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Result } from './cblite-js/cblite/src/result';
 import { Scope } from './cblite-js/cblite/src/scope';
 
-import { v4 as uuidv4 } from 'uuid';
-import 'react-native-get-random-values';
+import uuid from 'react-native-uuid';
 
 export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
@@ -95,9 +94,9 @@ export class CblReactNativeEngine implements ICoreEngine {
   collection_CreateCollection(args: CollectionArgs): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_CreateCollection(
+        args.collectionName,
         args.name,
-        args.scopeName,
-        args.collectionName
+        args.scopeName
       ).then(
         (result: Collection) => {
           resolve(result);
@@ -116,9 +115,9 @@ export class CblReactNativeEngine implements ICoreEngine {
   collection_DeleteCollection(args: CollectionArgs): Promise<void> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_DeleteCollection(
+        args.collectionName,
         args.name,
-        args.scopeName,
-        args.collectionName
+        args.scopeName
       ).then(
         () => {
           resolve();
@@ -131,7 +130,27 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_DeleteDocument(args: CollectionDeleteDocumentArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    const concurrencyControl =
+      args.concurrencyControl !== null
+        ? (args.concurrencyControl as number)
+        : -9999;
+
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_DeleteDocument(
+        args.docId,
+        args.name,
+        args.scopeName,
+        args.collectionName,
+        concurrencyControl
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_DeleteIndex(args: CollectionDeleteIndexArgs): Promise<void> {
@@ -141,15 +160,30 @@ export class CblReactNativeEngine implements ICoreEngine {
   collection_GetBlobContent(
     args: CollectionDocumentGetBlobContentArgs
   ): Promise<{ data: ArrayBuffer }> {
-    return Promise.resolve({ data: undefined });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetBlobContent(
+        args.key,
+        args.documentId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (resultsData: { data: Iterable<number> }) => {
+          resolve({ data: new Uint8Array(resultsData.data).buffer });
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetCollection(args: CollectionArgs): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetCollection(
+        args.collectionName,
         args.name,
-        args.scopeName,
-        args.collectionName
+        args.scopeName
       ).then(
         (result: Collection) => {
           resolve(result);
@@ -178,7 +212,20 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_GetCount(args: CollectionArgs): Promise<{ count: number }> {
-    return Promise.resolve({ count: 0 });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetCount(
+        args.collectionName,
+        args.name,
+        args.scopeName
+      ).then(
+        (result: { count: number }) => {
+          resolve(result);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetDefault(args: DatabaseArgs): Promise<Collection> {
@@ -197,13 +244,41 @@ export class CblReactNativeEngine implements ICoreEngine {
   collection_GetDocument(
     args: CollectionGetDocumentArgs
   ): Promise<DocumentResult> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetDocument(
+        args.docId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (dr: DocumentResult) => {
+          resolve(dr);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetDocumentExpiration(
     args: CollectionGetDocumentArgs
   ): Promise<DocumentExpirationResult> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetDocumentExpiration(
+        args.docId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (der: DocumentExpirationResult) => {
+          resolve(der);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetIndexes(args: CollectionArgs): Promise<{ indexes: string[] }> {
@@ -211,7 +286,21 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_PurgeDocument(args: CollectionPurgeDocumentArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_PurgeDocument(
+        args.docId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_RemoveChangeListener(
@@ -229,20 +318,55 @@ export class CblReactNativeEngine implements ICoreEngine {
   collection_Save(
     args: CollectionSaveArgs
   ): Promise<CollectionDocumentSaveResult> {
-    return Promise.resolve(undefined);
+    const concurrencyControl =
+      args.concurrencyControl !== null
+        ? (args.concurrencyControl as number)
+        : -9999;
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_Save(
+        args.document,
+        args.id,
+        args.name,
+        args.scopeName,
+        args.collectionName,
+        concurrencyControl
+      ).then(
+        (resultsData: CollectionDocumentSaveResult) => {
+          resolve(resultsData);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_SetDocumentExpiration(
     args: CollectionDocumentExpirationArgs
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_SetDocumentExpiration(
+        args.expiration.toISOString(),
+        args.docId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   database_ChangeEncryptionKey(args: DatabaseEncryptionKeyArgs): Promise<void> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.database_ChangeEncryptionKey(
-        args.name,
-        args.newKey
+        args.newKey,
+        args.name
       ).then(
         () => resolve(),
         (error: any) => {
@@ -264,7 +388,19 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   database_Copy(args: DatabaseCopyArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.database_Copy(
+        args.path,
+        args.name,
+        args.config.directory,
+        args.config.encryptionKey
+      ).then(
+        () => resolve(),
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   /**
@@ -483,17 +619,6 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  logging_SetLogLevel(args: DatabaseSetLogLevelArgs): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.CblReactNative.database_SetLogLevel(args.domain, args.logLevel).then(
-        () => resolve(),
-        (error: any) => {
-          reject(error);
-        }
-      );
-    });
-  }
-
   /**
    * @deprecated This will be removed in future versions. Use collection_GetBlobContent instead.
    */
@@ -621,7 +746,7 @@ export class CblReactNativeEngine implements ICoreEngine {
 
   scope_GetScope(args: ScopeArgs): Promise<Scope> {
     return new Promise((resolve, reject) => {
-      this.CblReactNative.scope_GetScope(args.name, args.scopeName).then(
+      this.CblReactNative.scope_GetScope(args.scopeName, args.name).then(
         (result: Scope) => {
           resolve(result);
         },
@@ -646,6 +771,6 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   getUUID(): string {
-    return uuidv4().toString();
+    return uuid.v4().toString();
   }
 }

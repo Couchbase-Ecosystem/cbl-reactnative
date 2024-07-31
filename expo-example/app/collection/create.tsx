@@ -1,67 +1,54 @@
-import React, { useContext, useState } from 'react';
-import { View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme } from '@/components/Themed';
-import ResultListView from '@/components/ResultsListView';
-import DatabaseContext from '@/providers/DatabaseContext';
-import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
-import DatabaseScopeCollectionActionForm from '@/components/DatabaseScopeCollectionActionForm';
+import React, { useState } from 'react';
+import { StyledTextInput } from '@/components/StyledTextInput';
 import create from '@/service/collection/create';
+import { Database } from 'cbl-reactnative';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import { Divider } from '@gluestack-ui/themed';
+import HeaderView from '@/components/HeaderView';
 
 export default function CollectionCreateScreen() {
-  const { databases } = useContext(DatabaseContext)!;
-  const [databaseName, setDatabaseName] = useState<string>('');
   const [scopeName, setScopeName] = useState<string>('');
   const [collectionName, setCollectionName] = useState<string>('');
-  const [resultMessage, setResultsMessage] = useState<string[]>([]);
-  const navigation = useNavigation();
-  const styles = useStyleScheme();
-  useNavigationBarTitleResetOption('Create Collection', navigation, reset);
 
   function reset() {
-    setDatabaseName('');
     setScopeName('');
     setCollectionName('');
-    setResultsMessage([]);
   }
 
-  const update = async () => {
-    if (databaseName === '') {
-      setResultsMessage((prev) => [
-        ...prev,
-        'Error: Database name is required',
-      ]);
-    } else {
-      try {
-        const collection = await create(
-          databases,
-          databaseName,
-          scopeName,
-          collectionName
-        );
-        setResultsMessage((prev) => [
-          ...prev,
-          `Created collection: <${collection.scope.name}.${collection.name}> in database: <${databaseName}>`,
-        ]);
-      } catch (error) {
-        // @ts-ignore
-        setResultsMessage((prev) => [...prev, error.message]);
-      }
+  async function update(database: Database): Promise<string[]> {
+    try {
+      const collection = await create(database, scopeName, collectionName);
+      return [
+        `Created collection: <${collection.scope.name}.${collection.name}> in database: <${database.getName()}>`,
+      ];
+    } catch (error) {
+      // @ts-ignore
+      return [error.message];
     }
-  };
+  }
 
   return (
-    <View style={styles.container}>
-      <DatabaseScopeCollectionActionForm
-        databaseName={databaseName}
-        setDatabaseName={setDatabaseName}
-        scopeName={scopeName}
-        setScopeName={setScopeName}
-        collectionName={collectionName}
-        setCollectionName={setCollectionName}
-        handleUpdatePressed={update}
+    <CBLDatabaseActionContainer
+      screenTitle={'Create Collection'}
+      handleUpdatePressed={update}
+      handleResetPressed={reset}
+    >
+      <HeaderView name="Collection Information" iconName="bookshelf" />
+      <StyledTextInput
+        style={{ marginBottom: 5 }}
+        autoCapitalize="none"
+        placeholder="Scope Name"
+        onChangeText={(scopeText) => setScopeName(scopeText)}
+        defaultValue={scopeName}
       />
-      <ResultListView messages={resultMessage} />
-    </View>
+      <Divider style={{ marginTop: 2, marginBottom: 2 }} />
+      <StyledTextInput
+        style={{ marginBottom: 5 }}
+        autoCapitalize="none"
+        placeholder="Collection Name"
+        onChangeText={(collectionText) => setCollectionName(collectionText)}
+        defaultValue={collectionName}
+      />
+    </CBLDatabaseActionContainer>
   );
 }

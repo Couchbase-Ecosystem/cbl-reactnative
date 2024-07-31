@@ -1,7 +1,7 @@
 import React from 'react';
 import { DatabaseScopeCollectionActionFormProps } from '@/types/databaseScopeCollectionActionFormProps.type';
 import DatabaseScopeCollectionForm from '@/components/DatabaseScopeCollectionForm';
-import CollectionToolbarHeaderView from '@/components/CollectionToolbarHeaderView';
+import DatabaseToolbarHeaderView from '@/components/DatabaseToolbarHeaderView';
 
 export default function DatabaseScopeCollectionActionForm({
   databaseName,
@@ -20,7 +20,7 @@ export default function DatabaseScopeCollectionActionForm({
   ];
   return (
     <>
-      <CollectionToolbarHeaderView icons={icons} />
+      <DatabaseToolbarHeaderView icons={icons} />
       <DatabaseScopeCollectionForm
         databaseName={databaseName}
         setDatabaseName={setDatabaseName}
