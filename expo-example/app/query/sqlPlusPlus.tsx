@@ -1,52 +1,57 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Database } from 'cbl-reactnative';
 import execute from '@/service/query/execute';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
-import { useStyleScheme } from '@/components/Themed';
-import { StyledTextInput } from '@/components/StyledTextInput';
-import HeaderView from '@/components/HeaderView';
+import explain from '@/service/query/explain';
+import CBLDatabaseQueryActionContainer from '@/components/CBLDatabaseQueryActionContainer';
 
 export default function QuerySqlPlusPlusScreen() {
-  const [query, setQuery] = useState<string>('');
-  const styles = useStyleScheme();
+  function reset() {}
 
-  function reset() {
-    setQuery('');
-  }
-
-  async function update(database: Database): Promise<string[]> {
+  async function runQuery(
+    database: Database,
+    sqlQuery: string,
+    isExplain: boolean
+  ): Promise<string[]> {
     try {
       const date = new Date().toISOString();
-      const results = await execute(query, null, database);
       const dict: string[] = [];
-      for (const result of results) {
-        dict.push(`${date}::<<${JSON.stringify(result)}>>`);
+      if (isExplain) {
+        const result = await explain(sqlQuery, null, database);
+        dict.push(`${date}::<<${result}>>`);
+        return dict;
+      } else {
+        const results = await execute(sqlQuery, null, database);
+        for (const result of results) {
+          dict.push(`${date}::<<${JSON.stringify(result)}>>`);
+        }
+        return dict;
       }
-      return dict;
     } catch (error) {
       // @ts-ignore
       return [error.message];
     }
   }
 
+  function updatePressed(
+    database: Database,
+    sqlQuery: string
+  ): Promise<string[]> {
+    return runQuery(database, sqlQuery, false);
+  }
+
+  function explainPressed(
+    database: Database,
+    sqlQuery: string
+  ): Promise<string[]> {
+    return runQuery(database, sqlQuery, true);
+  }
+
   return (
-    <CBLDatabaseActionContainer
+    <CBLDatabaseQueryActionContainer
       screenTitle={'Query Workbench'}
-      handleUpdatePressed={update}
+      handleUpdatePressed={updatePressed}
+      handleExplainedPressed={explainPressed}
       handleResetPressed={reset}
-    >
-      <HeaderView name="Query Editor" iconName="database-search" />
-      <StyledTextInput
-        autoCapitalize="none"
-        style={[
-          styles.textInput,
-          { height: undefined, minHeight: 120, marginTop: 5, marginBottom: 15 },
-        ]}
-        placeholder="SQL++ Query"
-        onChangeText={(newText) => setQuery(newText)}
-        defaultValue={query}
-        multiline={true}
-      />
-    </CBLDatabaseActionContainer>
+    />
   );
 }

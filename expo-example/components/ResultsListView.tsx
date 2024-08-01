@@ -6,15 +6,17 @@ import { ResultsListViewProps } from '@/types/resultsListViewProps.type';
 import { Divider } from '@gluestack-ui/themed';
 
 export default function ResultListView({ messages }: ResultsListViewProps) {
+  const date = new Date().toISOString();
   return (
     <>
       <HeaderView name={'Results'} iconName={'information'} />
-      <ScrollView style={{ marginLeft: 16 }}>
+      <ScrollView style={{ marginLeft: 16, marginTop: 2 }}>
         {messages?.map((message, index) => (
           <>
-            <Text key={`message-${index}`}>{message}</Text>
+            <Text key={`message-${index}-${date}`}>{message}</Text>
             <Divider
-              style={{ marginTop: 5, marginBottom: 10, marginLeft: 2 }}
+              key={`divider-${index}-${date}`}
+              style={{ marginTop: 16, marginBottom: 16, marginLeft: 2 }}
             />
           </>
         ))}

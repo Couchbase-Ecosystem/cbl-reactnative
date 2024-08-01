@@ -955,6 +955,52 @@ class CblReactnative: NSObject {
         }
     }
     
+    @objc(query_Explain:
+            withParameters:
+            fromDatabaseWithName:
+            withResolver:
+            withRejecter:)
+    func query_Explain(
+        query: NSString,
+        parameters: NSDictionary,
+        name: NSString,
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock)
+    {
+        backgroundQueue.async {
+            do {
+                let (isError, databaseName) = DataAdapter.shared.adaptDatabaseName(name: name, reject: reject)
+                let (isQueryArgsError, queryArgs) =
+                DataAdapter.shared.adaptQueryParameter(query: query, parameters: parameters, reject: reject)
+                if isError || isQueryArgsError {
+                    return
+                }
+                var results = ""
+                if let queryParams = queryArgs.parameters {
+                    results = try DatabaseManager.shared.queryExplain(queryArgs.query, parameters: queryParams, databaseName: databaseName)
+                    
+                } else {
+                    results = try DatabaseManager.shared.queryExplain(queryArgs.query, databaseName: databaseName)
+                }
+                let dict:NSDictionary = [
+                    "data": results]
+                DispatchQueue.main.async {
+                    resolve(dict)
+                }
+                
+            } catch let error as NSError {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            }
+            
+        }
+    }
+    
     
     // MARK: - Scope Functions
     
