@@ -4,7 +4,7 @@ import execute from '@/service/query/execute';
 import explain from '@/service/query/explain';
 import CBLDatabaseQueryActionContainer from '@/components/CBLDatabaseQueryActionContainer';
 
-export default function QuerySqlPlusPlusScreen() {
+export default function QueryParametersScreen() {
   function reset() {}
 
   async function runQuery(
@@ -35,7 +35,6 @@ export default function QuerySqlPlusPlusScreen() {
       return [error.message];
     }
   }
-
   function updatePressed(
     database: Database,
     sqlQuery: string
@@ -52,7 +51,7 @@ export default function QuerySqlPlusPlusScreen() {
 
   return (
     <CBLDatabaseQueryActionContainer
-      screenTitle={'Query Workbench'}
+      screenTitle={'Query Parameters'}
       handleUpdatePressed={updatePressed}
       handleExplainedPressed={explainPressed}
       handleResetPressed={reset}

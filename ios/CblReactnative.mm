@@ -184,7 +184,17 @@ RCT_EXTERN_METHOD(database_SetLogLevel:(NSString *)domain
 
 // MARK: - SQL++ Query Functions
 
-RCT_EXTERN_METHOD(database_GetPath:(NSString *)name
+RCT_EXTERN_METHOD(query_Execute:
+  (NSString *)query
+  withParameters: (NSDictionary *)parameters
+  fromDatabaseWithName:(NSString *)name
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(query_Explain:
+  (NSString *)query
+  withParameters: (NSDictionary *)parameters
+  fromDatabaseWithName:(NSString *)name
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 

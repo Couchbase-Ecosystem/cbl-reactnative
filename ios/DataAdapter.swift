@@ -153,6 +153,26 @@ public class DataAdapter {
         return (isError, databaseName)
     }
     
+    public func adaptQueryParameter(
+        query: NSString,
+        parameters: NSDictionary,
+        reject: @escaping RCTPromiseRejectBlock) ->
+    (Bool, QueryArgs)
+    {
+        var isError = false
+        let args = QueryArgs()
+        let strQuery = String(query)
+        // Check the query
+        let errorMessageQuery = self.checkStringValue(value: strQuery, propertyName: "Query")
+        if !errorMessageQuery.isEmpty {
+            isError = true
+            reject("QUERY_ERROR", errorMessageQuery, nil)
+        }
+        args.query = strQuery
+        args.parameters = (parameters as? [String: Any])
+        return (isError, args)
+    }
+    
     public func adaptNonEmptyString(value: NSString, propertyName: String, reject: @escaping RCTPromiseRejectBlock) -> (Bool, String) {
         var isError = false
         let strValue = String(value)
@@ -167,7 +187,7 @@ public class DataAdapter {
     
     public func checkStringValue(value: String, propertyName: String) -> String {
         if (value.isEmpty){
-            return "Error:  \(propertyName) must be provided"
+            return "Error: \(propertyName) must be provided"
         } else {
             return ""
         }
