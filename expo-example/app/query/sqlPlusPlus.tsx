@@ -17,12 +17,16 @@ export default function QuerySqlPlusPlusScreen() {
       const dict: string[] = [];
       if (isExplain) {
         const result = await explain(sqlQuery, null, database);
-        dict.push(`${date}::<<${result}>>`);
+        dict.push(`${date}::Explain: <<${result}>>`);
         return dict;
       } else {
         const results = await execute(sqlQuery, null, database);
-        for (const result of results) {
-          dict.push(`${date}::<<${JSON.stringify(result)}>>`);
+        if (results.length === 0) {
+          dict.push(`${date}::INFO: No results`);
+        } else {
+          for (const result of results) {
+            dict.push(`${date}::Data: <<${JSON.stringify(result)}>>`);
+          }
         }
         return dict;
       }
