@@ -11,6 +11,15 @@ RCT_EXTERN_METHOD(collection_CreateCollection:
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(collection_CreateIndex:
+  (NSString *) indexName
+  withIndexData:(NSDictionary *)index
+  fromCollectionWithName:(NSString *) collectionName
+  fromScopeWithName:(NSString *) scopeName
+  fromDatabaseWithName:(NSString *) name
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(collection_DeleteCollection:
   (NSString *) collectionName
   fromDatabaseWithName:(NSString *) name
@@ -24,6 +33,14 @@ RCT_EXTERN_METHOD(collection_DeleteDocument:
   fromScopeWithName:(NSString *) scopeName
   FromCollectionWithName:(NSString *) collectionName
   withOptionalConcurrencyControl:(nonnull NSNumber *) concurrencyControlValue
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(collection_DeleteIndex:
+  (NSString *) indexName
+  fromCollectionWithName:(NSString *) collectionName
+  fromScopeWithName:(NSString *) scopeName
+  fromDatabaseWithName:(NSString *) name
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
@@ -82,6 +99,13 @@ RCT_EXTERN_METHOD(collection_GetDocumentExpiration:
   fromDatabaseWithName:(NSString *) name
   fromScopeWithName:(NSString *) scopeName
   fromCollectionWithName:(NSString *) collectionName
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(collection_GetIndexes:
+  (NSString *) collectionName
+  fromScopeWithName:(NSString *) scopeName
+  fromDatabaseWithName:(NSString *) name
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 

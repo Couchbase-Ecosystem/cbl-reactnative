@@ -173,6 +173,23 @@ public class DataAdapter {
         return (isError, args)
     }
     
+    public func adaptIndexToArrayAny(dict: NSDictionary, reject: @escaping RCTPromiseRejectBlock) -> (Bool, IndexArgs){
+        let indexArgs = IndexArgs()
+        var isError = false
+        var result = [[Any]]()
+        indexArgs.indexType = String(dict["type"] as! NSString)
+        for (key, value) in dict["items"] as! NSDictionary {
+            result.append([key, value])
+        }
+        indexArgs.indexes = result
+        if (indexArgs.indexes.isEmpty || indexArgs.indexType.isEmpty){
+            isError = true
+            reject("INDEX_ERROR", "Can't parse Index information", nil)
+            
+        }
+        return (isError, indexArgs)
+    }
+    
     public func adaptNonEmptyString(value: NSString, propertyName: String, reject: @escaping RCTPromiseRejectBlock) -> (Bool, String) {
         var isError = false
         let strValue = String(value)
