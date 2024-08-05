@@ -169,8 +169,8 @@ class CblReactnative: NSObject {
         }
     }
     
-    @objc(collection_DeleteCollection:fromCollectionWithName:fromScopeWithName:fromDatabaseWithName:withResolver:withRejecter:)
-    func collection_DeleteCollection(
+    @objc(collection_DeleteIndex:fromCollectionWithName:fromScopeWithName:fromDatabaseWithName:withResolver:withRejecter:)
+    func collection_DeleteIndex(
         indexName: NSString,
         collectionName: NSString,
         scopeName: NSString,

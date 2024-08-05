@@ -169,7 +169,21 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_DeleteIndex(args: CollectionDeleteIndexArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_DeleteIndex(
+        args.indexName,
+        args.collectionName,
+        args.scopeName,
+        args.name
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetBlobContent(
