@@ -4,6 +4,7 @@ import CBLCollectionActionContainer from '@/components/CBLCollectionActionContai
 import HeaderView from '@/components/HeaderView';
 import { Divider } from '@gluestack-ui/themed';
 import { StyledTextInput } from '@/components/StyledTextInput';
+import create from '@/service/indexes/create';
 
 export default function IndexCreateScreen() {
   const [indexName, setIndexName] = useState<string>('');
@@ -15,9 +16,13 @@ export default function IndexCreateScreen() {
   }
 
   async function update(collection: Collection): Promise<string[]> {
-    return [
-      `Collection: <${collection.fullName()}> was retrieved from database <${collection.database.getName()}>`,
-    ];
+    try {
+      await create(collection, indexName, indexProperties);
+      return [`Index ${indexName} was created successfully`];
+    } catch (error) {
+      // @ts-ignore
+      return [error.message];
+    }
   }
 
   return (
