@@ -153,6 +153,18 @@ public class DataAdapter {
         return (isError, databaseName)
     }
     
+    public func adaptReplicatorId(replicatorId:NSString, reject: @escaping RCTPromiseRejectBlock) -> (Bool,String){
+        var isError = false
+        let repId = String(replicatorId)
+        // Check the replicatorId
+        let errorMessageReplicatorId = self.checkStringValue(value: repId, propertyName: "ReplicatorId")
+        if !errorMessageReplicatorId.isEmpty {
+            isError = true
+            reject("DATABASE_ERROR", errorMessageReplicatorId, nil)
+        }
+        return (isError, repId)
+    }
+    
     public func adaptQueryParameter(
         query: NSString,
         parameters: NSDictionary,
