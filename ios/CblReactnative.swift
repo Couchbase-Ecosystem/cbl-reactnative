@@ -1149,14 +1149,14 @@ class CblReactnative: NSObject {
                         reject("REPLICATOR_ERROR", "couldn't deserialize replicator config, is config proper JSON string formatted?", nil)
                     }
                 } catch let error as NSError {
-                DispatchQueue.main.async {
-                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
                 }
-            } catch {
-                DispatchQueue.main.async {
-                    reject("DATABASE_ERROR", error.localizedDescription, nil)
-                }
-            }
                 
             }
         }
@@ -1166,7 +1166,26 @@ class CblReactnative: NSObject {
         replicatorId: NSString,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock) -> Void {
-            
+            backgroundQueue.async {
+                do {
+                    let (isError, repId) = DataAdapter.shared.adaptReplicatorId(replicatorId: replicatorId, reject: reject)
+                    if isError {
+                        return
+                    }
+                    try ReplicatorManager.shared.start(repId)
+                    DispatchQueue.main.async {
+                        resolve(nil)
+                    }
+                } catch let error as NSError {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                }
+            }
         }
     
     @objc(replicator_Stop:withResolver:withRejecter:)
@@ -1174,7 +1193,26 @@ class CblReactnative: NSObject {
         replicatorId: NSString,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock) -> Void {
-            
+            backgroundQueue.async {
+                do {
+                    let (isError, repId) = DataAdapter.shared.adaptReplicatorId(replicatorId: replicatorId, reject: reject)
+                    if isError {
+                        return
+                    }
+                    try ReplicatorManager.shared.stop(repId)
+                    DispatchQueue.main.async {
+                        resolve(nil)
+                    }
+                } catch let error as NSError {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                }
+            }
         }
     
     @objc(replicator_ResetCheckpoint:withResolver:withRejecter:)
@@ -1182,7 +1220,26 @@ class CblReactnative: NSObject {
         replicatorId: NSString,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock) -> Void {
-            
+            backgroundQueue.async {
+                do {
+                    let (isError, repId) = DataAdapter.shared.adaptReplicatorId(replicatorId: replicatorId, reject: reject)
+                    if isError {
+                        return
+                    }
+                    try ReplicatorManager.shared.resetCheckpoint(repId)
+                    DispatchQueue.main.async {
+                        resolve(nil)
+                    }
+                } catch let error as NSError {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                }
+            }
         }
     
     @objc(replicator_GetStatus:withResolver:withRejecter:)
@@ -1190,7 +1247,27 @@ class CblReactnative: NSObject {
         replicatorId: NSString,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock) -> Void {
-            
+            backgroundQueue.async {
+                do {
+                    let (isError, repId) = DataAdapter.shared.adaptReplicatorId(replicatorId: replicatorId, reject: reject)
+                    if isError {
+                        return
+                    }
+                    let status = try ReplicatorManager.shared.getStatus(repId)
+                    let dict:NSDictionary = NSDictionary(dictionary: status)
+                    DispatchQueue.main.async {
+                        resolve(dict)
+                    }
+                } catch let error as NSError {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                }
+            }
         }
     
     @objc(replicator_GetPendingDocumentIds:fromDatabaseWithName:fromScopeWithName:fromCollectionWithName:withResolver:withRejecter:)
@@ -1201,7 +1278,34 @@ class CblReactnative: NSObject {
         collectionName: NSString,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock) -> Void {
-            
+            backgroundQueue.async {
+                do {
+                    let (isError, repId) = DataAdapter.shared.adaptReplicatorId(replicatorId: replicatorId, reject: reject)
+                    let (isCollectionArgsError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+                    if isError || isCollectionArgsError {
+                        return
+                    }
+                    if let collection = try CollectionManager.shared.getCollection(args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName) {
+                        let pendingIds = try ReplicatorManager.shared.getPendingDocumentIds(repId, collection: collection)
+                        let dict:NSDictionary = NSDictionary(dictionary: pendingIds)
+                        DispatchQueue.main.async {
+                            resolve(dict)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            reject("REPLICATOR_ERROR", "Couldn't resolve collection passed in", nil)
+                        }
+                    }
+                } catch let error as NSError {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                }
+            }
         }
     
     @objc(replicator_IsDocumentPending:fromReplicatorWithId:fromDatabaseWithName:fromScopeWithName:fromCollectionWithName:withResolver:withRejecter:)
@@ -1213,6 +1317,35 @@ class CblReactnative: NSObject {
         collectionName: NSString,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock) -> Void {
+            backgroundQueue.async {
+                do {
+                    let (isError, repId) = DataAdapter.shared.adaptReplicatorId(replicatorId: replicatorId, reject: reject)
+                    let (isCollectionArgsError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+                    let (isDocumentError, docId) = DataAdapter.shared.adaptNonEmptyString(value: documentId, propertyName: "docId", reject: reject)
+                    if isError || isDocumentError || isCollectionArgsError {
+                        return
+                    }
+                    if let collection = try CollectionManager.shared.getCollection(args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName) {
+                        let isPending = try ReplicatorManager.shared.isDocumentPending(repId, documentId: docId, collection: collection)
+                        let dict:NSDictionary = NSDictionary(dictionary: isPending)
+                        DispatchQueue.main.async {
+                            resolve(dict)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            reject("REPLICATOR_ERROR", "Couldn't resolve collection passed in", nil)
+                        }
+                    }
+                } catch let error as NSError {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                }
+            }
             
         }
     
@@ -1221,7 +1354,26 @@ class CblReactnative: NSObject {
         replicatorId: NSString,
         resolve: @escaping RCTPromiseResolveBlock,
         reject: @escaping RCTPromiseRejectBlock) -> Void {
-            
+            backgroundQueue.async {
+                do {
+                    let (isError, repId) = DataAdapter.shared.adaptReplicatorId(replicatorId: replicatorId, reject: reject)
+                    if isError {
+                        return
+                    }
+                    try ReplicatorManager.shared.cleanUp(repId)
+                    DispatchQueue.main.async {
+                        resolve(nil)
+                    }
+                } catch let error as NSError {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        reject("REPLICATOR_ERROR", error.localizedDescription, nil)
+                    }
+                }
+            }
         }
     
     
