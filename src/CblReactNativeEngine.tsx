@@ -109,7 +109,22 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_CreateIndex(args: CollectionCreateIndexArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_CreateIndex(
+        args.indexName,
+        args.index,
+        args.collectionName,
+        args.scopeName,
+        args.name
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_DeleteCollection(args: CollectionArgs): Promise<void> {
@@ -154,7 +169,21 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_DeleteIndex(args: CollectionDeleteIndexArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_DeleteIndex(
+        args.indexName,
+        args.collectionName,
+        args.scopeName,
+        args.name
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_GetBlobContent(
@@ -282,7 +311,20 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   collection_GetIndexes(args: CollectionArgs): Promise<{ indexes: string[] }> {
-    return Promise.resolve({ indexes: [] });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.collection_GetIndexes(
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (items: { indexes: string[] }) => {
+          resolve(items);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_PurgeDocument(args: CollectionPurgeDocumentArgs): Promise<void> {

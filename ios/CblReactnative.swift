@@ -60,6 +60,48 @@ class CblReactnative: NSObject {
         }
     }
     
+    @objc(collection_CreateIndex:withIndexData:fromCollectionWithName:fromScopeWithName:fromDatabaseWithName:withResolver:withRejecter:)
+    func collection_CreateIndex(
+        indexName: NSString,
+        index: NSDictionary,
+        collectionName: NSString,
+        scopeName: NSString,
+        name: NSString,
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
+    ) -> Void {
+        backgroundQueue.async {
+            do {
+                let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+                let (isIndexNameError, idxName) = DataAdapter.shared.adaptNonEmptyString(value: indexName, propertyName: "indexName", reject:reject)
+                
+                let (isIndexDataError, indexData) = DataAdapter.shared.adaptIndexToArrayAny(dict: index, reject: reject)
+                if isError || isIndexNameError || isIndexDataError {
+                    return
+                }
+                
+                try CollectionManager.shared.createIndex(
+                    idxName,
+                    indexType: indexData.indexType,
+                    items: indexData.indexes,
+                    collectionName: args.collectionName,
+                    scopeName: args.scopeName,
+                    databaseName: args.databaseName)
+                DispatchQueue.main.async {
+                    resolve(nil)
+                }
+            } catch let error as NSError {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            }
+        }
+    }
+    
     @objc(collection_DeleteCollection:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
     func collection_DeleteCollection(
         collectionName: NSString,
@@ -114,6 +156,44 @@ class CblReactnative: NSObject {
                     "concurrencyControlResult": result]
                 DispatchQueue.main.async {
                     resolve(dict)
+                }
+            } catch let error as NSError {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            }
+        }
+    }
+    
+    @objc(collection_DeleteIndex:fromCollectionWithName:fromScopeWithName:fromDatabaseWithName:withResolver:withRejecter:)
+    func collection_DeleteIndex(
+        indexName: NSString,
+        collectionName: NSString,
+        scopeName: NSString,
+        name: NSString,
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
+    ) -> Void {
+        backgroundQueue.async {
+            do {
+                let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+                let (isIndexNameError, idxName) = DataAdapter.shared.adaptNonEmptyString(value: indexName, propertyName: "indexName", reject:reject)
+                
+                if isError || isIndexNameError {
+                    return
+                }
+                
+                try CollectionManager.shared.deleteIndex(
+                    idxName,
+                    collectionName: args.collectionName,
+                    scopeName: args.scopeName,
+                    databaseName: args.databaseName)
+                DispatchQueue.main.async {
+                    resolve(nil)
                 }
             } catch let error as NSError {
                 DispatchQueue.main.async {
@@ -279,6 +359,7 @@ class CblReactnative: NSObject {
         }
     }
     
+    
     @objc(collection_GetDefault:withResolver:withRejecter:)
     func collection_GetDefault(
         name: NSString,
@@ -395,6 +476,43 @@ class CblReactnative: NSObject {
                     resolve(nil)
                 }
                 return
+            } catch let error as NSError {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    reject("DATABASE_ERROR", error.localizedDescription, nil)
+                }
+            }
+        }
+    }
+    
+    @objc(collection_GetIndexes:fromScopeWithName:fromDatabaseWithName:withResolver:withRejecter:)
+    func collection_DeleteCollection(
+        collectionName: NSString,
+        scopeName: NSString,
+        name: NSString,
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock
+    ) -> Void {
+        backgroundQueue.async {
+            do {
+                let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+                
+                if isError {
+                    return
+                }
+                
+                let indexes = try CollectionManager.shared.indexes(
+                    args.collectionName,
+                    scopeName: args.scopeName,
+                    databaseName: args.databaseName)
+                let dict:NSDictionary = [
+                    "indexes": indexes]
+                DispatchQueue.main.async {
+                    resolve(dict)
+                }
             } catch let error as NSError {
                 DispatchQueue.main.async {
                     reject("DATABASE_ERROR", error.localizedDescription, nil)
