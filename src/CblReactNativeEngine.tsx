@@ -39,6 +39,7 @@ import {
   ReplicationChangeListenerArgs,
   ReplicatorArgs,
   ReplicatorCollectionArgs,
+  ReplicatorCreateArgs,
   ReplicatorDocumentPendingArgs,
   ScopeArgs,
   ScopesResult,
@@ -758,27 +759,83 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   replicator_Cleanup(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Cleanup(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
-  replicator_Create(args: any): Promise<ReplicatorArgs> {
-    return Promise.resolve(undefined);
+  replicator_Create(args: ReplicatorCreateArgs): Promise<ReplicatorArgs> {
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Create(args.config).then(
+        (results: ReplicatorArgs) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_GetPendingDocumentIds(
     args: ReplicatorCollectionArgs
   ): Promise<{ pendingDocumentIds: string[] }> {
-    return Promise.resolve({ pendingDocumentIds: [] });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_GetPendingDocumentIds(
+        args.replicatorId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (results: { pendingDocumentIds: string[] }) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_GetStatus(args: ReplicatorArgs): Promise<ReplicatorStatus> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_GetStatus(args.replicatorId).then(
+        (results: ReplicatorStatus) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_IsDocumentPending(
     args: ReplicatorDocumentPendingArgs
   ): Promise<{ isPending: boolean }> {
-    return Promise.resolve({ isPending: false });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_IsDocumentPending(
+        args.documentId,
+        args.replicatorId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (results: { isPending: boolean }) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_RemoveChangeListener(
@@ -788,15 +845,42 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   replicator_ResetCheckpoint(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_ResetCheckpoint(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_Start(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Start(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_Stop(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Stop(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   scope_GetDefault(args: DatabaseArgs): Promise<Scope> {
