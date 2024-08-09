@@ -1,5 +1,5 @@
 export function useDatabaseNavigationSections() {
-  const sections = [
+  return [
     {
       title: 'Database API',
       icon: 'database',
@@ -40,5 +40,4 @@ export function useDatabaseNavigationSections() {
       ],
     },
   ];
-  return sections;
 }

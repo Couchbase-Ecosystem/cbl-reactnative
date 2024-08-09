@@ -1,13 +1,13 @@
 export function useReplicationNavigationSections() {
-  const sections = [
+  return [
     {
       title: 'Replicator API',
       icon: 'database-sync',
       data: [
         {
           id: 1,
-          title: 'Create Replicator Config',
-          path: '/replication/config',
+          title: 'Replicator Configs',
+          path: '/replication/configListing',
         },
         {
           id: 2,
@@ -42,5 +42,4 @@ export function useReplicationNavigationSections() {
       ],
     },
   ];
-  return sections;
 }

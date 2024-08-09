@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import defaultCollection from '@/service/collection/default';
 import { Database } from 'cbl-reactnative';
 import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
 
-export default function CollectionGetDefaultScreen() {
+export default function ReplicationConfigListingScreen() {
   function reset() {}
 
   async function update(database: Database) {
@@ -20,7 +20,7 @@ export default function CollectionGetDefaultScreen() {
 
   return (
     <CBLDatabaseActionContainer
-      screenTitle={'Get Default Collection'}
+      screenTitle={'Replication Configs'}
       handleUpdatePressed={update}
       handleResetPressed={reset}
     />
