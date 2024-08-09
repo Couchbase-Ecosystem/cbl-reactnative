@@ -1,5 +1,5 @@
 export function useQueryNavigationSections() {
-  const sections = [
+  return [
     {
       title: 'Query API',
       icon: 'magnify',
@@ -14,5 +14,4 @@ export function useQueryNavigationSections() {
       ],
     },
   ];
-  return sections;
 }

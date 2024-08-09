@@ -1,5 +1,5 @@
 export function useDocumentNavigationSections() {
-  const sections = [
+  return [
     {
       title: 'Document API',
       icon: 'file-document-multiple-outline',
@@ -40,5 +40,4 @@ export function useDocumentNavigationSections() {
       ],
     },
   ];
-  return sections;
 }
