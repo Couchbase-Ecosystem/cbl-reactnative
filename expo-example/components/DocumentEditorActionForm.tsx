@@ -7,6 +7,7 @@ import { Divider } from '@gluestack-ui/themed';
 import { useWidgetSelectOptions } from '@/hooks/useWidgetSelectOptions';
 import SelectKeyValue from '@/components/SelectKeyValue';
 import { useGeneratedWidgets } from '@/hooks/useGeneratedWidgets';
+import { StyleSheet, View } from 'react-native';
 
 export default function DocumentEditorActionForm({
   documentId,
@@ -21,7 +22,7 @@ export default function DocumentEditorActionForm({
   const widgets = useGeneratedWidgets();
 
   function updateSelectedWidget(value: string) {
-    const key = parseInt(value);
+    const key = parseInt(value, 10);
     setSelectKey(key);
     const selectedWidget = widgets[key];
     if (selectedWidget) {
@@ -34,32 +35,46 @@ export default function DocumentEditorActionForm({
   return (
     <>
       <HeaderView name="Document Information" iconName="file-document" />
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Document Id"
-        onChangeText={(documentIdText) => setDocumentId(documentIdText)}
-        defaultValue={documentId}
-      />
-      <Divider style={{ marginTop: 5, marginBottom: 10, marginLeft: 8 }} />
-      <StyledTextInput
-        autoCapitalize="none"
-        style={[
-          styles.textInput,
-          { height: undefined, minHeight: 120, marginTop: 5, marginBottom: 15 },
-        ]}
-        placeholder="JSON Document"
-        onChangeText={(newText) => setDocument(newText)}
-        defaultValue={document}
-        multiline={true}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          style={styles.input}
+          autoCapitalize="none"
+          placeholder="Document Id"
+          onChangeText={(documentIdText) => setDocumentId(documentIdText)}
+          defaultValue={documentId}
+        />
+        <Divider style={localStyles.divider} />
+        <StyledTextInput
+          autoCapitalize="none"
+          style={[styles.textInput, localStyles.inputJsonDocument]}
+          placeholder="JSON Document"
+          onChangeText={(newText) => setDocument(newText)}
+          defaultValue={document}
+          multiline={true}
+        />
+      </View>
       <HeaderView name="Generated Data" iconName="file-document-multiple" />
-      <SelectKeyValue
-        headerTitle="Select Document"
-        onSelectChange={updateSelectedWidget}
-        placeholder="Select a Generated Widget"
-        items={widgetOptions}
-      />
+      <View style={styles.component}>
+        <SelectKeyValue
+          headerTitle="Select Document"
+          onSelectChange={updateSelectedWidget}
+          placeholder="Select a Generated Widget"
+          items={widgetOptions}
+        />
+      </View>
     </>
   );
 }
+
+const localStyles = StyleSheet.create({
+  divider: {
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  inputJsonDocument: {
+    height: undefined,
+    minHeight: 120,
+    marginTop: 2,
+    marginBottom: 15,
+  },
+});

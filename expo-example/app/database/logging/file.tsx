@@ -55,8 +55,8 @@ export default function LoggingFileScreen() {
     let maxSizeInt = 0;
 
     if (numericRegex.test(maxRotateCount) && numericRegex.test(maxSize)) {
-      maxRotateCountInt = parseInt(maxRotateCount);
-      maxSizeInt = parseInt(maxSize);
+      maxRotateCountInt = parseInt(maxRotateCount, 10);
+      maxSizeInt = parseInt(maxSize, 10);
     } else {
       setResultsMessage((prev) => [
         ...prev,
@@ -80,8 +80,8 @@ export default function LoggingFileScreen() {
 
   const handleLocationPress = async () => {
     try {
-      const path = await getFileDefaultPath();
-      setPath(path);
+      const defaultPath = await getFileDefaultPath();
+      setPath(defaultPath);
     } catch (error) {
       // @ts-ignore
       setResultsMessage((prev) => [...prev, error]);
@@ -111,87 +111,81 @@ export default function LoggingFileScreen() {
           iconName="file-compare"
           icons={icons}
         />
-        <TextInput
-          autoCapitalize="none"
-          style={[
-            styles.textInput,
-            { color: textColor, height: undefined, minHeight: 80 },
-          ]}
-          placeholder="Log Directory Path"
-          placeholderTextColor={placeholderTextColor}
-          onChangeText={(newText) => setPath(newText)}
-          defaultValue={path}
-          multiline={true}
-        />
-        <Divider style={{ marginTop: 10, marginBottom: 10 }} />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ paddingLeft: 6, fontSize: 16 }}>Use Plain Text</Text>
-          <Switch
-            style={{ paddingRight: 16 }}
-            value={usePlainText}
-            onValueChange={setUsePlainText}
+        <View style={styles.component}>
+          <TextInput
+            autoCapitalize="none"
+            style={[
+              styles.textInput,
+              fileStyles.logDirectory,
+              { color: textColor },
+            ]}
+            placeholder="Log Directory Path"
+            placeholderTextColor={placeholderTextColor}
+            onChangeText={(newText) => setPath(newText)}
+            defaultValue={path}
+            multiline={true}
           />
+          <Divider style={fileStyles.divider} />
+          <View style={styles.viewStackRightComponent}>
+            <Text style={styles.text}>Use Plain Text</Text>
+            <Switch
+              style={fileStyles.switch}
+              value={usePlainText}
+              onValueChange={setUsePlainText}
+            />
+          </View>
+
+          <Divider style={{ marginTop: 10 }} />
+
+          <SelectKeyValue
+            headerTitle="Select a Log Level"
+            onSelectChange={setSelectedLogLevel}
+            placeholder="Log Level"
+            items={logLevels}
+          />
+
+          <Divider style={fileStyles.divider} />
+
+          <Text style={styles.text}>Max Rotate Count</Text>
+          <TextInput
+            keyboardType="numeric"
+            style={[
+              styles.textInput,
+              styles.text,
+              fileStyles.maxSizeInput,
+              {
+                color: textColor,
+              },
+            ]}
+            placeholder="0"
+            placeholderTextColor={placeholderTextColor}
+            onChangeText={(changeMaxRotateCount) =>
+              setMaxRotateCount(changeMaxRotateCount)
+            }
+            defaultValue={maxRotateCount.toString()}
+          />
+
+          <Divider style={fileStyles.divider} />
+
+          <Text style={styles.text}>Max Size (in bytes)</Text>
+          <TextInput
+            keyboardType="numeric"
+            style={[
+              styles.textInput,
+              styles.text,
+              fileStyles.maxSizeInput,
+              {
+                color: textColor,
+              },
+            ]}
+            placeholder="0"
+            placeholderTextColor={placeholderTextColor}
+            onChangeText={(changedMaxSize) => setMaxSize(changedMaxSize)}
+            defaultValue={maxSize}
+          />
+
+          <Divider style={fileStyles.divider} />
         </View>
-
-        <Divider style={{ marginTop: 10 }} />
-
-        <SelectKeyValue
-          headerTitle="Select a Log Level"
-          onSelectChange={setSelectedLogLevel}
-          placeholder="Log Level"
-          items={logLevels}
-        />
-
-        <Divider style={{ marginTop: 12, marginBottom: 12 }} />
-
-        <Text style={{ paddingLeft: 6, fontSize: 16 }}>Max Rotate Count</Text>
-        <TextInput
-          keyboardType="numeric"
-          style={[
-            styles.textInput,
-            {
-              color: textColor,
-              height: undefined,
-              minHeight: 30,
-              fontSize: 16,
-            },
-          ]}
-          placeholder="0"
-          placeholderTextColor={placeholderTextColor}
-          onChangeText={(maxRotateCount) => setMaxRotateCount(maxRotateCount)}
-          defaultValue={maxRotateCount.toString()}
-        />
-
-        <Divider style={{ marginTop: 12, marginBottom: 12 }} />
-
-        <Text style={{ paddingLeft: 6, fontSize: 16 }}>
-          Max Size (in bytes)
-        </Text>
-        <TextInput
-          keyboardType="numeric"
-          style={[
-            styles.textInput,
-            {
-              color: textColor,
-              height: undefined,
-              minHeight: 30,
-              fontSize: 16,
-            },
-          ]}
-          placeholder="0"
-          placeholderTextColor={placeholderTextColor}
-          onChangeText={(maxSize) => setMaxSize(maxSize)}
-          defaultValue={maxSize}
-        />
-
-        <Divider style={{ marginTop: 12, marginBottom: 12 }} />
-
         <ResultListView messages={resultMessage} />
       </ScrollView>
     </SafeAreaView>
@@ -203,6 +197,21 @@ const fileStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 10,
+  },
+  divider: {
+    marginTop: 12,
+    marginBottom: 12,
+  },
+  logDirectory: {
+    height: undefined,
+    minHeight: 80,
+  },
+  maxSizeInput: {
+    height: undefined,
+    minHeight: 30,
+  },
+  switch: {
+    paddingRight: 16,
   },
   text: {
     flex: 1, // Takes up as much space as possible, pushing the switch to the end

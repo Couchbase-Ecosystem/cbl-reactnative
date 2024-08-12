@@ -8,9 +8,9 @@ import ReplicatorConfigGeneralForm from '@/components/ReplicatorConfigGeneral';
 export default function ReplicationConfigCreateScreen() {
   const [replicatorType, setReplicatorType] = useState<string>('');
   const [connectionString, setConnectionString] = useState<string>('');
-  const [heartbeat, setHeartbeat] = useState<string>('');
-  const [maxAttempts, setMaxAttempts] = useState<string>('');
-  const [maxWaitTime, setMaxWaitTime] = useState<string>('');
+  const [heartbeat, setHeartbeat] = useState<string>('300');
+  const [maxAttempts, setMaxAttempts] = useState<string>('10');
+  const [maxWaitTime, setMaxWaitTime] = useState<string>('300');
   const [continuous, setContinuous] = useState<boolean>(false);
   const [autoPurgeEnabled, setAutoPurgeEnabled] = useState<boolean>(false);
   const [acceptParentDomainCookies, setAcceptParentDomainCookies] =

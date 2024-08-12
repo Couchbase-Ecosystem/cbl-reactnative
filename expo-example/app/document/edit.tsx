@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useStyleScheme } from '@/components/Themed';
 import DocumentEditorActionForm from '@/components/DocumentEditorActionForm';
 import save from '@/service/document/save';
 import { Collection } from 'cbl-reactnative';
@@ -8,7 +7,6 @@ import CBLCollectionActionContainer from '@/components/CBLCollectionActionContai
 export default function DocumentEditorScreen() {
   const [document, setDocument] = useState<string>('');
   const [documentId, setDocumentId] = useState<string>('');
-  const styles = useStyleScheme();
 
   function reset() {
     setDocument('');
@@ -24,7 +22,7 @@ export default function DocumentEditorScreen() {
       if (
         document !== undefined &&
         document !== null &&
-        doc.getId() == documentId
+        doc.getId() === documentId
       ) {
         return [
           `Document <${documentId}> saved in Collection <${collection.fullName()}> Database <${collection.database.getName()}>`,

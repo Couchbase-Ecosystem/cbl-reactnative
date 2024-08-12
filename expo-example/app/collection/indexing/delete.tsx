@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Collection } from 'cbl-reactnative';
 import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
 import HeaderView from '@/components/HeaderView';
-import { Divider } from '@gluestack-ui/themed';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import deleteIndex from '@/service/indexes/delete';
+import { useStyleScheme } from '@/components/Themed';
+import { View } from 'react-native';
 
 export default function IndexCreateScreen() {
+  const styles = useStyleScheme();
   const [indexName, setIndexName] = useState<string>('');
 
   function reset() {
@@ -30,12 +32,14 @@ export default function IndexCreateScreen() {
       screenTitle="Delete Index"
     >
       <HeaderView name="Index" iconName="magnify" />
-      <StyledTextInput
-        autoCapitalize="none"
-        placeholder="IndexName"
-        onChangeText={(newText) => setIndexName(newText)}
-        defaultValue={indexName}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          autoCapitalize="none"
+          placeholder="IndexName"
+          onChangeText={(newText) => setIndexName(newText)}
+          defaultValue={indexName}
+        />
+      </View>
     </CBLCollectionActionContainer>
   );
 }

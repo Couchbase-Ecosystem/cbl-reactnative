@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { SafeAreaView, TextInput, useColorScheme } from 'react-native';
+import { SafeAreaView, TextInput, useColorScheme, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme, useThemeColor } from '@/components/Themed';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
@@ -60,14 +60,16 @@ export default function ChangeEncryptionScreen() {
         iconName="security"
         handleUpdatePressed={update}
       />
-      <TextInput
-        autoCapitalize="none"
-        style={[styles.textInput, { color: textColor }]}
-        placeholder="Encryption Key"
-        placeholderTextColor={placeholderTextColor}
-        onChangeText={(newText) => setEncryptionKey(newText)}
-        defaultValue={encryptionKey}
-      />
+      <View style={styles.component}>
+        <TextInput
+          autoCapitalize="none"
+          style={[styles.textInput, { color: textColor }]}
+          placeholder="Encryption Key"
+          placeholderTextColor={placeholderTextColor}
+          onChangeText={(newText) => setEncryptionKey(newText)}
+          defaultValue={encryptionKey}
+        />
+      </View>
       <ResultListView messages={resultMessage} />
     </SafeAreaView>
   );

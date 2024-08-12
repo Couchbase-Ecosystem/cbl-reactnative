@@ -3,7 +3,7 @@ import DatabaseContext from '@/providers/DatabaseContext';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
 import ResultListView from '@/components/ResultsListView';
 import DatabaseNameForm from '@/components/DatabaseNameForm';
 import { CBLDatabaseQueryActionContainerProps } from '@/types/CBLDatabaseQueryActionContainerProps.type';
@@ -18,12 +18,14 @@ export default function CBLDatabaseQueryActionContainer({
   handleResetPressed,
   children,
 }: CBLDatabaseQueryActionContainerProps) {
+  const navigation = useNavigation();
+  const styles = useStyleScheme();
+
   const { databases } = useContext(DatabaseContext)!;
   const [databaseName, setDatabaseName] = useState<string>('');
   const [sqlQuery, setSqlQuery] = useState<string>('');
   const [resultMessage, setResultsMessage] = useState<string[]>([]);
-  const navigation = useNavigation();
-  const styles = useStyleScheme();
+
   useNavigationBarTitleResetOption(screenTitle, navigation, reset);
 
   function isFormValidate(): boolean {
@@ -105,19 +107,27 @@ export default function CBLDatabaseQueryActionContainer({
         iconName="database-search"
         icons={icons}
       />
-      <StyledTextInput
-        autoCapitalize="none"
-        style={[
-          styles.textInput,
-          { height: undefined, minHeight: 120, marginTop: 5, marginBottom: 15 },
-        ]}
-        placeholder="SQL++ Query"
-        onChangeText={(newText) => setSqlQuery(newText)}
-        defaultValue={sqlQuery}
-        multiline={true}
-      />
-      {children && children}
+      <View style={styles.component}>
+        <StyledTextInput
+          autoCapitalize="none"
+          style={[styles.textInput, localStyles.query]}
+          placeholder="SQL++ Query"
+          onChangeText={(newText) => setSqlQuery(newText)}
+          defaultValue={sqlQuery}
+          multiline={true}
+        />
+        {children && children}
+      </View>
       <ResultListView messages={resultMessage} />
     </SafeAreaView>
   );
 }
+
+const localStyles = StyleSheet.create({
+  query: {
+    height: undefined,
+    minHeight: 120,
+    marginTop: 5,
+    marginBottom: 15,
+  },
+});

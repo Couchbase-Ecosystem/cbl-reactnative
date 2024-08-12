@@ -4,6 +4,8 @@ import { CBLDocumentIdCollectionContainerProps } from '@/types/CBLDocumentIdColl
 import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
 import HeaderView from '@/components/HeaderView';
 import { StyledTextInput } from '@/components/StyledTextInput';
+import { useStyleScheme } from '@/components/Themed';
+import { View } from 'react-native';
 
 export default function CBLDocumentIdCollectionActionContainer({
   screenTitle,
@@ -11,6 +13,7 @@ export default function CBLDocumentIdCollectionActionContainer({
   handleResetPressed,
   children,
 }: CBLDocumentIdCollectionContainerProps) {
+  const styles = useStyleScheme();
   const [documentId, setDocumentId] = useState<string>('');
 
   async function update(collection: Collection) {
@@ -28,14 +31,16 @@ export default function CBLDocumentIdCollectionActionContainer({
       handleResetPressed={reset}
     >
       <HeaderView name="Document Information" iconName="file-document" />
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Document Id"
-        onChangeText={(documentIdText) => setDocumentId(documentIdText)}
-        defaultValue={documentId}
-      />
-      {children && children}
+      <View style={styles.component}>
+        <StyledTextInput
+          style={styles.input}
+          autoCapitalize="none"
+          placeholder="Document Id"
+          onChangeText={(documentIdText) => setDocumentId(documentIdText)}
+          defaultValue={documentId}
+        />
+        {children && children}
+      </View>
     </CBLCollectionActionContainer>
   );
 }

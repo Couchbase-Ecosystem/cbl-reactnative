@@ -3,9 +3,9 @@ import { StyledTextInput } from '@/components/StyledTextInput';
 import get from '@/service/scope/get';
 import { Database } from 'cbl-reactnative';
 import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
-import { Divider } from '@gluestack-ui/themed';
 import { useStyleScheme } from '@/components/Themed';
 import HeaderView from '@/components/HeaderView';
+import { StyleSheet, View } from 'react-native';
 
 export default function ScopeGetScreen() {
   const [scopeName, setScopeName] = useState<string>('');
@@ -33,13 +33,15 @@ export default function ScopeGetScreen() {
     >
       <HeaderView name="Scope Information" iconName="file-cabinet" />
 
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Scope Name"
-        onChangeText={(scopeText) => setScopeName(scopeText)}
-        defaultValue={scopeName}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          style={styles.input}
+          autoCapitalize="none"
+          placeholder="Scope Name"
+          onChangeText={(scopeText) => setScopeName(scopeText)}
+          defaultValue={scopeName}
+        />
+      </View>
     </CBLDatabaseActionContainer>
   );
 }

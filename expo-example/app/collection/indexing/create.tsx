@@ -5,8 +5,11 @@ import HeaderView from '@/components/HeaderView';
 import { Divider } from '@gluestack-ui/themed';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import create from '@/service/indexes/create';
+import { useStyleScheme } from '@/components/Themed';
+import { StyleSheet, View } from 'react-native';
 
 export default function IndexCreateScreen() {
+  const styles = useStyleScheme();
   const [indexName, setIndexName] = useState<string>('');
   const [indexProperties, setIndexProperties] = useState<string>('');
 
@@ -32,25 +35,30 @@ export default function IndexCreateScreen() {
       screenTitle="Create Index"
     >
       <HeaderView name="Index" iconName="magnify" />
-      <StyledTextInput
-        autoCapitalize="none"
-        placeholder="IndexName"
-        onChangeText={(newText) => setIndexName(newText)}
-        defaultValue={indexName}
-      />
-      <Divider style={{ marginLeft: 8, marginTop: 10, marginBottom: 10 }} />
-      <StyledTextInput
-        style={{
-          height: 120,
-          minHeight: 20,
-          marginBottom: 10,
-        }}
-        autoCapitalize="none"
-        placeholder="Index Properties (comma separated)"
-        onChangeText={(newText) => setIndexProperties(newText)}
-        defaultValue={indexProperties}
-        multiline={true}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          autoCapitalize="none"
+          placeholder="IndexName"
+          onChangeText={(newText) => setIndexName(newText)}
+          defaultValue={indexName}
+        />
+        <Divider style={localStyles.divider} />
+        <StyledTextInput
+          style={styles.indexProperties}
+          autoCapitalize="none"
+          placeholder="Index Properties (comma separated)"
+          onChangeText={(newText) => setIndexProperties(newText)}
+          defaultValue={indexProperties}
+          multiline={true}
+        />
+      </View>
     </CBLCollectionActionContainer>
   );
 }
+
+const localStyles = StyleSheet.create({
+  divider: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+});

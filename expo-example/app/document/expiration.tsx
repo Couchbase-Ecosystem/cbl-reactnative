@@ -4,8 +4,11 @@ import { Collection } from 'cbl-reactnative';
 import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
+import { useStyleScheme } from '@/components/Themed';
+import { StyleSheet } from 'react-native';
 
 export default function GetDocumentExpirationScreen() {
+  const styles = useStyleScheme();
   const [expiration, setExpiration] = useState<string>('');
 
   function reset() {
@@ -33,8 +36,9 @@ export default function GetDocumentExpirationScreen() {
       handleUpdatePressed={update}
       handleResetPressed={reset}
     >
-      <Divider style={{ marginTop: 5, marginBottom: 10, marginLeft: 8 }} />
+      <Divider style={localStyles.divider} />
       <StyledTextInput
+        style={styles.input}
         autoCapitalize="none"
         placeholder="Expiration in ISO8601 Format"
         onChangeText={(newText) => setExpiration(newText)}
@@ -43,3 +47,9 @@ export default function GetDocumentExpirationScreen() {
     </CBLDocumentIdCollectionActionContainer>
   );
 }
+const localStyles = StyleSheet.create({
+  divider: {
+    marginTop: 5,
+    marginBottom: 5,
+  },
+});

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useStyleScheme } from '@/components/Themed';
 import ResultListView from '@/components/ResultsListView';
@@ -69,13 +69,14 @@ export default function PerformMaintenanceScreen() {
         iconName="database-cog"
         handleUpdatePressed={update}
       />
-      <SelectKeyValue
-        headerTitle="Types of Database Maintenance"
-        onSelectChange={setSelectedMaintenanceType}
-        placeholder="Select a Maintenance Type"
-        items={maintenanceTypes}
-      />
-
+      <View style={styles.component}>
+        <SelectKeyValue
+          headerTitle="Types of Database Maintenance"
+          onSelectChange={setSelectedMaintenanceType}
+          placeholder="Select a Maintenance Type"
+          items={maintenanceTypes}
+        />
+      </View>
       <ResultListView messages={resultMessage} />
     </SafeAreaView>
   );

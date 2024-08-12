@@ -53,6 +53,10 @@ export function BaseStyles() {
     container: {
       flex: 1,
     },
+    component: {
+      paddingLeft: 8,
+      paddingRight: 12,
+    },
     header: {
       fontSize: 16,
       fontWeight: 'bold',
@@ -73,16 +77,26 @@ export function BaseStyles() {
     dividerTextInput: {
       marginTop: 15,
       marginBottom: 5,
-      marginLeft: 8,
     },
     dividerCollectionFormTextInput: {
       marginTop: 5,
       marginBottom: 5,
       marginLeft: 8,
     },
+    indexProperties: {
+      height: 120,
+      minHeight: 20,
+      marginBottom: 10,
+    },
+    input: {
+      marginBottom: 5,
+    },
     textInput: {
       height: 40,
-      paddingStart: 8,
+      paddingStart: 2,
+      fontSize: 16,
+    },
+    text: {
       fontSize: 16,
     },
     selectTextDescription: {
@@ -98,6 +112,14 @@ export function BaseStyles() {
     selectContainer: {
       paddingTop: 10,
       paddingBottom: 8,
+    },
+    switch: {
+      paddingRight: 16,
+    },
+    viewStackRightComponent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
   });
 }

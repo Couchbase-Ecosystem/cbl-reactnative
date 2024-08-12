@@ -4,8 +4,11 @@ import listCollections from '@/service/collection/list';
 import { Database } from 'cbl-reactnative';
 import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
 import HeaderView from '@/components/HeaderView';
+import { View } from 'react-native';
+import { useStyleScheme } from '@/components/Themed';
 
 export default function CollectionListScreen() {
+  const styles = useStyleScheme();
   const [scopeName, setScopeName] = useState<string>('');
 
   function reset() {
@@ -42,13 +45,15 @@ export default function CollectionListScreen() {
     >
       <HeaderView name="Scope Information" iconName="file-cabinet" />
 
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Scope Name"
-        onChangeText={(scopeText) => setScopeName(scopeText)}
-        defaultValue={scopeName}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          style={{ marginBottom: 5 }}
+          autoCapitalize="none"
+          placeholder="Scope Name"
+          onChangeText={(scopeText) => setScopeName(scopeText)}
+          defaultValue={scopeName}
+        />
+      </View>
     </CBLDatabaseActionContainer>
   );
 }

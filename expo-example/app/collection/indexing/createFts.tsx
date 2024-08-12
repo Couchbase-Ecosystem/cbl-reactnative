@@ -5,10 +5,11 @@ import HeaderView from '@/components/HeaderView';
 import { Divider, Switch } from '@gluestack-ui/themed';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import createFts from '@/service/indexes/createFts';
-import { View } from 'react-native';
-import { Text } from '@/components/Themed';
+import { StyleSheet, View } from 'react-native';
+import { Text, useStyleScheme } from '@/components/Themed';
 
 export default function IndexFtsCreateScreen() {
+  const styles = useStyleScheme();
   const [indexName, setIndexName] = useState<string>('');
   const [ignoreAccents, setIgnoreAccents] = useState<boolean>(false);
   const [indexProperties, setIndexProperties] = useState<string>('');
@@ -36,41 +37,42 @@ export default function IndexFtsCreateScreen() {
       screenTitle="Create FTS Index"
     >
       <HeaderView name="Index" iconName="magnify" />
-      <StyledTextInput
-        autoCapitalize="none"
-        placeholder="IndexName"
-        onChangeText={(newText) => setIndexName(newText)}
-        defaultValue={indexName}
-      />
-      <Divider style={{ marginLeft: 8, marginTop: 10, marginBottom: 10 }} />
-      <StyledTextInput
-        style={{
-          height: 120,
-          minHeight: 20,
-          marginBottom: 10,
-        }}
-        autoCapitalize="none"
-        placeholder="Index Properties (comma separated)"
-        onChangeText={(newText) => setIndexProperties(newText)}
-        defaultValue={indexProperties}
-        multiline={true}
-      />
-      <Divider style={{ marginTop: 10, marginBottom: 10 }} />
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <Text style={{ paddingLeft: 6, fontSize: 16 }}>Ignore Accents</Text>
-        <Switch
-          style={{ paddingRight: 16 }}
-          value={ignoreAccents}
-          onValueChange={setIgnoreAccents}
+      <View style={styles.component}>
+        <StyledTextInput
+          autoCapitalize="none"
+          placeholder="IndexName"
+          onChangeText={(newText) => setIndexName(newText)}
+          defaultValue={indexName}
         />
+        <Divider style={localStyles.divider} />
+        <StyledTextInput
+          style={styles.indexProperties}
+          autoCapitalize="none"
+          placeholder="Index Properties (comma separated)"
+          onChangeText={(newText) => setIndexProperties(newText)}
+          defaultValue={indexProperties}
+          multiline={true}
+        />
+        <Divider style={localStyles.divider} />
+        <View style={[styles.viewStackRightComponent, localStyles.viewLast]}>
+          <Text style={styles.text}>Ignore Accents</Text>
+          <Switch
+            style={styles.switch}
+            value={ignoreAccents}
+            onValueChange={setIgnoreAccents}
+          />
+        </View>
       </View>
     </CBLCollectionActionContainer>
   );
 }
+
+const localStyles = StyleSheet.create({
+  divider: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  viewLast: {
+    marginBottom: 16,
+  },
+});

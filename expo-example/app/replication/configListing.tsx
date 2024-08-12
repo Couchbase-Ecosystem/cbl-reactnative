@@ -1,28 +1,54 @@
-import React, { useState } from 'react';
-import defaultCollection from '@/service/collection/default';
-import { Database } from 'cbl-reactnative';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import React from 'react';
+import { AddIcon, Fab, Icon } from '@gluestack-ui/themed';
+import { Link, useRouter } from 'expo-router';
+import { SafeAreaView, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useStyleScheme } from '@/components/Themed';
+import useNavigationBarTitleOption from '@/hooks/useNativgationBarTitle';
 
 export default function ReplicationConfigListingScreen() {
-  function reset() {}
+  const navigation = useNavigation();
+  const router = useRouter();
+  useNavigationBarTitleOption('Replicator Configs', navigation);
 
-  async function update(database: Database) {
-    try {
-      const collection = await defaultCollection(database);
-      return [
-        `Found Collection: <${collection.fullName()}> in Database: <${collection.database.getName()}>`,
-      ];
-    } catch (error) {
-      // @ts-ignore
-      return [error.message];
-    }
-  }
+  const handleFabPress = () => {
+    router.push('/replication/config');
+  };
 
   return (
-    <CBLDatabaseActionContainer
-      screenTitle={'Replication Configs'}
-      handleUpdatePressed={update}
-      handleResetPressed={reset}
-    />
+    <SafeAreaView style={localStyles.safeArea}>
+      <View style={localStyles.container}>
+        <Fab
+          placement="bottom right"
+          style={localStyles.fab}
+          onPress={handleFabPress}
+        >
+          <Icon as={AddIcon} style={localStyles.icon} />
+        </Fab>
+      </View>
+    </SafeAreaView>
   );
 }
+
+const localStyles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+  },
+  icon: {
+    color: 'white',
+    width: 40,
+    height: 40,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 40,
+    right: 20,
+    width: 70,
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

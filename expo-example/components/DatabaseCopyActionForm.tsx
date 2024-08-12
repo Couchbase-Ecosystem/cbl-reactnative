@@ -5,6 +5,7 @@ import { DatabaseCopyActionFormProps } from '@/types/databaseCopyActionFormProps
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
 import { useStyleScheme } from '@/components/Themed';
+import { View } from 'react-native';
 
 export default function DatabaseCopyActionForm({
   newDatabaseName,
@@ -35,12 +36,14 @@ export default function DatabaseCopyActionForm({
         iconName="database-edit"
         icons={icons}
       />
-      <StyledTextInput
-        autoCapitalize="none"
-        placeholder="New Database Name"
-        onChangeText={(newText) => setNewDatabaseName(newText)}
-        defaultValue={newDatabaseName}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          autoCapitalize="none"
+          placeholder="New Database Name"
+          onChangeText={(newText) => setNewDatabaseName(newText)}
+          defaultValue={newDatabaseName}
+        />
+      </View>
       <Divider
         style={{
           marginTop: 5,
