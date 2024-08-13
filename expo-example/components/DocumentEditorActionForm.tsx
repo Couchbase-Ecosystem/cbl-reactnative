@@ -1,4 +1,4 @@
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import React, { useState } from 'react';
 import { DocumentEditorActionFormProps } from '@/types/documentEditorActionFormProps.type';
 import { StyledTextInput } from '@/components/StyledTextInput';

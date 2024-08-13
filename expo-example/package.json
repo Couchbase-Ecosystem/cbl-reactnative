@@ -19,6 +19,7 @@
     "@gluestack-ui/config": "^1.1.19",
     "@gluestack-ui/themed": "^1.1.40",
     "@react-navigation/native": "^6.0.2",
+    "react-usestateref": "^1.0.9",
     "cbl-reactnative": "file:..",
     "expo": "~51.0.19",
     "expo-dev-client": "~4.0.20",

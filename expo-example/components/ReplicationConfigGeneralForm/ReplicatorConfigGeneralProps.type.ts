@@ -16,4 +16,6 @@ export type ReplicatorConfigGeneralProps = {
   autoPurgeEnabled: boolean;
   setAcceptParentDomainCookies: (arg: boolean) => void;
   acceptParentDomainCookies: boolean;
+  setAcceptOnlySelfSignedCerts: (args: boolean) => void;
+  acceptOnlySelfSignedCerts: boolean;
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Collection } from 'cbl-reactnative';
 import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import deleteIndex from '@/service/indexes/delete';
 import { useStyleScheme } from '@/components/Themed';

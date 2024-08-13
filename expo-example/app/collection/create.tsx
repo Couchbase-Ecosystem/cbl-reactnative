@@ -4,7 +4,7 @@ import create from '@/service/collection/create';
 import { Database } from 'cbl-reactnative';
 import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
 import { Divider } from '@gluestack-ui/themed';
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import { StyleSheet, View } from 'react-native';
 import { useStyleScheme } from '@/components/Themed';
 

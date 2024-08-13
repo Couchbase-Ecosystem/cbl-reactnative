@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Collection } from 'cbl-reactnative';
 import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import { Divider } from '@gluestack-ui/themed';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import create from '@/service/indexes/create';

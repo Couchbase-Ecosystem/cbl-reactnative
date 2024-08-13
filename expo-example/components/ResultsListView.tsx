@@ -1,4 +1,4 @@
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { Text } from '@/components/Themed';

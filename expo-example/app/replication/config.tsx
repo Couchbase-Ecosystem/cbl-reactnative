@@ -3,9 +3,11 @@ import defaultCollection from '@/service/collection/default';
 import { Database } from 'cbl-reactnative';
 import { SafeAreaView, ScrollView, Text } from 'react-native';
 import { useStyleScheme } from '@/components/Themed';
-import ReplicatorConfigGeneralForm from '@/components/ReplicatorConfigGeneral';
+import ReplicatorConfigGeneralForm from '@/components/ReplicationConfigGeneralForm/ReplicatorConfigGeneralForm';
+import ReplicatorAuthenticationForm from '@/components/ReplicatorAuthenticationForm/ReplicatorAuthenticationForm';
 
 export default function ReplicationConfigCreateScreen() {
+  //general form
   const [replicatorType, setReplicatorType] = useState<string>('');
   const [connectionString, setConnectionString] = useState<string>('');
   const [heartbeat, setHeartbeat] = useState<string>('300');
@@ -15,8 +17,35 @@ export default function ReplicationConfigCreateScreen() {
   const [autoPurgeEnabled, setAutoPurgeEnabled] = useState<boolean>(false);
   const [acceptParentDomainCookies, setAcceptParentDomainCookies] =
     useState<boolean>(false);
+  const [acceptOnlySelfSignedCerts, setAcceptOnlySelfSignedCerts] =
+    useState<boolean>(false);
+  //used for authentication type and authentication fields
+  const [selectedAuthenticationType, setSelectedAuthenticationType] =
+    useState<string>('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [sessionId, setSessionId] = useState<string>('');
+  const [cookieName, setCookieName] = useState<string>('');
 
-  function reset() {}
+  function reset() {
+    setConnectionString('');
+    //setHeaders('');
+    setHeartbeat('60');
+    setMaxAttempts('0');
+    setMaxWaitTime('300');
+    setReplicatorType('');
+    setContinuous(true);
+    setAutoPurgeEnabled(true);
+    setAcceptParentDomainCookies(false);
+    setAcceptOnlySelfSignedCerts(false);
+
+    //authentication section
+    setSelectedAuthenticationType('');
+    setUsername('');
+    setPassword('');
+    setSessionId('');
+    setCookieName('');
+  }
 
   async function update(database: Database) {
     try {
@@ -50,6 +79,18 @@ export default function ReplicationConfigCreateScreen() {
           setMaxAttempts={setMaxAttempts}
           setMaxWaitTime={setMaxWaitTime}
           setReplicatorType={setReplicatorType}
+        />
+        <ReplicatorAuthenticationForm
+          selectedAuthenticationType={selectedAuthenticationType}
+          setSelectedAuthenticationType={setSelectedAuthenticationType}
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+          sessionId={sessionId}
+          setSessionId={setSessionId}
+          cookieName={cookieName}
+          setCookieName={setCookieName}
         />
       </ScrollView>
     </SafeAreaView>

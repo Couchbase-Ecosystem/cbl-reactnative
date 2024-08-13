@@ -3,7 +3,7 @@ import { StyledTextInput } from '@/components/StyledTextInput';
 import listCollections from '@/service/collection/list';
 import { Database } from 'cbl-reactnative';
 import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import { View } from 'react-native';
 import { useStyleScheme } from '@/components/Themed';
 

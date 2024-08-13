@@ -3,7 +3,7 @@ import { useStyleScheme } from '@/components/Themed';
 import { DatabaseScopeCollectionFormProps } from '@/types/databaseScopeCollectionFormProps.type';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import { StyleSheet, View } from 'react-native';
 
 export default function DatabaseScopeCollectionForm({

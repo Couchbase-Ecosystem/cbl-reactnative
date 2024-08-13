@@ -1,10 +1,11 @@
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
 import React from 'react';
 import { StyledTextInput } from '@/components/StyledTextInput';
 import { Text, View, useStyleScheme } from '@/components/Themed';
 import { Divider, Switch } from '@gluestack-ui/themed';
-import { ReplicatorConfigGeneralProps } from '@/types/ReplicatorConfigGeneralProps.type';
+import { ReplicatorConfigGeneralProps } from '@/components/ReplicationConfigGeneralForm/ReplicatorConfigGeneralProps.type';
 import SelectKeyValue from '@/components/SelectKeyValue';
+import { StyleSheet } from 'react-native';
 
 export default function ReplicatorConfigGeneralForm({
   setConnectionString,
@@ -22,6 +23,8 @@ export default function ReplicatorConfigGeneralForm({
   setAcceptParentDomainCookies,
   acceptParentDomainCookies,
   setReplicatorType,
+  acceptOnlySelfSignedCerts,
+  setAcceptOnlySelfSignedCerts,
 }: ReplicatorConfigGeneralProps) {
   const styles = useStyleScheme();
   const replicatorTypes = [
@@ -32,31 +35,23 @@ export default function ReplicatorConfigGeneralForm({
   return (
     <>
       <HeaderView name="General" iconName="cog" />
-      <View style={styles.component}>
+      <View style={[styles.component, localStyles.view]}>
         <SelectKeyValue
           headerTitle="Select Replicator Type"
           onSelectChange={setReplicatorType}
           placeholder="Replicator Types"
           items={replicatorTypes}
         />
-        <Divider style={{ marginTop: 5, marginBottom: 10 }} />
+        <Divider style={localStyles.divider} />
         <StyledTextInput
           autoCapitalize="none"
-          style={[
-            styles.textInput,
-            {
-              height: undefined,
-              minHeight: 120,
-              marginTop: 5,
-              marginBottom: 15,
-            },
-          ]}
+          style={[styles.textInput, localStyles.connectionString]}
           placeholder="Connection String"
           onChangeText={(newText) => setConnectionString(newText)}
           defaultValue={connectionString}
           multiline={true}
         />
-        <Divider style={{ marginTop: 5, marginBottom: 10 }} />
+        <Divider style={localStyles.divider} />
         <Text>Heartbeat (in seconds)</Text>
         <StyledTextInput
           autoCapitalize="none"
@@ -66,7 +61,7 @@ export default function ReplicatorConfigGeneralForm({
           defaultValue={heartbeat}
           multiline={true}
         />
-        <Divider style={{ marginTop: 5, marginBottom: 10 }} />
+        <Divider style={localStyles.divider} />
         <View>
           <Text>Max Attempts (0 restores default behavior)</Text>
           <StyledTextInput
@@ -78,7 +73,7 @@ export default function ReplicatorConfigGeneralForm({
             multiline={true}
           />
         </View>
-        <Divider style={{ marginTop: 5, marginBottom: 10 }} />
+        <Divider style={localStyles.divider} />
         <View>
           <Text>Max Attempts Wait Time (in seconds)</Text>
           <StyledTextInput
@@ -90,14 +85,8 @@ export default function ReplicatorConfigGeneralForm({
             multiline={true}
           />
         </View>
-        <Divider style={{ marginTop: 5, marginBottom: 10 }} />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <Divider style={localStyles.divider} />
+        <View style={styles.viewStackRightComponent}>
           <Text style={{ paddingLeft: 2, fontSize: 16 }}>Continuous</Text>
           <Switch
             style={{ paddingRight: 16 }}
@@ -105,14 +94,8 @@ export default function ReplicatorConfigGeneralForm({
             onValueChange={setContinuous}
           />
         </View>
-        <Divider style={{ marginTop: 5, marginBottom: 10 }} />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <Divider style={localStyles.divider} />
+        <View style={styles.viewStackRightComponent}>
           <Text style={{ paddingLeft: 2, fontSize: 16 }}>
             Auto Purge Enabled
           </Text>
@@ -122,14 +105,8 @@ export default function ReplicatorConfigGeneralForm({
             onValueChange={setAutoPurgeEnabled}
           />
         </View>
-        <Divider style={{ marginTop: 5, marginBottom: 10 }} />
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
+        <Divider style={localStyles.divider} />
+        <View style={styles.viewStackRightComponent}>
           <Text style={{ paddingLeft: 2, fontSize: 16 }}>
             Accept Parent Domain Cookies
           </Text>
@@ -139,7 +116,33 @@ export default function ReplicatorConfigGeneralForm({
             onValueChange={setAcceptParentDomainCookies}
           />
         </View>
+        <Divider style={localStyles.divider} />
+        <View style={styles.viewStackRightComponent}>
+          <Text style={{ paddingLeft: 2, fontSize: 16 }}>
+            Accept Only Self-Signed Certs
+          </Text>
+          <Switch
+            style={{ paddingRight: 16 }}
+            value={acceptOnlySelfSignedCerts}
+            onValueChange={setAcceptOnlySelfSignedCerts}
+          />
+        </View>
       </View>
     </>
   );
 }
+const localStyles = StyleSheet.create({
+  divider: {
+    marginTop: 5,
+    marginBottom: 10,
+  },
+  connectionString: {
+    height: undefined,
+    minHeight: 120,
+    marginTop: 5,
+    marginBottom: 15,
+  },
+  view: {
+    paddingBottom: 20,
+  },
+});

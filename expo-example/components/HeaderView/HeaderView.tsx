@@ -1,14 +1,16 @@
 import React from 'react';
-import { Text, useColorScheme, View } from 'react-native';
+import { Text, useColorScheme, View, StyleSheet } from 'react-native';
 import { useStyleScheme } from '@/components/Themed';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { HeaderViewProps } from '@/types/headerViewProps.type';
+import { HeaderViewProps } from '@/components/HeaderView/headerViewProps.type';
 
-export default function HeaderView({ name, iconName }: HeaderViewProps) {
+export default function HeaderView({ name, iconName, style }: HeaderViewProps) {
   const scheme = useColorScheme();
   const styles = useStyleScheme();
+  const combinedStyles = StyleSheet.flatten([styles.header, style]);
+
   return (
-    <View style={styles.header}>
+    <View style={combinedStyles}>
       <MaterialCommunityIcons
         name={iconName}
         size={24}
