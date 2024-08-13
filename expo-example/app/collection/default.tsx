@@ -1,7 +1,7 @@
 import React from 'react';
 import defaultCollection from '@/service/collection/default';
 import { Database } from 'cbl-reactnative';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 
 export default function CollectionGetDefaultScreen() {
   function reset() {}

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import setExpirationDate from '@/service/document/setExpirationDate';
 import { Collection } from 'cbl-reactnative';
-import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer/CBLDocumentIdCollectionActionContainer';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import { StyleSheet } from 'react-native';
 
 export default function GetDocumentExpirationScreen() {

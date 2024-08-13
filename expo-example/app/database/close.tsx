@@ -1,7 +1,7 @@
 import React from 'react';
 import { Database } from 'cbl-reactnative';
 import close from '@/service/database/close';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 
 export default function DatabaseCloseScreen() {
   function reset() {}

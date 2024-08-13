@@ -1,5 +1,5 @@
 import React from 'react';
-import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer';
+import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer/CBLDocumentIdCollectionActionContainer';
 import deleteDocument from '@/service/document/deleteDocument';
 import { Collection } from 'cbl-reactnative';
 

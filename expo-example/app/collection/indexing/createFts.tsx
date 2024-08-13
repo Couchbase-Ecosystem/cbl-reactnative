@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Collection } from 'cbl-reactnative';
-import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
+import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer/CBLCollectionActionContainer';
 import HeaderView from '@/components/HeaderView/HeaderView';
 import { Divider, Switch } from '@gluestack-ui/themed';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import createFts from '@/service/indexes/createFts';
 import { StyleSheet, View } from 'react-native';
-import { Text, useStyleScheme } from '@/components/Themed';
+import { Text, useStyleScheme } from '@/components/Themed/Themed';
 
 export default function IndexFtsCreateScreen() {
   const styles = useStyleScheme();

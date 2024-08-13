@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Collection } from 'cbl-reactnative';
-import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
+import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer/CBLCollectionActionContainer';
 import HeaderView from '@/components/HeaderView/HeaderView';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import deleteIndex from '@/service/indexes/delete';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import { View } from 'react-native';
 
 export default function IndexCreateScreen() {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import defaultCollection from '@/service/collection/default';
 import { Database } from 'cbl-reactnative';
 import { SafeAreaView, ScrollView, Text } from 'react-native';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import ReplicatorConfigGeneralForm from '@/components/ReplicationConfigGeneralForm/ReplicatorConfigGeneralForm';
 import ReplicatorAuthenticationForm from '@/components/ReplicatorAuthenticationForm/ReplicatorAuthenticationForm';
 
@@ -63,6 +63,18 @@ export default function ReplicationConfigCreateScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <ReplicatorAuthenticationForm
+          selectedAuthenticationType={selectedAuthenticationType}
+          setSelectedAuthenticationType={setSelectedAuthenticationType}
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+          sessionId={sessionId}
+          setSessionId={setSessionId}
+          cookieName={cookieName}
+          setCookieName={setCookieName}
+        />
         <ReplicatorConfigGeneralForm
           acceptParentDomainCookies={acceptParentDomainCookies}
           autoPurgeEnabled={autoPurgeEnabled}
@@ -81,18 +93,6 @@ export default function ReplicationConfigCreateScreen() {
           setMaxWaitTime={setMaxWaitTime}
           setAcceptOnlySelfSignedCerts={setAcceptOnlySelfSignedCerts}
           setReplicatorType={setReplicatorType}
-        />
-        <ReplicatorAuthenticationForm
-          selectedAuthenticationType={selectedAuthenticationType}
-          setSelectedAuthenticationType={setSelectedAuthenticationType}
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-          sessionId={sessionId}
-          setSessionId={setSessionId}
-          cookieName={cookieName}
-          setCookieName={setCookieName}
         />
       </ScrollView>
     </SafeAreaView>

@@ -9,16 +9,20 @@ import {
 } from 'react-native';
 import { Switch, Divider } from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme, useThemeColor, Text } from '@/components/Themed';
-import ResultListView from '@/components/ResultsListView';
+import {
+  useStyleScheme,
+  useThemeColor,
+  Text,
+} from '@/components/Themed/Themed';
+import ResultListView from '@/components/ResultsListView/ResultsListView';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
-import SelectKeyValue from '@/components/SelectKeyValue';
+import SelectKeyValue from '@/components/SelectKeyValue/SelectKeyValue';
 import { useLogLevelAsValues } from '@/hooks/useLogLevel';
-import DatabaseNameForm from '@/components/DatabaseNameForm';
+import DatabaseNameForm from '@/components/DatabaseNameForm/DatabaseNameForm';
 import { usePlaceholderTextColor } from '@/hooks/usePlaceholderTextColor';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
-import HeaderToolbarView from '@/components/HeaderToolbarView';
+import HeaderToolbarView from '@/components/HeaderToolbarView/HeaderToolbarView';
 
 export default function LoggingFileScreen() {
   const { databases } = useContext(DatabaseContext)!;

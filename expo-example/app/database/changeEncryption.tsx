@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { SafeAreaView, TextInput, useColorScheme, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme, useThemeColor } from '@/components/Themed';
-import DatabaseNameForm from '@/components/DatabaseNameForm';
-import HeaderRunActionView from '@/components/HeaderRunActionView';
-import ResultListView from '@/components/ResultsListView';
+import { useStyleScheme, useThemeColor } from '@/components/Themed/Themed';
+import DatabaseNameForm from '@/components/DatabaseNameForm/DatabaseNameForm';
+import HeaderRunActionView from '@/components/HeaderRunActionView/HeaderRunActionView';
+import ResultListView from '@/components/ResultsListView/ResultsListView';
 import changeEncryptionKey from '@/service/database/changeEncryptionKey';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';

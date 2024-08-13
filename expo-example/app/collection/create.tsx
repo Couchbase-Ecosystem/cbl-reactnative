@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import create from '@/service/collection/create';
 import { Database } from 'cbl-reactnative';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 import { Divider } from '@gluestack-ui/themed';
 import HeaderView from '@/components/HeaderView/HeaderView';
 import { StyleSheet, View } from 'react-native';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 
 export default function CollectionCreateScreen() {
   const styles = useStyleScheme();

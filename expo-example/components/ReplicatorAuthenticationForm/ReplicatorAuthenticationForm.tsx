@@ -1,9 +1,9 @@
 import React from 'react';
-import SelectKeyValue from '@/components/SelectKeyValue';
-import { StyledTextInput } from '@/components/StyledTextInput';
-import { View, Text, StyleSheet } from 'react-native';
+import SelectKeyValue from '@/components/SelectKeyValue/SelectKeyValue';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
+import { View, StyleSheet } from 'react-native';
 import { ReplicatorAuthenticationFormProps } from '@/components/ReplicatorAuthenticationForm/ReplicatorAuthenticationFormProps.type';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import HeaderView from '@/components/HeaderView/HeaderView';
 import { Divider } from '@gluestack-ui/themed';
 type Item = { key: string; value: string };
@@ -103,6 +103,6 @@ const localStyles = StyleSheet.create({
     marginBottom: 10,
   },
   view: {
-    paddingBottom: 40,
+    paddingBottom: 20,
   },
 });

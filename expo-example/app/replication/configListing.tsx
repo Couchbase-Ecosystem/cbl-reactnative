@@ -3,7 +3,7 @@ import { AddIcon, Fab, Icon } from '@gluestack-ui/themed';
 import { Link, useRouter } from 'expo-router';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import useNavigationBarTitleOption from '@/hooks/useNativgationBarTitle';
 
 export default function ReplicationConfigListingScreen() {

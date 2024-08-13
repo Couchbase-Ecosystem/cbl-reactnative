@@ -1,10 +1,10 @@
 import HeaderView from '@/components/HeaderView/HeaderView';
 import React from 'react';
-import { StyledTextInput } from '@/components/StyledTextInput';
-import { Text, View, useStyleScheme } from '@/components/Themed';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
+import { Text, View, useStyleScheme } from '@/components/Themed/Themed';
 import { Divider, Switch } from '@gluestack-ui/themed';
 import { ReplicatorConfigGeneralProps } from '@/components/ReplicationConfigGeneralForm/ReplicatorConfigGeneralProps.type';
-import SelectKeyValue from '@/components/SelectKeyValue';
+import SelectKeyValue from '@/components/SelectKeyValue/SelectKeyValue';
 import { StyleSheet } from 'react-native';
 
 export default function ReplicatorConfigGeneralForm({

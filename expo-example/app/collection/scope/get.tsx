@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import get from '@/service/scope/get';
 import { Database } from 'cbl-reactnative';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
-import { useStyleScheme } from '@/components/Themed';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import HeaderView from '@/components/HeaderView/HeaderView';
 import { StyleSheet, View } from 'react-native';
 

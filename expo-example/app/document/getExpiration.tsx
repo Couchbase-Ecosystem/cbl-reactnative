@@ -1,5 +1,5 @@
 import React from 'react';
-import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer';
+import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer/CBLDocumentIdCollectionActionContainer';
 import getExpirationDate from '@/service/document/getExpirationDate';
 import { Collection } from 'cbl-reactnative';
 

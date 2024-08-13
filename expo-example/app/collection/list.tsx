@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import listCollections from '@/service/collection/list';
 import { Database } from 'cbl-reactnative';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 import HeaderView from '@/components/HeaderView/HeaderView';
 import { View } from 'react-native';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 
 export default function CollectionListScreen() {
   const styles = useStyleScheme();

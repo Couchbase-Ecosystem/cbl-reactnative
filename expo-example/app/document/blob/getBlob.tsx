@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import { Collection } from 'cbl-reactnative';
-import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer/CBLDocumentIdCollectionActionContainer';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
 import getBlob from '@/service/document/getBlob';
 import { StyleSheet, View } from 'react-native';

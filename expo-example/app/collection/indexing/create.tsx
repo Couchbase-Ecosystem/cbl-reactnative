@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Collection } from 'cbl-reactnative';
-import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
+import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer/CBLCollectionActionContainer';
 import HeaderView from '@/components/HeaderView/HeaderView';
 import { Divider } from '@gluestack-ui/themed';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import create from '@/service/indexes/create';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import { StyleSheet, View } from 'react-native';
 
 export default function IndexCreateScreen() {

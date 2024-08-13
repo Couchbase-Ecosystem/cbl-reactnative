@@ -1,5 +1,3 @@
-import React from 'react';
-
 export type ReplicatorConfigGeneralProps = {
   setReplicatorType: (arg: string) => void;
   setConnectionString: (arg: string) => void;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Collection } from 'cbl-reactnative';
 import deleteCollection from '@/service/collection/delete';
-import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
+import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer/CBLCollectionActionContainer';
 
 export default function CollectionDeleteScreen() {
   function reset() {}

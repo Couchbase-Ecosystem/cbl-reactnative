@@ -2,7 +2,7 @@ import React from 'react';
 import { Database } from 'cbl-reactnative';
 import execute from '@/service/query/execute';
 import explain from '@/service/query/explain';
-import CBLDatabaseQueryActionContainer from '@/components/CBLDatabaseQueryActionContainer';
+import CBLDatabaseQueryActionContainer from '@/components/CBLDatabaseQueryActionContainer/CBLDatabaseQueryActionContainer';
 
 export default function QueryParametersScreen() {
   function reset() {}
