@@ -71,6 +71,7 @@ export default function ReplicationConfigCreateScreen() {
           heartbeat={heartbeat}
           maxAttempts={maxAttempts}
           maxWaitTime={maxWaitTime}
+          acceptOnlySelfSignedCerts={acceptOnlySelfSignedCerts}
           setAcceptParentDomainCookies={setAcceptParentDomainCookies}
           setAutoPurgeEnabled={setAutoPurgeEnabled}
           setConnectionString={setConnectionString}
@@ -78,6 +79,7 @@ export default function ReplicationConfigCreateScreen() {
           setHeartbeat={setHeartbeat}
           setMaxAttempts={setMaxAttempts}
           setMaxWaitTime={setMaxWaitTime}
+          setAcceptOnlySelfSignedCerts={setAcceptOnlySelfSignedCerts}
           setReplicatorType={setReplicatorType}
         />
         <ReplicatorAuthenticationForm
