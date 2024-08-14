@@ -47,12 +47,16 @@ export default function ReplicationConfigCreateScreen() {
     setCookieName('');
   }
 
-  async function update(database: Database) {
+  async function update(
+    database: Database,
+    scopeName: string,
+    collections: string[]
+  ) {
     try {
-      const collection = await defaultCollection(database);
-      return [
-        `Found Collection: <${collection.fullName()}> in Database: <${collection.database.getName()}>`,
-      ];
+      //const collection = await defaultCollection(database);
+      //return [
+      //  `Found Collection: <${collection.fullName()}> in Database: <${collection.database.getName()}>`,
+      //];
     } catch (error) {
       // @ts-ignore
       return [error.message];
