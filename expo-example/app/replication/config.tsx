@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import defaultCollection from '@/service/collection/default';
 import { Database } from 'cbl-reactnative';
-import { SafeAreaView, ScrollView, Text } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native';
 import { useStyleScheme } from '@/components/Themed/Themed';
 import ReplicatorConfigGeneralForm from '@/components/ReplicationConfigGeneralForm/ReplicatorConfigGeneralForm';
 import ReplicatorAuthenticationForm from '@/components/ReplicatorAuthenticationForm/ReplicatorAuthenticationForm';
+import ReplicatorConfigCollectionForm from '@/components/ReplicationConfigCollectionForm/ReplicatorConfigCollectionForm';
+import ResultListView from '@/components/ResultsListView/ResultsListView';
+import { useNavigation } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import useNavigationBarTitleOption from '@/hooks/useNativgationBarTitle';
 
 export default function ReplicationConfigCreateScreen() {
+  const navigation = useNavigation();
+  useNavigationBarTitleOption('Add Replicator Config', navigation);
   //general form
   const [replicatorType, setReplicatorType] = useState<string>('');
   const [connectionString, setConnectionString] = useState<string>('');
@@ -26,6 +32,8 @@ export default function ReplicationConfigCreateScreen() {
   const [password, setPassword] = useState<string>('');
   const [sessionId, setSessionId] = useState<string>('');
   const [cookieName, setCookieName] = useState<string>('');
+  //used for displaying result messages
+  const [resultMessages, setResultMessages] = useState<string[]>([]);
 
   function reset() {
     setConnectionString('');
@@ -45,13 +53,14 @@ export default function ReplicationConfigCreateScreen() {
     setPassword('');
     setSessionId('');
     setCookieName('');
+    setResultMessages([]);
   }
 
   async function update(
     database: Database,
     scopeName: string,
     collections: string[]
-  ) {
+  ): Promise<void> {
     try {
       //const collection = await defaultCollection(database);
       //return [
@@ -62,11 +71,18 @@ export default function ReplicationConfigCreateScreen() {
       return [error.message];
     }
   }
+
+  function updateResultMessage(messages: string[]) {}
   const styles = useStyleScheme();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        <ReplicatorConfigCollectionForm
+          handleResetPressed={reset}
+          handleUpdatePressed={update}
+          updateResultMessage={updateResultMessage}
+        />
         <ReplicatorAuthenticationForm
           selectedAuthenticationType={selectedAuthenticationType}
           setSelectedAuthenticationType={setSelectedAuthenticationType}
@@ -98,7 +114,18 @@ export default function ReplicationConfigCreateScreen() {
           setAcceptOnlySelfSignedCerts={setAcceptOnlySelfSignedCerts}
           setReplicatorType={setReplicatorType}
         />
+        <ResultListView
+          style={localStyles.resultMessages}
+          useScrollView={false}
+          messages={resultMessages}
+        />
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const localStyles = StyleSheet.create({
+  resultMessages: {
+    paddingBottom: 40,
+  },
+});

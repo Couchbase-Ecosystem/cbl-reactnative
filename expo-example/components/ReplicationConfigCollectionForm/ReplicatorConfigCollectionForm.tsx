@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { ReplicatorConfigCollectionFormProps } from '@/components/ReplicationConfigCollectionForm/ReplicatorConfigCollectionFormProps.type';
-import { Database } from '../../../lib/typescript/src';
+import { Database } from 'cbl-reactnative';
 import DatabaseContext from '@/providers/DatabaseContext';
 import DatabaseNameActionForm from '@/components/DatabaseNameActionForm/DatabaseNameActionForm';
 import HeaderView from '@/components/HeaderView/HeaderView';
