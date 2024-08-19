@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { Database } from 'cbl-reactnative';
-import { SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { useStyleScheme } from '@/components/Themed/Themed';
 import ReplicatorConfigGeneralForm from '@/components/ReplicationConfigGeneralForm/ReplicatorConfigGeneralForm';
 import ReplicatorAuthenticationForm from '@/components/ReplicatorAuthenticationForm/ReplicatorAuthenticationForm';
 import ReplicatorConfigCollectionForm from '@/components/ReplicationConfigCollectionForm/ReplicatorConfigCollectionForm';
 import ResultListView from '@/components/ResultsListView/ResultsListView';
 import { useNavigation } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
 import useNavigationBarTitleOption from '@/hooks/useNativgationBarTitle';
 
 export default function ReplicationConfigCreateScreen() {
+  const styles = useStyleScheme();
   const navigation = useNavigation();
   useNavigationBarTitleOption('Add Replicator Config', navigation);
-  //general form
   const [replicatorType, setReplicatorType] = useState<string>('');
   const [connectionString, setConnectionString] = useState<string>('');
   const [heartbeat, setHeartbeat] = useState<string>('300');
@@ -25,19 +24,16 @@ export default function ReplicationConfigCreateScreen() {
     useState<boolean>(false);
   const [acceptOnlySelfSignedCerts, setAcceptOnlySelfSignedCerts] =
     useState<boolean>(false);
-  //used for authentication type and authentication fields
   const [selectedAuthenticationType, setSelectedAuthenticationType] =
     useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [sessionId, setSessionId] = useState<string>('');
   const [cookieName, setCookieName] = useState<string>('');
-  //used for displaying result messages
   const [resultMessages, setResultMessages] = useState<string[]>([]);
 
   function reset() {
     setConnectionString('');
-    //setHeaders('');
     setHeartbeat('60');
     setMaxAttempts('0');
     setMaxWaitTime('300');
@@ -62,18 +58,31 @@ export default function ReplicationConfigCreateScreen() {
     collections: string[]
   ): Promise<void> {
     try {
-      //const collection = await defaultCollection(database);
-      //return [
-      //  `Found Collection: <${collection.fullName()}> in Database: <${collection.database.getName()}>`,
-      //];
+      if (replicatorType === '') {
+        setResultMessages(['Replicator Type is required']);
+        return;
+      }
+      if (selectedAuthenticationType === '') {
+        setResultMessages(['Authentication Type is required']);
+        return;
+      }
+      if (scopeName === '') {
+        setResultMessages(['Scope Name is required']);
+        return;
+      }
+      if (collections.length === 0) {
+        setResultMessages(['At least one collection is required']);
+        return;
+      }
     } catch (error) {
       // @ts-ignore
       return [error.message];
     }
   }
 
-  function updateResultMessage(messages: string[]) {}
-  const styles = useStyleScheme();
+  function updateResultMessage(messages: string[]) {
+    setResultMessages((prev) => [...prev, ...messages]);
+  }
 
   return (
     <SafeAreaView style={styles.container}>
