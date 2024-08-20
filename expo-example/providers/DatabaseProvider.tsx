@@ -1,5 +1,5 @@
 import React, { useState, ReactNode, useMemo } from 'react';
-import { Database, CblReactNativeEngine } from 'cbl-reactnative';
+import { Database, CblReactNativeEngine, Replicator } from 'cbl-reactnative';
 import DatabaseContext from '@/providers/DatabaseContext';
 import ReplicatorContext from '@/providers/ReplicatorContext';
 
@@ -9,9 +9,9 @@ type DatabaseProviderProps = {
 
 const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
   const [databases, setDatabases] = useState<Record<string, Database>>({});
-  const [replicatorIds, setReplicatorIds] = useState<Record<string, string>>(
-    {}
-  );
+  const [replicatorIds, setReplicatorIds] = useState<
+    Record<string, Replicator>
+  >({});
 
   const databasesValue = useMemo(
     () => ({ databases, setDatabases }),

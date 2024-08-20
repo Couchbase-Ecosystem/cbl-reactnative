@@ -90,7 +90,6 @@ export default function ReplicatorAuthenticationForm({
               onChangeText={(newText) => setCookieName(newText)}
               defaultValue={cookieName}
             />
-            <Divider style={localStyles.divider} />
           </>
         ) : null}
       </View>

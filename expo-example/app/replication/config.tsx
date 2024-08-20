@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Database } from 'cbl-reactnative';
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import { useStyleScheme } from '@/components/Themed/Themed';
@@ -6,13 +6,17 @@ import ReplicatorConfigGeneralForm from '@/components/ReplicationConfigGeneralFo
 import ReplicatorAuthenticationForm from '@/components/ReplicatorAuthenticationForm/ReplicatorAuthenticationForm';
 import ReplicatorConfigCollectionForm from '@/components/ReplicationConfigCollectionForm/ReplicatorConfigCollectionForm';
 import ResultListView from '@/components/ResultsListView/ResultsListView';
+import ReplicatorContext from '@/providers/ReplicatorContext';
 import { useNavigation } from '@react-navigation/native';
 import useNavigationBarTitleOption from '@/hooks/useNativgationBarTitle';
+import createReplicatorFromConfig from '@/service/replicator/createReplicatorFromConfig';
 
 export default function ReplicationConfigCreateScreen() {
+  const { setReplicatorIds } = useContext(ReplicatorContext)!;
   const styles = useStyleScheme();
   const navigation = useNavigation();
   useNavigationBarTitleOption('Add Replicator Config', navigation);
+
   const [replicatorType, setReplicatorType] = useState<string>('');
   const [connectionString, setConnectionString] = useState<string>('');
   const [heartbeat, setHeartbeat] = useState<string>('300');
@@ -58,6 +62,7 @@ export default function ReplicationConfigCreateScreen() {
     collections: string[]
   ): Promise<void> {
     try {
+      const connStringLower = connectionString.toLowerCase();
       if (replicatorType === '') {
         setResultMessages(['Replicator Type is required']);
         return;
@@ -74,6 +79,39 @@ export default function ReplicationConfigCreateScreen() {
         setResultMessages(['At least one collection is required']);
         return;
       }
+      if (
+        connStringLower === '' ||
+        !connStringLower.startsWith('ws://') ||
+        !connStringLower.startsWith('wss://')
+      ) {
+        setResultMessages(['Connection String is required']);
+        return;
+      }
+      const replicatorId = await createReplicatorFromConfig(
+        setReplicatorIds,
+        database,
+        scopeName,
+        collections,
+        replicatorType,
+        connectionString,
+        heartbeat,
+        maxAttempts,
+        maxWaitTime,
+        continuous,
+        autoPurgeEnabled,
+        acceptParentDomainCookies,
+        acceptOnlySelfSignedCerts,
+        selectedAuthenticationType,
+        username,
+        password,
+        sessionId,
+        cookieName
+      );
+      const date = new Date();
+      setResultMessages((prev) => [
+        ...prev,
+        `${date.toISOString()}:: Replicator created with id: ${replicatorId}`,
+      ]);
     } catch (error) {
       // @ts-ignore
       return [error.message];
