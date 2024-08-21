@@ -31,7 +31,7 @@ export default function ReplicatorConfigCollectionForm({
           databases[databaseName] instanceof Database
         ) {
           const database = databases[databaseName];
-          const collectionsList = collections.trim().split(',');
+          const collectionsList = collections.split(',').map((c) => c.trim());
           await handleUpdatePressed(database, scopeName, collectionsList);
         } else {
           updateResultMessage([

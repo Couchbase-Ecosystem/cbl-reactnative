@@ -6,36 +6,41 @@ export function useReplicationNavigationSections() {
       data: [
         {
           id: 1,
-          title: 'Replicator Configs',
-          path: '/replication/configListing',
+          title: 'Create Replicator',
+          path: '/replication/config',
         },
         {
           id: 2,
-          title: 'Replicator Start/Stop',
+          title: 'Replicator Start',
           path: '/replication/start',
         },
         {
           id: 3,
+          title: 'Replicator Stop',
+          path: '/replication/stop',
+        },
+        {
+          id: 4,
           title: 'Pending Documents',
           path: '/replication/pendingDocs',
         },
         {
-          id: 4,
+          id: 5,
           title: 'Is Documents Pending',
           path: '/replication/isPending',
         },
         {
-          id: 5,
+          id: 6,
           title: 'Replicator Logs',
           path: '/replication/logs',
         },
         {
-          id: 6,
+          id: 7,
           title: 'Status Changes',
           path: '/replication/status',
         },
         {
-          id: 7,
+          id: 8,
           title: 'Document Changes',
           path: '/replication/documentChange',
         },

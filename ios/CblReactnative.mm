@@ -223,36 +223,32 @@ RCT_EXTERN_METHOD(query_Explain:
   withRejecter:(RCTPromiseRejectBlock)reject)
 
 // MARK: - Replicator Functions
+
+RCT_EXTERN_METHOD(replicator_AddChangeListener:
+  (NSString *)changeListenerToken
+  withReplicatorId:(NSString *)replicatorId
+  withCallback:(RCTResponseSenderBlock)callback)
+
+RCT_EXTERN_METHOD(replicator_Cleanup:
+  (NSString *)replicatorId
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(replicator_Create:
   (NSDictionary *)config
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(replicator_Start:
-  (NSString *)replicatorId
-  withResolver:(RCTPromiseResolveBlock)resolve
-  withRejecter:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(replicator_Stop:
-  (NSString *)replicatorId
-  withResolver:(RCTPromiseResolveBlock)resolve
-  withRejecter:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(replicator_ResetCheckpoint:
-  (NSString *)replicatorId
-  withResolver:(RCTPromiseResolveBlock)resolve
-  withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(replicator_GetPendingDocumentIds:
+                  (NSString *)replicatorId
+                  fromDatabaseWithName:(NSString *) name
+                  fromScopeWithName:(NSString *) scopeName
+                  fromCollectionWithName:(NSString *) collectionName
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(replicator_GetStatus:
   (NSString *)replicatorId
-  withResolver:(RCTPromiseResolveBlock)resolve
-  withRejecter:(RCTPromiseRejectBlock)reject)
-
-RCT_EXTERN_METHOD(replicator_GetPendingDocumentIds:
-  (NSString *)replicatorId
-  fromDatabaseWithName:(NSString *) name
-  fromScopeWithName:(NSString *) scopeName
-  fromCollectionWithName:(NSString *) collectionName
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
@@ -265,10 +261,26 @@ RCT_EXTERN_METHOD(replicator_IsDocumentPending:
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(replicator_Cleanup:
-  (NSString *)replicatorId
-  withResolver:(RCTPromiseResolveBlock)resolve
-  withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(replicator_ResetCheckpoint:
+                  (NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_RemoveChangeListener:
+                  (NSString *)changeListenerToken
+                  withReplicatorId:(NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_Start:
+                  (NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_Stop:
+                  (NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
 
 // MARK: - Scope Functions
 RCT_EXTERN_METHOD(scope_GetDefault:

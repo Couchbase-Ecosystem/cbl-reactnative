@@ -1,7 +1,10 @@
 import { NativeModules, Platform } from 'react-native';
 import {
-  CollectionArgs,
   CollectionChangeListenerArgs,
+  ICoreEngine,
+  ListenerCallback,
+  ListenerHandle,
+  CollectionArgs,
   CollectionCreateIndexArgs,
   CollectionDeleteDocumentArgs,
   CollectionDeleteIndexArgs,
@@ -30,9 +33,6 @@ import {
   DocumentExpirationResult,
   DocumentGetBlobContentArgs,
   DocumentResult,
-  ICoreEngine,
-  ListenerCallback,
-  ListenerHandle,
   QueryChangeListenerArgs,
   QueryExecuteArgs,
   QueryRemoveChangeListenerArgs,
@@ -45,10 +45,10 @@ import {
   ScopesResult,
 } from './cblite-js/cblite/core-types';
 
-import { Collection } from './cblite-js/cblite/src/collection';
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
-import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
+import { Collection } from './cblite-js/cblite/src/collection';
 import { Result } from './cblite-js/cblite/src/result';
+import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Scope } from './cblite-js/cblite/src/scope';
 
 import uuid from 'react-native-uuid';
@@ -747,14 +747,29 @@ export class CblReactNativeEngine implements ICoreEngine {
   replicator_AddChangeListener(
     args: ReplicationChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
-    return Promise.resolve(undefined);
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_AddChangeListener(
+        args.changeListenerToken,
+        args.replicatorId,
+        (results: [any, any]) => {
+          lcb(results[0], results[1]);
+        }
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_AddDocumentChangeListener(
     args: ReplicationChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 

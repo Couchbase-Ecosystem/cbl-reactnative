@@ -6,7 +6,7 @@ import { ReplicatorAuthenticationFormProps } from '@/components/ReplicatorAuthen
 import { useStyleScheme } from '@/components/Themed/Themed';
 import HeaderView from '@/components/HeaderView/HeaderView';
 import { Divider } from '@gluestack-ui/themed';
-type Item = { key: string; value: string };
+import { Item } from '@/types/item.type';
 
 export default function ReplicatorAuthenticationForm({
   selectedAuthenticationType,

@@ -32,6 +32,7 @@ export default async function createReplicatorFromConfig(
   sessionId: string | undefined,
   cookieName: string | undefined
 ): Promise<string> {
+  let replicator: Replicator;
   const target = new URLEndpoint(connectionString);
   const config = new ReplicatorConfiguration(target);
   const cols = await getCollections(collections, scopeName, database);
@@ -55,7 +56,11 @@ export default async function createReplicatorFromConfig(
   config.setAutoPurgeEnabled(autoPurgeEnabled);
   config.setAcceptParentDomainCookies(acceptParentDomainCookies);
   config.setAcceptOnlySelfSignedCerts(acceptOnlySelfSignedCerts);
-  const replicator = await Replicator.create(config);
+  try {
+    replicator = await Replicator.create(config);
+  } catch (e) {
+    throw new Error(`Can't create replicator - error: ${e}`);
+  }
   const uuid = replicator.getId();
   if (uuid !== undefined && uuid !== '') {
     setReplicatorIds((prev) => {
@@ -73,10 +78,16 @@ async function getCollections(
   database: Database
 ): Promise<Collection[]> {
   const resultsCollections: Collection[] = [];
-  collections.map(async (collectionName) => {
-    const collection = await database.collection(scopeName, collectionName);
-    resultsCollections.push(collection);
-  });
+  for (const collectionName of collections) {
+    try {
+      const collection = await database.collection(collectionName, scopeName);
+      resultsCollections.push(collection);
+    } catch (e) {
+      throw new Error(
+        `Can't get collection ${collectionName} from scope ${scopeName} - error: ${e}`
+      );
+    }
+  }
   return resultsCollections;
 }
 

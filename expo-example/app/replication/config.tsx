@@ -8,14 +8,14 @@ import ReplicatorConfigCollectionForm from '@/components/ReplicationConfigCollec
 import ResultListView from '@/components/ResultsListView/ResultsListView';
 import ReplicatorContext from '@/providers/ReplicatorContext';
 import { useNavigation } from '@react-navigation/native';
-import useNavigationBarTitleOption from '@/hooks/useNativgationBarTitle';
 import createReplicatorFromConfig from '@/service/replicator/createReplicatorFromConfig';
+import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
 
 export default function ReplicationConfigCreateScreen() {
   const { setReplicatorIds } = useContext(ReplicatorContext)!;
   const styles = useStyleScheme();
   const navigation = useNavigation();
-  useNavigationBarTitleOption('Add Replicator Config', navigation);
+  useNavigationBarTitleResetOption('Create Replicator', navigation, reset);
 
   const [replicatorType, setReplicatorType] = useState<string>('');
   const [connectionString, setConnectionString] = useState<string>('');
@@ -56,12 +56,22 @@ export default function ReplicationConfigCreateScreen() {
     setResultMessages([]);
   }
 
+  function isConnectionStringValid(connStringLower: string) {
+    return (
+      connStringLower.startsWith('ws://') ||
+      connStringLower.startsWith('wss://')
+    );
+  }
+
   async function update(
     database: Database,
     scopeName: string,
     collections: string[]
   ): Promise<void> {
     try {
+      if (database === null || database === undefined) {
+        setResultMessages(['Database is required, currently not set']);
+      }
       const connStringLower = connectionString.toLowerCase();
       if (replicatorType === '') {
         setResultMessages(['Replicator Type is required']);
@@ -79,11 +89,7 @@ export default function ReplicationConfigCreateScreen() {
         setResultMessages(['At least one collection is required']);
         return;
       }
-      if (
-        connStringLower === '' ||
-        !connStringLower.startsWith('ws://') ||
-        !connStringLower.startsWith('wss://')
-      ) {
+      if (connStringLower === '' || !isConnectionStringValid(connStringLower)) {
         setResultMessages(['Connection String is required']);
         return;
       }
@@ -114,7 +120,7 @@ export default function ReplicationConfigCreateScreen() {
       ]);
     } catch (error) {
       // @ts-ignore
-      return [error.message];
+      setResultMessages((prev) => [...prev, error.message]);
     }
   }
 
