@@ -81,14 +81,14 @@ export class CblReactNativeEngine implements ICoreEngine {
   collection_AddChangeListener(
     args: CollectionChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
   collection_AddDocumentChangeListener(
     args: DocumentChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
@@ -700,7 +700,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   query_AddChangeListener(
     args: QueryChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
