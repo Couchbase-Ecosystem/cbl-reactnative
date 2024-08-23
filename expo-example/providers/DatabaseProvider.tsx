@@ -4,12 +4,13 @@ import DatabaseContext from '@/providers/DatabaseContext';
 import ReplicatorContext from '@/providers/ReplicatorContext';
 import ReplicatorStatusChangeContext from '@/providers/ReplicatorStatusChangeContext';
 import ReplicatorDocumentChangeContext from '@/providers/ReplicationDocumentChangeContext';
-
+import ReplicatorStatusTokenContext from './ReplicatorStatusTokenContext';
 type DatabaseProviderProps = {
   children: ReactNode;
 };
 
 const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
+  // State to store for database, replication, and reporting
   const [databases, setDatabases] = useState<Record<string, Database>>({});
   const [replicatorIds, setReplicatorIds] = useState<
     Record<string, Replicator>
@@ -17,6 +18,7 @@ const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
   const [statusChangeMessages, setStatusChangeMessages] = useState<
     Record<string, string[]>
   >({});
+  const [statusToken, setStatusToken] = useState<Record<string, string>>({});
   const [documentChangeMessages, setDocumentChangeMessages] = useState<
     Record<string, string[]>
   >({});
@@ -33,6 +35,10 @@ const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
     () => ({ statusChangeMessages, setStatusChangeMessages }),
     [statusChangeMessages, setStatusChangeMessages]
   );
+  const replicatorStatusTokenValue = useMemo(
+    () => ({ statusToken, setStatusToken }),
+    [statusToken, setStatusToken]
+  );
   const replicatorDocumentChangeValue = useMemo(
     () => ({ documentChangeMessages, setDocumentChangeMessages }),
     [documentChangeMessages, setDocumentChangeMessages]
@@ -43,15 +49,19 @@ const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
   return (
     <DatabaseContext.Provider value={databasesValue}>
       <ReplicatorContext.Provider value={replicatorIdsValue}>
-        <ReplicatorStatusChangeContext.Provider
-          value={replicatorStatusChangeValue}
+        <ReplicatorStatusTokenContext.Provider
+          value={replicatorStatusTokenValue}
         >
-          <ReplicatorDocumentChangeContext.Provider
-            value={replicatorDocumentChangeValue}
+          <ReplicatorStatusChangeContext.Provider
+            value={replicatorStatusChangeValue}
           >
-            {children}
-          </ReplicatorDocumentChangeContext.Provider>
-        </ReplicatorStatusChangeContext.Provider>
+            <ReplicatorDocumentChangeContext.Provider
+              value={replicatorDocumentChangeValue}
+            >
+              {children}
+            </ReplicatorDocumentChangeContext.Provider>
+          </ReplicatorStatusChangeContext.Provider>
+        </ReplicatorStatusTokenContext.Provider>
       </ReplicatorContext.Provider>
     </DatabaseContext.Provider>
   );
