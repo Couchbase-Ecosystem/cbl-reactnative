@@ -4,9 +4,10 @@ import CouchbaseLiteSwift
 @objc(
     CblReactnative
 )
-class CblReactnative: NSObject {
+class CblReactnative: RCTEventEmitter {
     
     // MARK: - Member Properties
+    private var hasListeners = false
     var databaseChangeListeners = [String: Any]()
     
     var collectionChangeListeners = [String: Any]()
@@ -21,6 +22,47 @@ class CblReactnative: NSObject {
     
     // Create a serial DispatchQueue for background tasks
     let backgroundQueue = DispatchQueue(label: "com.cblite.reactnative.backgroundQueue")
+    
+    override init() {
+        super.init()
+    }
+    // MARK: - Setup Notifications
+    
+    override func startObserving() {
+        hasListeners = true
+    }
+    
+    override func stopObserving() {
+        hasListeners = false
+    }
+    
+    override func supportedEvents() -> [String]! {
+        return ["collectionChange","collectionDocumentChange","queryChange","replicatorStatusChange","replicatorDocumentChange"]
+    }
+    
+    @objc override static func requiresMainQueueSetup() -> Bool {
+        return true
+    }
+    
+    @objc func handleNotification(_ notification: Notification) {
+        if self.hasListeners {
+            let userInfo = notification.userInfo ?? [:]
+            switch notification.name {
+                case .collectionChange:
+                    sendEvent(withName: "collectionChange", body: userInfo)
+                case .collectionDocumentChange:
+                    sendEvent(withName: "collectionDocumentChange", body: userInfo)
+                case .queryChange:
+                    sendEvent(withName: "queryChange", body: userInfo)
+                case .replicatorStatusChange:
+                    sendEvent(withName: "queryChange", body: userInfo)
+                case .replicatorDocumentChange:
+                    sendEvent(withName: "replicatorDocumentChange", body: userInfo)
+                default:
+                    break
+            }
+        }
+    }
     
     // MARK: - Collection Functions
     
@@ -1121,11 +1163,14 @@ class CblReactnative: NSObject {
     
     // MARK: - Replicator Functions
     
-    @objc(replicator_AddChangeListener:withReplicatorId:withCallback:)
+    @objc(replicator_AddChangeListener:withReplicatorId:withResolver:
+            withRejecter:)
     func replicator_AddChangeListener(
         changeListenerToken: NSString,
         replicatorId: NSString,
-        callback: @escaping RCTResponseSenderBlock ) -> Void {
+        resolve: @escaping RCTPromiseResolveBlock,
+        reject: @escaping RCTPromiseRejectBlock)
+    {
         backgroundQueue.async {
             var errorMessage = ""
             var resultData = NSMutableDictionary()
@@ -1133,16 +1178,17 @@ class CblReactnative: NSObject {
             let token = String(changeListenerToken)
             guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
                 errorMessage = "No such replicator found for id \(replId)"
-                callback([resultData, errorMessage])
+                reject("REPLICATOR_ERROR", errorMessage, nil)
                 return
             }
             
             let listener = replicator.addChangeListener(withQueue: self.backgroundQueue, { change in
                 let statusJson = ReplicatorHelper.generateReplicatorStatusJson(change.status)
                 resultData.setValue(statusJson, forKey: "status")
-                callback([resultData, errorMessage])
+                NotificationCenter.default.post(name: .replicatorStatusChange, object: nil, userInfo: resultData as? [AnyHashable : Any])
             })
             self.replicatorChangeListeners[token] = listener
+            resolve(nil)
         }
     }
     
@@ -1544,4 +1590,12 @@ class CblReactnative: NSObject {
             }
         }
     }
+}
+
+extension Notification.Name {
+    static let collectionChange = Notification.Name("collectionChange")
+    static let collectionDocumentChange = Notification.Name("collectionDocumentChange")
+    static let queryChange = Notification.Name("queryChange")
+    static let replicatorStatusChange = Notification.Name("replicatorStatusChange")
+    static let replicatorDocumentChange = Notification.Name("replicatorDocumentChange")
 }

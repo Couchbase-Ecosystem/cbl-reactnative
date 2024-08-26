@@ -1,6 +1,7 @@
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(CblReactnative, NSObject)
+@interface RCT_EXTERN_MODULE(CblReactnative, RCTEventEmitter)
 
 // MARK: - Collection Functions
 
@@ -227,7 +228,8 @@ RCT_EXTERN_METHOD(query_Explain:
 RCT_EXTERN_METHOD(replicator_AddChangeListener:
   (NSString *)changeListenerToken
   withReplicatorId:(NSString *)replicatorId
-  withCallback:(RCTResponseSenderBlock)callback)
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(replicator_Cleanup:
   (NSString *)replicatorId
