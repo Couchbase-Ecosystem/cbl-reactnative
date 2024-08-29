@@ -1,6 +1,6 @@
 import { StyleSheet, Button } from 'react-native';
 import { useState } from 'react';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@/components/Themed/Themed';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
 export default function TabOneScreen() {

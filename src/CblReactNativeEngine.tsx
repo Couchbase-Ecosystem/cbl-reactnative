@@ -1,7 +1,15 @@
-import { NativeModules, Platform } from 'react-native';
 import {
-  CollectionArgs,
+  EmitterSubscription,
+  NativeEventEmitter,
+  DeviceEventEmitter,
+  NativeModules,
+  Platform,
+} from 'react-native';
+import {
   CollectionChangeListenerArgs,
+  ICoreEngine,
+  ListenerCallback,
+  CollectionArgs,
   CollectionCreateIndexArgs,
   CollectionDeleteDocumentArgs,
   CollectionDeleteIndexArgs,
@@ -30,24 +38,22 @@ import {
   DocumentExpirationResult,
   DocumentGetBlobContentArgs,
   DocumentResult,
-  ICoreEngine,
-  ListenerCallback,
-  ListenerHandle,
   QueryChangeListenerArgs,
   QueryExecuteArgs,
   QueryRemoveChangeListenerArgs,
   ReplicationChangeListenerArgs,
   ReplicatorArgs,
   ReplicatorCollectionArgs,
+  ReplicatorCreateArgs,
   ReplicatorDocumentPendingArgs,
   ScopeArgs,
   ScopesResult,
 } from './cblite-js/cblite/core-types';
 
-import { Collection } from './cblite-js/cblite/src/collection';
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
-import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
+import { Collection } from './cblite-js/cblite/src/collection';
 import { Result } from './cblite-js/cblite/src/result';
+import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Scope } from './cblite-js/cblite/src/scope';
 
 import uuid from 'react-native-uuid';
@@ -55,6 +61,25 @@ import uuid from 'react-native-uuid';
 export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
   _defaultScopeName = '_default';
+
+  //event name mapping for the native side of the module
+  _eventReplicatorStatusChange = 'replicatorStatusChange';
+  _eventReplicatorDocumentChange = 'replicatorDocumentChange';
+  _eventCollectionChange = 'collectionChange';
+  _eventCollectionDocumentChange = 'collectionDocumentChange';
+  _eventQueryChange = 'queryChange';
+
+  //used to listen to replicator change events for both status and document changes
+  private _isReplicatorStatusChangeEventSetup: boolean = false;
+  private _replicatorChangeListeners: Map<string, ListenerCallback> = new Map();
+  private _replicatorStatusChangeSubscription: EmitterSubscription | undefined =
+    undefined;
+
+  private _replicatorDocumentChangeListeners: Map<string, ListenerCallback> =
+    new Map();
+  private _replicatorDocumentChangeStopListener: () => void | undefined =
+    undefined;
+  private _isReplicatorDocumentChangeEventSetup: boolean = false;
 
   private static readonly LINKING_ERROR =
     `The package 'cbl-reactnative' doesn't seem to be linked. Make sure: \n\n` +
@@ -73,21 +98,38 @@ export class CblReactNativeEngine implements ICoreEngine {
         }
       );
 
+  private _eventEmitter = new NativeEventEmitter(this.CblReactNative);
+
   constructor() {
     EngineLocator.registerEngine(EngineLocator.key, this);
   }
 
+  //startListeningEvents - used to listen to events from the native side of the module.  Implements Native change listeners for Couchbase Lite
+  startListeningEvents = (event: string, callback: any) => {
+    console.log(`::DEBUG:: Registering listener for event: ${event}`);
+    return this._eventEmitter.addListener(
+      event,
+      (data) => {
+        console.log(
+          `Received event: ${event} with data: ${JSON.stringify(data)}`
+        );
+        callback(data);
+      },
+      this
+    );
+  };
+
   collection_AddChangeListener(
     args: CollectionChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
   collection_AddDocumentChangeListener(
     args: DocumentChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
@@ -699,7 +741,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   query_AddChangeListener(
     args: QueryChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
@@ -746,57 +788,222 @@ export class CblReactNativeEngine implements ICoreEngine {
   replicator_AddChangeListener(
     args: ReplicationChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
-    return Promise.resolve(undefined);
+  ): Promise<void> {
+    //need to track the listener callback for later use due to how React Native events work.  Events are global so we need to first find which callback to call, we could have multiple replicators registered
+    //https://reactnative.dev/docs/native-modules-ios#sending-events-to-javascript
+    if (this._replicatorChangeListeners.has(args.changeListenerToken)) {
+      throw new Error(
+        'ERROR:  changeListenerToken already exists and is registered to listen to callbacks, cannot add a new one'
+      );
+    }
+    //if the event listener is not setup, then set up the listener.
+    //Event listener only needs to be setup once for any replicators in memory
+    if (!this._isReplicatorStatusChangeEventSetup) {
+      this._replicatorStatusChangeSubscription = this.startListeningEvents(
+        this._eventReplicatorStatusChange,
+        (results: any) => {
+          const token = results.token as string;
+          const data = results.status;
+          const error = results.error;
+          if (token === undefined || token === null || token.length === 0) {
+            console.log(
+              '::ERROR:: No token to resolve back to proper callback for Replicator Status Change'
+            );
+            throw new Error(
+              'ERROR:  No token to resolve back to proper callback'
+            );
+          }
+          const callback = this._replicatorChangeListeners.get(token);
+          if (callback !== undefined) {
+            callback(data, error);
+          } else {
+            console.log(
+              `Error: Could not found callback method for token: ${token}.`
+            );
+            throw new Error(
+              `Error: Could not found callback method for token: ${token}.`
+            );
+          }
+        }
+      );
+      const count = this._eventEmitter.listenerCount('replicatorStatusChange');
+      console.log(`::DEBUG::Replicator Status Change Listener count: ${count}`);
+      this._isReplicatorStatusChangeEventSetup = true;
+    }
+    //add token to change listener map
+    this._replicatorChangeListeners.set(args.changeListenerToken, lcb);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_AddChangeListener(
+        args.changeListenerToken,
+        args.replicatorId
+      ).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          this._replicatorChangeListeners.delete(args.changeListenerToken);
+          //stop the event listening if there is an error and no other tokens are present, thus no need to listen to events
+          if (this._replicatorChangeListeners.size === 0) {
+            this._replicatorStatusChangeSubscription.remove();
+            this._isReplicatorStatusChangeEventSetup = false;
+          }
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_AddDocumentChangeListener(
     args: ReplicationChangeListenerArgs,
     lcb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
   replicator_Cleanup(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Cleanup(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
-  replicator_Create(args: any): Promise<ReplicatorArgs> {
-    return Promise.resolve(undefined);
+  replicator_Create(args: ReplicatorCreateArgs): Promise<ReplicatorArgs> {
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Create(args.config).then(
+        (results: ReplicatorArgs) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_GetPendingDocumentIds(
     args: ReplicatorCollectionArgs
   ): Promise<{ pendingDocumentIds: string[] }> {
-    return Promise.resolve({ pendingDocumentIds: [] });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_GetPendingDocumentIds(
+        args.replicatorId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (results: { pendingDocumentIds: string[] }) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_GetStatus(args: ReplicatorArgs): Promise<ReplicatorStatus> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_GetStatus(args.replicatorId).then(
+        (results: ReplicatorStatus) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_IsDocumentPending(
     args: ReplicatorDocumentPendingArgs
   ): Promise<{ isPending: boolean }> {
-    return Promise.resolve({ isPending: false });
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_IsDocumentPending(
+        args.documentId,
+        args.replicatorId,
+        args.name,
+        args.scopeName,
+        args.collectionName
+      ).then(
+        (results: { isPending: boolean }) => {
+          resolve(results);
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_RemoveChangeListener(
     args: ReplicationChangeListenerArgs
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_RemoveChangeListener(
+        args.changeListenerToken,
+        args.replicatorId
+      ).then(
+        () => {
+          //remove the listener callback from the map
+          if (this._replicatorChangeListeners.has(args.changeListenerToken)) {
+            this._replicatorChangeListeners.delete(args.changeListenerToken);
+          }
+          //remove listening to events if there are no more listeners registered
+          if (this._replicatorChangeListeners.size === 0) {
+            this._replicatorStatusChangeSubscription.remove();
+            this._isReplicatorStatusChangeEventSetup = false;
+          }
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_ResetCheckpoint(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_ResetCheckpoint(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_Start(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Start(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_Stop(args: ReplicatorArgs): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_Stop(args.replicatorId).then(
+        () => {
+          resolve();
+        },
+        (error: any) => {
+          reject(error);
+        }
+      );
+    });
   }
 
   scope_GetDefault(args: DatabaseArgs): Promise<Scope> {

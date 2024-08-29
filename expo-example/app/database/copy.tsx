@@ -1,14 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { SafeAreaView, useColorScheme } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme, useThemeColor } from '@/components/Themed';
-import DatabaseNameForm from '@/components/DatabaseNameForm';
+import { useStyleScheme, useThemeColor } from '@/components/Themed/Themed';
+import DatabaseNameForm from '@/components/DatabaseNameForm/DatabaseNameForm';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
-import ResultListView from '@/components/ResultsListView';
+import ResultListView from '@/components/ResultsListView/ResultsListView';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
 import { usePlaceholderTextColor } from '@/hooks/usePlaceholderTextColor';
-import DatabaseCopyActionForm from '@/components/DatabaseCopyActionForm';
+import DatabaseCopyActionForm from '@/components/DatabaseCopyActionForm/DatabaseCopyActionForm';
 import copy from '@/service/database/copy';
 
 export default function DatabaseCopyScreen() {

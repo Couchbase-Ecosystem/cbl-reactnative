@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import { useStyleScheme } from '@/components/Themed';
+import { useStyleScheme } from '@/components/Themed/Themed';
 import { Collection, Blob } from 'cbl-reactnative';
-import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import CBLDocumentIdCollectionActionContainer from '@/components/CBLDocumentIdCollectionActionContainer/CBLDocumentIdCollectionActionContainer';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import { Divider } from '@gluestack-ui/themed';
 import setBlob from '@/service/document/setBlob';
+import { StyleSheet, View } from 'react-native';
 
 export default function DocumentSetBlobScreen() {
-  //database stuff
+  const styles = useStyleScheme();
   const [key, setKey] = useState<string>('');
   const [blobText, setBlobText] = useState<string>('');
-  //results
-  const styles = useStyleScheme();
 
   function reset() {
     setKey('');
@@ -46,26 +45,38 @@ export default function DocumentSetBlobScreen() {
       handleUpdatePressed={update}
       handleResetPressed={reset}
     >
-      <Divider style={{ marginTop: 5, marginBottom: 10, marginLeft: 8 }} />
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Blob Key"
-        onChangeText={(keyText) => setKey(keyText)}
-        defaultValue={key}
-      />
-      <Divider style={{ marginTop: 5, marginBottom: 10, marginLeft: 8 }} />
-      <StyledTextInput
-        autoCapitalize="none"
-        style={[
-          styles.textInput,
-          { height: undefined, minHeight: 120, marginTop: 5, marginBottom: 15 },
-        ]}
-        placeholder="Blob Text"
-        onChangeText={(newBlobText) => setBlobText(newBlobText)}
-        defaultValue={blobText}
-        multiline={true}
-      />
+      <View>
+        <Divider style={localStyles.divider} />
+        <StyledTextInput
+          style={styles.input}
+          autoCapitalize="none"
+          placeholder="Blob Key"
+          onChangeText={(keyText) => setKey(keyText)}
+          defaultValue={key}
+        />
+        <Divider style={localStyles.divider} />
+        <StyledTextInput
+          autoCapitalize="none"
+          style={[styles.textInput, localStyles.blobText]}
+          placeholder="Blob Text"
+          onChangeText={(newBlobText) => setBlobText(newBlobText)}
+          defaultValue={blobText}
+          multiline={true}
+        />
+      </View>
     </CBLDocumentIdCollectionActionContainer>
   );
 }
+
+const localStyles = StyleSheet.create({
+  blobText: {
+    height: undefined,
+    minHeight: 120,
+    marginTop: 2,
+    marginBottom: 15,
+  },
+  divider: {
+    marginTop: 5,
+    marginBottom: 10,
+  },
+});

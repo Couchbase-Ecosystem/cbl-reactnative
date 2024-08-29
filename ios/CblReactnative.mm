@@ -1,6 +1,7 @@
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(CblReactnative, NSObject)
+@interface RCT_EXTERN_MODULE(CblReactnative, RCTEventEmitter)
 
 // MARK: - Collection Functions
 
@@ -145,19 +146,19 @@ RCT_EXTERN_METHOD(database_ChangeEncryptionKey:
   withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(database_Close:(NSString *)name
-    withResolver:(RCTPromiseResolveBlock)resolve
-    withRejecter:(RCTPromiseRejectBlock)reject)
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(database_Copy:(NSString)path
-    withNewName:(NSString *)newName
-    withDirectory:(NSString *)directory
-    withEncryptionKey:(NSString *)encryptionKey
-    withResolver:(RCTPromiseResolveBlock)resolve
-    withRejecter:(RCTPromiseRejectBlock)reject)
+  withNewName:(NSString *)newName
+  withDirectory:(NSString *)directory
+  withEncryptionKey:(NSString *)encryptionKey
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(database_Delete:(NSString *)name 
-    withResolver:(RCTPromiseResolveBlock)resolve
-    withRejecter:(RCTPromiseRejectBlock)reject)
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(database_DeleteWithPath:(NSString *)path
     fromDatabaseWithName:(NSString *)name
@@ -222,8 +223,68 @@ RCT_EXTERN_METHOD(query_Explain:
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
-// MARK: - Scope Functions
+// MARK: - Replicator Functions
 
+RCT_EXTERN_METHOD(replicator_AddChangeListener:
+  (NSString *)changeListenerToken
+  withReplicatorId:(NSString *)replicatorId
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_Cleanup:
+  (NSString *)replicatorId
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_Create:
+  (NSDictionary *)config
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_GetPendingDocumentIds:
+                  (NSString *)replicatorId
+                  fromDatabaseWithName:(NSString *) name
+                  fromScopeWithName:(NSString *) scopeName
+                  fromCollectionWithName:(NSString *) collectionName
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_GetStatus:
+  (NSString *)replicatorId
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_IsDocumentPending:
+  (NSString *)documentId
+  fromReplicatorWithId:(NSString *) replicatorId
+  fromDatabaseWithName:(NSString *) name
+  fromScopeWithName:(NSString *) scopeName
+  fromCollectionWithName:(NSString *) collectionName
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_ResetCheckpoint:
+                  (NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_RemoveChangeListener:
+                  (NSString *)changeListenerToken
+                  withReplicatorId:(NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_Start:
+                  (NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replicator_Stop:
+                  (NSString *)replicatorId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+// MARK: - Scope Functions
 RCT_EXTERN_METHOD(scope_GetDefault:
   (NSString *)name
   withResolver:(RCTPromiseResolveBlock)resolve

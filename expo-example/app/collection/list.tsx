@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import listCollections from '@/service/collection/list';
 import { Database } from 'cbl-reactnative';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
-import HeaderView from '@/components/HeaderView';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
+import HeaderView from '@/components/HeaderView/HeaderView';
+import { View } from 'react-native';
+import { useStyleScheme } from '@/components/Themed/Themed';
 
 export default function CollectionListScreen() {
+  const styles = useStyleScheme();
   const [scopeName, setScopeName] = useState<string>('');
 
   function reset() {
@@ -42,13 +45,15 @@ export default function CollectionListScreen() {
     >
       <HeaderView name="Scope Information" iconName="file-cabinet" />
 
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Scope Name"
-        onChangeText={(scopeText) => setScopeName(scopeText)}
-        defaultValue={scopeName}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          style={{ marginBottom: 5 }}
+          autoCapitalize="none"
+          placeholder="Scope Name"
+          onChangeText={(scopeText) => setScopeName(scopeText)}
+          defaultValue={scopeName}
+        />
+      </View>
     </CBLDatabaseActionContainer>
   );
 }

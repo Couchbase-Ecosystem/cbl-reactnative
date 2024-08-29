@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Database } from 'cbl-reactnative';
 import deleteDatabase from '@/service/database/deleteDatabase';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 import DatabaseContext from '@/providers/DatabaseContext';
 
 export default function DatabaseDeleteScreen() {

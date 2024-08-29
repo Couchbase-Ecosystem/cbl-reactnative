@@ -1,5 +1,5 @@
 export function useCollectionNavigationSections() {
-  const sections = [
+  return [
     {
       title: 'Scopes API',
       icon: 'file-cabinet',
@@ -76,5 +76,4 @@ export function useCollectionNavigationSections() {
       ],
     },
   ];
-  return sections;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Database } from 'cbl-reactnative';
 import listScopes from '@/service/scope/list';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 
 export default function ScopeListScreen() {
   function reset() {}

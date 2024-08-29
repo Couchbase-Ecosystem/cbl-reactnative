@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { StyledTextInput } from '@/components/StyledTextInput';
+import { StyledTextInput } from '@/components/StyledTextInput/StyledTextInput';
 import create from '@/service/collection/create';
 import { Database } from 'cbl-reactnative';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 import { Divider } from '@gluestack-ui/themed';
-import HeaderView from '@/components/HeaderView';
+import HeaderView from '@/components/HeaderView/HeaderView';
+import { StyleSheet, View } from 'react-native';
+import { useStyleScheme } from '@/components/Themed/Themed';
 
 export default function CollectionCreateScreen() {
+  const styles = useStyleScheme();
+
   const [scopeName, setScopeName] = useState<string>('');
   const [collectionName, setCollectionName] = useState<string>('');
 
@@ -34,21 +38,30 @@ export default function CollectionCreateScreen() {
       handleResetPressed={reset}
     >
       <HeaderView name="Collection Information" iconName="bookshelf" />
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Scope Name"
-        onChangeText={(scopeText) => setScopeName(scopeText)}
-        defaultValue={scopeName}
-      />
-      <Divider style={{ marginTop: 2, marginBottom: 2 }} />
-      <StyledTextInput
-        style={{ marginBottom: 5 }}
-        autoCapitalize="none"
-        placeholder="Collection Name"
-        onChangeText={(collectionText) => setCollectionName(collectionText)}
-        defaultValue={collectionName}
-      />
+      <View style={styles.component}>
+        <StyledTextInput
+          style={styles.input}
+          autoCapitalize="none"
+          placeholder="Scope Name"
+          onChangeText={(scopeText) => setScopeName(scopeText)}
+          defaultValue={scopeName}
+        />
+        <Divider style={localStyles.divider} />
+        <StyledTextInput
+          style={styles.input}
+          autoCapitalize="none"
+          placeholder="Collection Name"
+          onChangeText={(collectionText) => setCollectionName(collectionText)}
+          defaultValue={collectionName}
+        />
+      </View>
     </CBLDatabaseActionContainer>
   );
 }
+
+const localStyles = StyleSheet.create({
+  divider: {
+    marginTop: 2,
+    marginBottom: 2,
+  },
+});

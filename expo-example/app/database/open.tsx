@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme } from '@/components/Themed';
-import DatabaseNameForm from '@/components/DatabaseNameForm';
+import { useStyleScheme } from '@/components/Themed/Themed';
+import DatabaseNameForm from '@/components/DatabaseNameForm/DatabaseNameForm';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
-import DatabaseConfigActionForm from '@/components/DatabaseConfigActionForm';
-import ResultListView from '@/components/ResultsListView';
+import DatabaseConfigActionForm from '@/components/DatabaseConfigActionForm/DatabaseConfigActionForm';
+import ResultListView from '@/components/ResultsListView/ResultsListView';
 import open from '@/service/database/open';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';

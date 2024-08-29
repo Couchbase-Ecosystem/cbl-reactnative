@@ -1,0 +1,3 @@
+type DatabaseHeaderViewProps = {
+  style?: object;
+};

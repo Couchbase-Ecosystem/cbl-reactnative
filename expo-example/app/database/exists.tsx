@@ -1,6 +1,6 @@
 import React from 'react';
 import doesExist from '@/service/database/exists';
-import CBLDatabaseNamePathActionContainer from '@/components/CBLDatabaseNamePathActionContainer';
+import CBLDatabaseNamePathActionContainer from '@/components/CBLDatabaseNamePathActionContainer/CBLDatabaseNamePathActionContainer';
 export default function DatabaseExistsScreen() {
   function reset() {}
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Database } from 'cbl-reactnative';
 import getPath from '@/service/database/getPath';
-import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer';
+import CBLDatabaseActionContainer from '@/components/CBLDatabaseActionContainer/CBLDatabaseActionContainer';
 
 export default function DatabasePathScreen() {
   function reset() {}

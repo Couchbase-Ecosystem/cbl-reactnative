@@ -1,14 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useStyleScheme } from '@/components/Themed';
-import ResultListView from '@/components/ResultsListView';
+import { useStyleScheme } from '@/components/Themed/Themed';
+import ResultListView from '@/components/ResultsListView/ResultsListView';
 import DatabaseContext from '@/providers/DatabaseContext';
 import useNavigationBarTitleResetOption from '@/hooks/useNavigationBarTitleResetOption';
-import HeaderRunActionView from '@/components/HeaderRunActionView';
-import SelectKeyValue from '@/components/SelectKeyValue';
+import HeaderRunActionView from '@/components/HeaderRunActionView/HeaderRunActionView';
+import SelectKeyValue from '@/components/SelectKeyValue/SelectKeyValue';
 import { useMaintenanceTypeAsValues } from '@/hooks/useMaintenanceTypes';
-import DatabaseNameForm from '@/components/DatabaseNameForm';
+import DatabaseNameForm from '@/components/DatabaseNameForm/DatabaseNameForm';
 import performMaintenance from '@/service/database/performMaintenance';
 
 export default function PerformMaintenanceScreen() {
@@ -69,13 +69,14 @@ export default function PerformMaintenanceScreen() {
         iconName="database-cog"
         handleUpdatePressed={update}
       />
-      <SelectKeyValue
-        headerTitle="Types of Database Maintenance"
-        onSelectChange={setSelectedMaintenanceType}
-        placeholder="Select a Maintenance Type"
-        items={maintenanceTypes}
-      />
-
+      <View style={styles.component}>
+        <SelectKeyValue
+          headerTitle="Types of Database Maintenance"
+          onSelectChange={setSelectedMaintenanceType}
+          placeholder="Select a Maintenance Type"
+          items={maintenanceTypes}
+        />
+      </View>
       <ResultListView messages={resultMessage} />
     </SafeAreaView>
   );

@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import deleteDatabaseByPath from '@/service/database/deleteDatabaseByPath';
 import DatabaseContext from '@/providers/DatabaseContext';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
-import CBLDatabaseNamePathActionContainer from '@/components/CBLDatabaseNamePathActionContainer';
+import CBLDatabaseNamePathActionContainer from '@/components/CBLDatabaseNamePathActionContainer/CBLDatabaseNamePathActionContainer';
 
 export default function DatabaseDeletePathScreen() {
   const { databases, setDatabases } = useContext(DatabaseContext)!;

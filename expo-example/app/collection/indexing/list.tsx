@@ -1,6 +1,6 @@
 import React from 'react';
 import { Collection } from 'cbl-reactnative';
-import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer';
+import CBLCollectionActionContainer from '@/components/CBLCollectionActionContainer/CBLCollectionActionContainer';
 import listIndexes from '@/service/indexes/list';
 
 export default function IndexesListScreen() {
