@@ -11,6 +11,7 @@ export default function ReplicatorIdActionForm({
   screenTitle,
   handleUpdatePressed,
   handleResetPressed,
+  handleStopPressed,
 }: ReplicatorIdActionFormProps) {
   const { replicatorIds } = useContext(ReplicatorContext)!;
   const [replicatorId, setReplicatorId] = useState<string>('');
@@ -27,6 +28,12 @@ export default function ReplicatorIdActionForm({
       onPress: update,
     },
   ];
+  if (handleStopPressed !== undefined) {
+    icons.push({
+      iconName: 'stop',
+      onPress: stop,
+    });
+  }
 
   async function update() {
     if (replicatorId in replicatorIds) {
@@ -35,6 +42,17 @@ export default function ReplicatorIdActionForm({
     } else {
       throw new Error(
         `Error: Replicator <${replicatorId}> not found in context. Make sure replicator was created first prior to trying to use it.`
+      );
+    }
+  }
+
+  async function stop() {
+    if (replicatorId in replicatorIds && handleStopPressed !== undefined) {
+      const replicator = replicatorIds[replicatorId];
+      await handleStopPressed(replicator);
+    } else {
+      throw new Error(
+        `Error: Replicator <${replicatorId}> not found in context or no handle to stop the replicator. Make sure replicator was created first prior to trying to stop it.`
       );
     }
   }

@@ -41,27 +41,7 @@ class CblReactnative: RCTEventEmitter {
     }
     
     @objc override static func requiresMainQueueSetup() -> Bool {
-        return true
-    }
-    
-    @objc func handleNotification(_ notification: Notification) {
-        if self.hasListeners {
-            let userInfo = notification.userInfo ?? [:]
-            switch notification.name {
-                case .collectionChange:
-                    sendEvent(withName: "collectionChange", body: userInfo)
-                case .collectionDocumentChange:
-                    sendEvent(withName: "collectionDocumentChange", body: userInfo)
-                case .queryChange:
-                    sendEvent(withName: "queryChange", body: userInfo)
-                case .replicatorStatusChange:
-                    sendEvent(withName: "queryChange", body: userInfo)
-                case .replicatorDocumentChange:
-                    sendEvent(withName: "replicatorDocumentChange", body: userInfo)
-                default:
-                    break
-            }
-        }
+        return false
     }
     
     // MARK: - Collection Functions
@@ -1173,7 +1153,7 @@ class CblReactnative: RCTEventEmitter {
     {
         backgroundQueue.async {
             var errorMessage = ""
-            var resultData = NSMutableDictionary()
+            
             let replId = String(replicatorId)
             let token = String(changeListenerToken)
             guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
@@ -1184,8 +1164,12 @@ class CblReactnative: RCTEventEmitter {
             
             let listener = replicator.addChangeListener(withQueue: self.backgroundQueue, { change in
                 let statusJson = ReplicatorHelper.generateReplicatorStatusJson(change.status)
+                let resultData = NSMutableDictionary()
+                resultData.setValue(token, forKey: "token")
                 resultData.setValue(statusJson, forKey: "status")
-                NotificationCenter.default.post(name: .replicatorStatusChange, object: nil, userInfo: resultData as? [AnyHashable : Any])
+                DispatchQueue.main.async {
+                    self.sendEvent(withName: "replicatorStatusChange", body: resultData)
+                }
             })
             self.replicatorChangeListeners[token] = listener
             resolve(nil)
@@ -1375,7 +1359,6 @@ class CblReactnative: RCTEventEmitter {
         reject: @escaping RCTPromiseRejectBlock) -> Void {
             backgroundQueue.async {
                 var errorMessage = ""
-                var resultData = NSMutableDictionary()
                 let replId = String(replicatorId)
                 let token = String(changeListenerToken)
                 guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {

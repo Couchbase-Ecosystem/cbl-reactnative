@@ -118,7 +118,7 @@ export default function CBLDatabaseQueryActionContainer({
         />
         {children && children}
       </View>
-      <ResultListView messages={resultMessage} />
+      <ResultListView messages={resultMessage} style={localStyles.results} />
     </SafeAreaView>
   );
 }
@@ -129,5 +129,8 @@ const localStyles = StyleSheet.create({
     minHeight: 120,
     marginTop: 5,
     marginBottom: 15,
+  },
+  results: {
+    marginBottom: 280,
   },
 });

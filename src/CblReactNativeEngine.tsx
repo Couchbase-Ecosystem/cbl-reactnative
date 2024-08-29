@@ -1,4 +1,10 @@
-import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import {
+  EmitterSubscription,
+  NativeEventEmitter,
+  DeviceEventEmitter,
+  NativeModules,
+  Platform,
+} from 'react-native';
 import {
   CollectionChangeListenerArgs,
   ICoreEngine,
@@ -66,7 +72,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   //used to listen to replicator change events for both status and document changes
   private _isReplicatorStatusChangeEventSetup: boolean = false;
   private _replicatorChangeListeners: Map<string, ListenerCallback> = new Map();
-  private _replicatorStatusChangeStopListener: () => void | undefined =
+  private _replicatorStatusChangeSubscription: EmitterSubscription | undefined =
     undefined;
 
   private _replicatorDocumentChangeListeners: Map<string, ListenerCallback> =
@@ -100,8 +106,17 @@ export class CblReactNativeEngine implements ICoreEngine {
 
   //startListeningEvents - used to listen to events from the native side of the module.  Implements Native change listeners for Couchbase Lite
   startListeningEvents = (event: string, callback: any) => {
-    const subscription = this._eventEmitter.addListener(event, callback);
-    return () => subscription.remove();
+    console.log(`::DEBUG:: Registering listener for event: ${event}`);
+    return this._eventEmitter.addListener(
+      event,
+      (data) => {
+        console.log(
+          `Received event: ${event} with data: ${JSON.stringify(data)}`
+        );
+        callback(data);
+      },
+      this
+    );
   };
 
   collection_AddChangeListener(
@@ -784,13 +799,16 @@ export class CblReactNativeEngine implements ICoreEngine {
     //if the event listener is not setup, then set up the listener.
     //Event listener only needs to be setup once for any replicators in memory
     if (!this._isReplicatorStatusChangeEventSetup) {
-      this._replicatorDocumentChangeStopListener = this.startListeningEvents(
+      this._replicatorStatusChangeSubscription = this.startListeningEvents(
         this._eventReplicatorStatusChange,
-        (results: any[]) => {
-          const token = results[0] as string;
-          const data = results[1];
-          const error = results[2];
+        (results: any) => {
+          const token = results.token as string;
+          const data = results.status;
+          const error = results.error;
           if (token === undefined || token === null || token.length === 0) {
+            console.log(
+              '::ERROR:: No token to resolve back to proper callback for Replicator Status Change'
+            );
             throw new Error(
               'ERROR:  No token to resolve back to proper callback'
             );
@@ -799,28 +817,34 @@ export class CblReactNativeEngine implements ICoreEngine {
           if (callback !== undefined) {
             callback(data, error);
           } else {
+            console.log(
+              `Error: Could not found callback method for token: ${token}.`
+            );
             throw new Error(
               `Error: Could not found callback method for token: ${token}.`
             );
           }
         }
       );
+      const count = this._eventEmitter.listenerCount('replicatorStatusChange');
+      console.log(`::DEBUG::Replicator Status Change Listener count: ${count}`);
       this._isReplicatorStatusChangeEventSetup = true;
     }
+    //add token to change listener map
+    this._replicatorChangeListeners.set(args.changeListenerToken, lcb);
     return new Promise((resolve, reject) => {
       this.CblReactNative.replicator_AddChangeListener(
         args.changeListenerToken,
         args.replicatorId
       ).then(
         () => {
-          //add token to change listener map
-          this._replicatorChangeListeners.set(args.changeListenerToken, lcb);
           resolve();
         },
         (error: any) => {
+          this._replicatorChangeListeners.delete(args.changeListenerToken);
           //stop the event listening if there is an error and no other tokens are present, thus no need to listen to events
           if (this._replicatorChangeListeners.size === 0) {
-            this._replicatorStatusChangeStopListener();
+            this._replicatorStatusChangeSubscription.remove();
             this._isReplicatorStatusChangeEventSetup = false;
           }
           reject(error);
@@ -921,13 +945,18 @@ export class CblReactNativeEngine implements ICoreEngine {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.replicator_RemoveChangeListener(
-        args.replicatorId,
-        args.changeListenerToken
+        args.changeListenerToken,
+        args.replicatorId
       ).then(
         () => {
           //remove the listener callback from the map
           if (this._replicatorChangeListeners.has(args.changeListenerToken)) {
             this._replicatorChangeListeners.delete(args.changeListenerToken);
+          }
+          //remove listening to events if there are no more listeners registered
+          if (this._replicatorChangeListeners.size === 0) {
+            this._replicatorStatusChangeSubscription.remove();
+            this._isReplicatorStatusChangeEventSetup = false;
           }
           resolve();
         },
