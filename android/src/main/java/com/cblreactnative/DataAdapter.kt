@@ -24,14 +24,20 @@ object DataAdapter {
   fun adaptCollectionToMap(collection: CBLCollection, databaseName: String)
     : WritableMap {
     val colMap: WritableMap = Arguments.createMap()
-    val scopeMap: WritableMap = Arguments.createMap()
+    val scopeMap: WritableMap = adaptScopeToMap(collection.scope, databaseName)
     colMap.putString("name", collection.name)
-    scopeMap.putString("name", collection.scope.name)
-    scopeMap.putString("databaseName", databaseName)
     colMap.putMap("scope", scopeMap)
     return colMap
   }
-  
+
+  fun adaptScopeToMap(scope: Scope,
+                         databaseName: String): WritableMap {
+    val scopeMap: WritableMap = Arguments.createMap()
+    scopeMap.putString("name", scope.name)
+    scopeMap.putString("databaseName", databaseName)
+    return scopeMap
+  }
+
   fun getDatabaseConfig(
     directory: String?,
     encryptionKey: String?): JSONObject {
