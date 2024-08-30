@@ -1,4 +1,4 @@
-package com.couchbase.rn.expexample
+package com.couchbase.expo.example
 
 import android.app.Application
 import android.content.res.Configuration

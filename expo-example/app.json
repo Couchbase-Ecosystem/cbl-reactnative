@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.couchbase.rn.expexample"
+      "package": "com.couchbase.expo.example",
+      "versionCode": 1
     },
     "plugins": [
       "expo-router",

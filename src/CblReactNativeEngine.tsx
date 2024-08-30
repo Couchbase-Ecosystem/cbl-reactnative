@@ -1,7 +1,6 @@
 import {
   EmitterSubscription,
   NativeEventEmitter,
-  DeviceEventEmitter,
   NativeModules,
   Platform,
 } from 'react-native';
