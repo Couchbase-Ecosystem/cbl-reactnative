@@ -373,6 +373,40 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
+  fun collection_Save(
+    document: ReadableMap,
+    docId: String,
+    name: String,
+    scopeName: String,
+    collectionName: String,
+    concurrencyControlValue: Double?,
+    promise: Promise
+  ){
+    try {
+      var concurrencyControl:ConcurrencyControl? = null
+      val writableMap = Arguments.createMap()
+      if (!DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
+        !DataValidation.validateDocumentId(docId, promise)) {
+        return
+      }
+      if (concurrencyControlValue != null) {
+        concurrencyControl = DataAdapter.adaptConcurrencyControlFromInt(concurrencyControlValue.toInt())
+      }
+      val doc = document.toHashMap()
+      val result = CollectionManager.saveDocument(docId, doc, concurrencyControl, collectionName, scopeName, name)
+      writableMap.putString("_id", result.first)
+      if (result.second != null) {
+        writableMap.putBoolean("concurrencyControlResult", result.second!!)
+      } else {
+        writableMap.putNull("concurrencyControlResult")
+      }
+      promise.resolve(writableMap)
+    } catch (e: Exception) {
+      promise.reject("DOCUMENT_ERROR", e.message)
+    }
+  }
+
+  @ReactMethod
   fun collection_SetDocumentExpiration(
     expiration: String,
     docId: String,
