@@ -511,7 +511,7 @@ class CblReactnative: RCTEventEmitter {
     }
     
     @objc(collection_GetIndexes:fromScopeWithName:fromDatabaseWithName:withResolver:withRejecter:)
-    func collection_DeleteCollection(
+    func collection_GetIndexes(
         collectionName: NSString,
         scopeName: NSString,
         name: NSString,

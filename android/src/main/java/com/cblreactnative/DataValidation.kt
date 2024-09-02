@@ -4,6 +4,17 @@ import com.facebook.react.bridge.Promise
 
 object DataValidation {
 
+  fun validateDocumentId(
+    documentId: String,
+    promise: Promise
+  ): Boolean {
+    val isValid = documentId.isNotEmpty()
+    if (!isValid) {
+      promise.reject("DOCUMENT_ERROR", "documentId must be provided")
+    }
+    return isValid
+  }
+
   fun validateCollection(
     collectionName: String,
     scopeName: String,
@@ -22,7 +33,7 @@ object DataValidation {
       && validateDatabaseName(databaseName, promise)
   }
 
-  fun validateCollectionName(
+  private fun validateCollectionName(
     collectionName: String,
     promise: Promise): Boolean {
     val isValid = collectionName.isNotEmpty()
@@ -32,7 +43,7 @@ object DataValidation {
     return isValid
   }
 
-  fun validateScopeName(
+  private fun validateScopeName(
     scopeName: String,
     promise: Promise): Boolean {
     val isValid = scopeName.isNotEmpty()
@@ -53,10 +64,6 @@ object DataValidation {
     return isValid
   }
 
-  fun validateEncryptionKey(encryptionKey: String): Boolean {
-    return encryptionKey.isNotEmpty()
-  }
-
   fun validatePath(
     path: String,
     promise: Promise): Boolean {
@@ -65,9 +72,5 @@ object DataValidation {
       promise.reject("DATABASE_ERROR", "Database path must be provided")
     }
     return isValid
-  }
-
-  fun validateNewName(newName: String): Boolean {
-    return newName.isNotEmpty()
   }
 }

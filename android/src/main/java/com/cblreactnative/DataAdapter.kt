@@ -6,11 +6,12 @@ import com.facebook.react.bridge.WritableMap
 import org.json.JSONObject
 
 import com.couchbase.lite.*
+import com.facebook.react.bridge.ReadableMap
 import com.couchbase.lite.Collection as CBLCollection
 
 object DataAdapter {
 
-  fun adaptMaintenanceTypeFromInt(maintenanceType: Int) : MaintenanceType {
+  fun adaptMaintenanceTypeFromInt(maintenanceType: Int): MaintenanceType {
     return when (maintenanceType) {
       0 -> MaintenanceType.COMPACT
       1 -> MaintenanceType.REINDEX
@@ -18,6 +19,76 @@ object DataAdapter {
       3 -> MaintenanceType.OPTIMIZE
       4 -> MaintenanceType.FULL_OPTIMIZE
       else -> MaintenanceType.FULL_OPTIMIZE
+    }
+  }
+
+  @Throws(Exception::class)
+  fun adaptDocumentToMap(document: Document?) : WritableMap {
+    if (document == null) {
+      return Arguments.createMap()
+    }
+    val map = document.toMap()
+    //fix blob - only return properties, to get the content they will have to call getBlobContent
+    for (key in map.keys) {
+      if (map[key] is Blob) {
+        val blob = map[key] as Blob
+        map[key] = blob.properties
+      }
+    }
+    map.remove("id")
+    map.remove("sequence")
+    val documentMap: WritableMap = Arguments.makeNativeMap(map)
+    documentMap.putString("_id", document.id)
+    documentMap.putLong("_sequence", document.sequence)
+    return documentMap
+  }
+
+  @Throws(Exception::class)
+  fun adaptMapToIndexDto(
+    indexName: String,
+    indexMap: ReadableMap
+  ): IndexDto {
+    val indexType = indexMap.getString("type")
+    val indexProperties = indexMap.getArray("items")
+    val valueIndexProperties = mutableListOf<ValueIndexItem>()
+    val fullTextIndexProperties = mutableListOf<FullTextIndexItem>()
+    val ignoreAccents = indexMap.getBoolean("ignoreAccents")
+    val language = indexMap.getString("language")
+
+    if (indexName.isEmpty()) {
+      throw Exception("Error: Index name must be provided")
+    }
+    if (indexType.isNullOrEmpty()) {
+      throw Exception("Error: Index type must be provided")
+    }
+    indexProperties?.let { ip ->
+      if (indexType == "value") {
+        for (i in 0 until ip.size()) {
+          valueIndexProperties.add(ValueIndexItem.property(indexProperties.getString(i)))
+        }
+      } else {
+
+        for (i in 0 until ip.size()) {
+          fullTextIndexProperties.add(FullTextIndexItem.property(indexProperties.getString(i)))
+        }
+      }
+    }
+
+    return IndexDto(
+      indexName,
+      indexType,
+      language,
+      ignoreAccents,
+      valueIndexProperties.toTypedArray(),
+      fullTextIndexProperties.toTypedArray()
+    )
+  }
+
+  fun adaptConcurrencyControlFromInt(concurrencyControl: Int): ConcurrencyControl {
+    return when (concurrencyControl) {
+      0 -> ConcurrencyControl.LAST_WRITE_WINS
+      1 -> ConcurrencyControl.FAIL_ON_CONFLICT
+      else -> ConcurrencyControl.LAST_WRITE_WINS
     }
   }
 
@@ -30,8 +101,10 @@ object DataAdapter {
     return colMap
   }
 
-  fun adaptScopeToMap(scope: Scope,
-                         databaseName: String): WritableMap {
+  fun adaptScopeToMap(
+    scope: Scope,
+    databaseName: String
+  ): WritableMap {
     val scopeMap: WritableMap = Arguments.createMap()
     scopeMap.putString("name", scope.name)
     scopeMap.putString("databaseName", databaseName)
@@ -40,7 +113,8 @@ object DataAdapter {
 
   fun getDatabaseConfig(
     directory: String?,
-    encryptionKey: String?): JSONObject {
+    encryptionKey: String?
+  ): JSONObject {
     val databaseConfig = JSONObject()
     if (directory != null) {
       databaseConfig.put("directory", directory)
