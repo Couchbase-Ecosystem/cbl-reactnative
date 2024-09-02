@@ -7,6 +7,9 @@ import org.json.JSONObject
 
 import com.couchbase.lite.*
 import com.facebook.react.bridge.ReadableMap
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import com.couchbase.lite.Collection as CBLCollection
 
 object DataAdapter {
@@ -82,6 +85,14 @@ object DataAdapter {
       valueIndexProperties.toTypedArray(),
       fullTextIndexProperties.toTypedArray()
     )
+  }
+
+  fun dateToISOString(date: Date?): String? {
+    if (date == null) {
+      return null
+    }
+    val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+    return format.format(date)
   }
 
   fun adaptConcurrencyControlFromInt(concurrencyControl: Int): ConcurrencyControl {

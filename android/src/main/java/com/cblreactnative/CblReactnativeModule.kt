@@ -300,7 +300,31 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     }
   }
 
-
+  @ReactMethod
+  fun collection_GetDocumentExpiration(
+    docId: String,
+    name: String,
+    scopeName: String,
+    collectionName: String,
+    promise: Promise
+  ){
+    try {
+      if (!DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
+        !DataValidation.validateDocumentId(docId, promise)) {
+        return
+      }
+      val map = Arguments.createMap()
+      val expiration = CollectionManager.getDocumentExpiration(docId, collectionName, scopeName, name)
+      if (expiration == null) {
+        map.putNull("expiration")
+      } else {
+        map.putString("expiration", DataAdapter.dateToISOString(expiration))
+      }
+      promise.resolve(map)
+    } catch (e: Exception) {
+      promise.reject("DOCUMENT_ERROR", e.message)
+    }
+  }
 
   @ReactMethod
   fun collection_GetIndexes(
@@ -325,6 +349,47 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       promise.resolve(resultsIndexes)
     } catch (e: Exception) {
       promise.reject("INDEX_ERROR", e.message)
+    }
+  }
+
+  @ReactMethod
+  fun collection_PurgeDocument(
+    docId: String,
+    name: String,
+    scopeName: String,
+    collectionName: String,
+    promise: Promise
+  ) {
+    try {
+      if (!DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
+        !DataValidation.validateDocumentId(docId, promise)) {
+        return
+      }
+      CollectionManager.purgeDocument(docId, collectionName, scopeName, name)
+      promise.resolve(null)
+    } catch (e: Exception) {
+      promise.reject("DOCUMENT_ERROR", e.message)
+    }
+  }
+
+  @ReactMethod
+  fun collection_SetDocumentExpiration(
+    expiration: String,
+    docId: String,
+    name: String,
+    scopeName: String,
+    collectionName: String,
+    promise: Promise){
+    try {
+      if (!DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
+        !DataValidation.validateDocumentId(docId, promise)
+      ) {
+        return
+      }
+      CollectionManager.setDocumentExpiration(expiration, docId, collectionName, scopeName, name)
+      promise.resolve(null)
+    } catch (e: Exception) {
+      promise.reject("DOCUMENT_ERROR", e.message)
     }
   }
 
