@@ -8,8 +8,6 @@ import ReplicatorIdActionForm from '@/components/ReplicatorIdActionForm/Replicat
 import { useStyleScheme } from '@/components/Themed/Themed';
 import { NativeEventEmitter, NativeModules, SafeAreaView } from 'react-native';
 import ResultListView from '@/components/ResultsListView/ResultsListView';
-//debug the message queue
-import MessageQueue from 'react-native/Libraries/BatchedBridge/MessageQueue';
 
 export default function ReplicatorStatusScreen() {
   //debug the message queue
@@ -54,12 +52,7 @@ export default function ReplicatorStatusScreen() {
             const newMessage = [
               `${date}::Status:: Replicator <${replicator.getId()}> status changed: ${change.status}`,
             ];
-            setStatusChangeMessages((prev) => {
-              return {
-                ...prev,
-                [replicatorId]: [...(prev[replicatorId] || []), ...newMessage],
-              };
-            });
+            setInformationMessages((prev) => [...prev, ...newMessage]);
           });
           setStatusToken((prev) => {
             return {

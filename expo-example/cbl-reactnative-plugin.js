@@ -6,7 +6,10 @@ const {
 
 // Function to modify Android build.gradle
 function modifyAndroidBuildGradle(config) {
-  config.modResults.contents += `apply from: "../../android/build.gradle"`;
+  const lineToAdd = ` apply from: "../../android/build.gradle"`;
+  if (!config.modResults.contents.includes(lineToAdd)) {
+    config.modResults.contents += lineToAdd;
+  }
   return config;
 }
 

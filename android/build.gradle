@@ -3,12 +3,13 @@ buildscript {
   def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["CblReactnative_kotlinVersion"]
 
   repositories {
+    maven {url 'https://mobile.maven.couchbase.com/maven2/dev/'}
     google()
     mavenCentral()
   }
 
   dependencies {
-    classpath "com.android.tools.build:gradle:7.2.1"
+    classpath "com.android.tools.build:gradle:8.0.0"
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
@@ -49,8 +50,7 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.cblreactnative"
-
+    namespace "com.cbl.reactnative"
     sourceSets {
       main {
         manifest.srcFile "src/main/AndroidManifestNew.xml"
@@ -83,8 +83,17 @@ android {
 }
 
 repositories {
+  maven {url 'https://mobile.maven.couchbase.com/maven2/dev/'}
   mavenCentral()
   google()
+}
+
+allprojects {
+  repositories {
+    maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
+    google()
+    mavenCentral()
+  }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
@@ -95,5 +104,7 @@ dependencies {
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "org.json:json:20240303"
+  implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:3.1.9"
 }
 
