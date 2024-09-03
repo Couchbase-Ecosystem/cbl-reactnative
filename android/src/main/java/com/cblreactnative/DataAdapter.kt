@@ -1,5 +1,6 @@
 package com.cblreactnative
 
+import android.annotation.SuppressLint
 import com.couchbase.lite.MaintenanceType
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
@@ -26,7 +27,7 @@ object DataAdapter {
   }
 
   @Throws(Exception::class)
-  fun adaptDocumentToMap(document: Document?) : WritableMap {
+  fun adaptDocumentToMap(document: Document?): WritableMap {
     if (document == null) {
       return Arguments.createMap()
     }
@@ -44,6 +45,42 @@ object DataAdapter {
     documentMap.putString("_id", document.id)
     documentMap.putLong("_sequence", document.sequence)
     return documentMap
+  }
+
+  @Throws(Exception::class)
+  fun adaptReadableMapToParameters(map: ReadableMap): Parameters? {
+    val queryParameters = Parameters()
+    val iterator = map.keySetIterator()
+    var count = 0
+    while (iterator.hasNextKey()) {
+      val key = iterator.nextKey()
+      val nestedMap = map.getMap(key)
+      val nestedType = nestedMap?.getString("type")
+      count += 1
+      when (nestedType) {
+        "int" -> queryParameters.setInt(key, nestedMap.getInt("value"))
+        "long" -> queryParameters.setLong(key, nestedMap.getLong("value"))
+        "float" -> queryParameters.setFloat(key, nestedMap.getDouble("value").toFloat())
+        "double" -> queryParameters.setDouble(key, nestedMap.getDouble("value"))
+        "boolean" -> queryParameters.setBoolean(key, nestedMap.getBoolean("value"))
+        "string" -> queryParameters.setString(key, nestedMap.getString("value"))
+        "date" -> {
+          val stringValue = map.getString("value")
+          stringValue?.let { strValue ->
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            val date = dateFormat.parse(strValue)
+            date?.let { d ->
+              queryParameters.setDate(key, d)
+            }
+          }
+        }
+        else -> throw Exception("Error: Invalid parameter type")
+      }
+    }
+    if (count == 0) {
+      return  null
+    }
+    return queryParameters
   }
 
   @Throws(Exception::class)

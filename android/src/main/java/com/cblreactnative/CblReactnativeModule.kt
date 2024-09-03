@@ -627,6 +627,47 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  // SQL++ Query Functions
+  @ReactMethod
+  fun query_Execute(
+  query: String,
+  parameters: ReadableMap,
+  name: String,
+  promise: Promise){
+    try {
+      if (!DataValidation.validateDatabaseName(name, promise) || !DataValidation.validateQuery(query, promise)) {
+        return
+      }
+      val queryParameters = DataAdapter.adaptReadableMapToParameters(parameters)
+      val results = DatabaseManager.executeQuery(query, name, queryParameters)
+      val resultsMap = Arguments.createMap()
+      resultsMap.putString("data", results)
+      promise.resolve(resultsMap)
+    } catch (e: Exception) {
+      promise.reject("QUERY_ERROR", e.message)
+    }
+  }
+
+  @ReactMethod
+  fun query_Explain(
+    query: String,
+    parameters: ReadableMap,
+    name: String,
+    promise: Promise){
+    try {
+      if (!DataValidation.validateDatabaseName(name, promise) || !DataValidation.validateQuery(query, promise)) {
+        return
+      }
+      val queryParameters = DataAdapter.adaptReadableMapToParameters(parameters)
+      val results = DatabaseManager.explainQuery(query, name, queryParameters)
+      val resultsMap = Arguments.createMap()
+      resultsMap.putString("data", results)
+      promise.resolve(resultsMap)
+    } catch (e: Exception) {
+      promise.reject("QUERY_ERROR", e.message)
+    }
+  }
+
   // Scope Functions
   @ReactMethod
   fun scope_GetDefault(

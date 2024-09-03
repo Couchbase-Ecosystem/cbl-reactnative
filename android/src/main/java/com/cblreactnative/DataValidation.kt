@@ -4,6 +4,17 @@ import com.facebook.react.bridge.Promise
 
 object DataValidation {
 
+  fun validateQuery(
+    query: String,
+    promise: Promise
+  ): Boolean {
+    val isValid = query.isNotEmpty()
+    if (!isValid) {
+      promise.reject("QUERY_ERROR", "Query must be provided")
+    }
+    return isValid
+  }
+
   fun validateDocumentId(
     documentId: String,
     promise: Promise
