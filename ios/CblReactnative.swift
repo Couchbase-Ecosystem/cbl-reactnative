@@ -1261,9 +1261,9 @@ class CblReactnative: RCTEventEmitter {
                     }
                     if let collection = try CollectionManager.shared.getCollection(args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName) {
                         let pendingIds = try ReplicatorManager.shared.getPendingDocumentIds(repId, collection: collection)
-                        let dict:NSDictionary = NSDictionary(dictionary: pendingIds)
+                        let resultDic:NSDictionary = ["pendingDocumentIds": pendingIds]
                         DispatchQueue.main.async {
-                            resolve(dict)
+                            resolve(resultDic)
                         }
                     } else {
                         DispatchQueue.main.async {

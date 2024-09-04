@@ -4,6 +4,17 @@ import com.facebook.react.bridge.Promise
 
 object DataValidation {
 
+  fun validateReplicatorId(
+    replicatorId: String,
+    promise: Promise
+  ): Boolean {
+    val isValid = replicatorId.isNotEmpty()
+    if (!isValid) {
+      promise.reject("REPLICATOR_ERROR", "replicatorId must be provided")
+    }
+    return isValid
+  }
+
   fun validateQuery(
     query: String,
     promise: Promise

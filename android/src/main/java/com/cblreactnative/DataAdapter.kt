@@ -1,6 +1,6 @@
 package com.cblreactnative
 
-import android.annotation.SuppressLint
+import cbl.js.kotiln.DatabaseManager
 import com.couchbase.lite.MaintenanceType
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
@@ -8,6 +8,8 @@ import org.json.JSONObject
 
 import com.couchbase.lite.*
 import com.facebook.react.bridge.ReadableMap
+import org.json.JSONArray
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -39,12 +41,13 @@ object DataAdapter {
         map[key] = blob.properties
       }
     }
-    map.remove("id")
     map.remove("sequence")
+    val resultsMap = Arguments.createMap()
     val documentMap: WritableMap = Arguments.makeNativeMap(map)
-    documentMap.putString("_id", document.id)
-    documentMap.putLong("_sequence", document.sequence)
-    return documentMap
+    resultsMap.putString("_id", document.id)
+    resultsMap.putDouble("_sequence", document.sequence.toDouble())
+    resultsMap.putMap("_data", documentMap)
+    return resultsMap
   }
 
   @Throws(Exception::class)
@@ -157,6 +160,151 @@ object DataAdapter {
     scopeMap.putString("name", scope.name)
     scopeMap.putString("databaseName", databaseName)
     return scopeMap
+  }
+
+  @Throws(Exception::class)
+  fun adaptReadableMapToReplicatorConfig(map: ReadableMap) : ReplicatorConfiguration {
+    val target = map.getMap("target")
+    val url = target?.getString("url")
+    val replicationTypeString = map.getString("replicationType")
+    if (url.isNullOrEmpty() || replicationTypeString.isNullOrEmpty()) {
+      throw Exception("Replicator target url or replicator type is required")
+    }
+    val replicatorType = adaptStringToReplicatorType(replicationTypeString)
+    val uri = URI(url)
+    val endpoint = URLEndpoint(uri)
+    val continuous = map.getBoolean("continuous")
+    val acceptParentDomainCookies = map.getBoolean("acceptParentDomainCookies")
+    val acceptSelfSignedCerts = map.getBoolean("acceptSelfSignedCerts")
+    val autoPurgeEnabled = map.getBoolean("autoPurgeEnabled")
+
+    val configBuilder = ReplicatorConfigurationFactory.newConfig(
+      target = endpoint,
+      continuous = continuous,
+      acceptParentDomainCookies = acceptParentDomainCookies,
+      acceptOnlySelfSignedServerCertificate = acceptSelfSignedCerts,
+      enableAutoPurge = autoPurgeEnabled,
+      type = replicatorType,
+    )
+    val authenticatorMap = map.getMap("authenticator")
+    authenticatorMap?.let {
+      val authenticator = adaptMapToAuthenticator(it)
+      configBuilder.authenticator = authenticator
+    }
+    //handle adding collections config
+    adaptCollectionsConfigFromMapForBuilder(map, configBuilder)
+    return configBuilder
+  }
+
+  private fun adaptCollectionsConfigFromMapForBuilder(map: ReadableMap, configBuilder: ReplicatorConfiguration) {
+    val configJson = map.getString("collectionConfig")
+    if (configJson.isNullOrEmpty()) {
+      throw IllegalArgumentException("Collection configuration is required")
+    }
+    val collectionConfigArray = JSONArray(configJson)
+    if (collectionConfigArray.length() == 0) {
+      throw IllegalArgumentException("Error: couldn't parse collection configuration arguments")
+    }
+    //loop through the collections and configuration and add to the config
+    //the item will have two keys, collections and config
+    for (itemCounter in 0 until collectionConfigArray.length()) {
+      val mutableCollections = mutableListOf<CBLCollection>()
+      val itemObject = collectionConfigArray.getJSONObject(itemCounter)
+      val collections = itemObject.optJSONArray("collections")
+      if (collections == null || collections.length() == 0) {
+        throw IllegalArgumentException("No collections found in the config")
+      } else {
+        for (collectionCounter in 0 until collections.length()) {
+          val collectionItemObj = collections.getJSONObject(collectionCounter)
+          val collectionObj = collectionItemObj.getJSONObject("collection")
+          val collectionName = collectionObj.getString("name")
+          val scopeName = collectionObj.getString("scopeName")
+          val databaseName = collectionObj.getString("databaseName")
+          val collection = DatabaseManager.getCollection(collectionName, scopeName, databaseName)
+          if (collection == null) {
+            throw IllegalArgumentException("Collection not found")
+          } else {
+            mutableCollections.add(collection)
+          }
+        }
+      }
+      //get the configuration for the collections which is a collection
+      //of documentIds and channels to filter
+      //these should be optional, where at least one collection is needed to be added
+      val replicatorCollectionConfig = CollectionConfiguration()
+      val configObj = itemObject.optJSONObject("config")
+      if (configObj != null) {
+        val documentIds = configObj.optJSONArray("documentIds")
+        if (documentIds != null) {
+          val ids = mutableListOf<String>()
+          for (i in 0 until documentIds.length()) {
+            ids.add(documentIds.getString(i))
+          }
+          replicatorCollectionConfig.documentIDs = ids
+        }
+        val channels = configObj.optJSONArray("channels")
+        if (channels != null) {
+          val channelsList = mutableListOf<String>()
+          for (i in 0 until channels.length()) {
+            channelsList.add(channels.getString(i))
+          }
+          replicatorCollectionConfig.channels = channelsList
+        }
+      }
+      configBuilder.addCollections(mutableCollections, replicatorCollectionConfig)
+    }
+  }
+
+  fun adaptReplicatorStatusToMap(status: ReplicatorStatus): WritableMap {
+    val resultMap = Arguments.createMap()
+    val progressMap = Arguments.createMap()
+    val errorMap = Arguments.createMap()
+    status.error?.let {
+      errorMap.putString("code", it.code.toString())
+      errorMap.putString("message", it.message)
+    }
+    progressMap.putDouble("completed", status.progress.completed.toDouble())
+    progressMap.putDouble("total", status.progress.total.toDouble())
+    resultMap.putString("activity", status.activityLevel.name)
+    resultMap.putMap("progress", progressMap)
+    resultMap.putMap("error", errorMap)
+    return resultMap
+  }
+
+  private fun adaptStringToReplicatorType(strValue :String): ReplicatorType {
+    return when (strValue) {
+      "PUSH" -> ReplicatorType.PUSH
+      "PULL" -> ReplicatorType.PULL
+      "PUSH_AND_PULL" -> ReplicatorType.PUSH_AND_PULL
+      else -> throw IllegalArgumentException("Invalid replicator type")
+    }
+  }
+
+  private fun adaptMapToAuthenticator(map: ReadableMap): Authenticator? {
+    val type = map.getString("type")
+    val data = map.getMap("data")
+    if (type.isNullOrEmpty() || data == null) {
+      throw IllegalArgumentException("Authenticator type and data are required")
+    }
+    when (type) {
+      "basic" -> {
+        val username = data.getString("username")
+        val password = data.getString("password")
+        if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
+          throw IllegalArgumentException("Username and password are required")
+        }
+        return BasicAuthenticator(username, password.toCharArray())
+      }
+      "session" -> {
+        val sessionId = data.getString("sessionId")
+        val cookieName = data.getString("cookieName")
+        if(sessionId.isNullOrEmpty() || cookieName.isNullOrEmpty()) {
+          throw IllegalArgumentException("SessionId and cookieName are required")
+        }
+        return SessionAuthenticator(sessionId, cookieName)
+      }
+      else -> throw IllegalArgumentException("Invalid authenticator type")
+    }
   }
 
   fun getDatabaseConfig(

@@ -4,7 +4,7 @@
   "version": "0.1.2",
   "scripts": {
     "prebuild": "cd .. && npm run build && cd expo-example && expo prebuild",
-    "prebuild:clean": "cd .. && npm run build && cd .. && expo prebuild --clean",
+    "prebuild:clean": "cd .. && npm run build && cd expo-example && expo prebuild --clean",
     "start": "expo start",
     "android": "cd .. && npm run build && cd expo-example && expo run:android",
     "ios": "cd .. && npm run build && cd expo-example && expo run:ios",

@@ -1,10 +1,10 @@
 package com.cblreactnative
 
-import android.provider.ContactsContract.Data
 import cbl.js.kotiln.DatabaseManager
 import cbl.js.kotiln.CollectionManager
 import cbl.js.kotiln.FileSystemHelper
 import cbl.js.kotiln.LoggingManager
+import cbl.js.kotiln.ReplicatorManager
 import com.couchbase.lite.*
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -14,10 +14,14 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReadableMap
-import com.facebook.react.bridge.WritableArray
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
+@OptIn(DelicateCoroutinesApi::class)
 @Suppress("FunctionName")
 class CblReactnativeModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -59,7 +63,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         return
       }
       promise.reject("COLLECTION_ERROR", "Error creating collection")
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -92,7 +96,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         CollectionManager.createIndex(indexName, idx, collectionName, scopeName, name)
       }
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("INDEX_ERROR", e.message)
     }
   }
@@ -110,7 +114,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
       DatabaseManager.deleteCollection(collectionName, scopeName, name)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -137,7 +141,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val result =
         CollectionManager.deleteDocument(docId, collectionName, scopeName, name, concurrency)
       promise.resolve(result)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DOCUMENT_ERROR", e.message)
     }
 
@@ -159,7 +163,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         promise.reject("INDEX_ERROR", "Index name must be provided")
       }
       CollectionManager.deleteIndex(indexName, collectionName, scopeName, name)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("INDEX_ERROR", e.message)
     }
   }
@@ -186,7 +190,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
       writableMap.putArray("data", writableArray)
       promise.resolve(writableMap)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DOCUMENT_ERROR", e.message)
     }
   }
@@ -209,7 +213,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         return
       }
       promise.reject("COLLECTION_ERROR", "Error getting collection")
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -233,7 +237,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val resultsCollections: WritableMap = Arguments.createMap()
       resultsCollections.putArray("collections", colList)
       promise.resolve(resultsCollections)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -253,7 +257,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val map = Arguments.createMap()
       map.putInt("count", count)
       promise.resolve(map)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -274,7 +278,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         return
       }
       promise.reject("COLLECTION_ERROR", "Error getting default collection")
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -295,7 +299,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val doc = CollectionManager.getDocument(docId, collectionName, scopeName, name)
       val docMap = DataAdapter.adaptDocumentToMap(doc)
       promise.resolve(docMap)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DOCUMENT_ERROR", e.message)
     }
   }
@@ -321,7 +325,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         map.putString("expiration", DataAdapter.dateToISOString(expiration))
       }
       promise.resolve(map)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DOCUMENT_ERROR", e.message)
     }
   }
@@ -347,7 +351,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val resultsIndexes: WritableMap = Arguments.createMap()
       resultsIndexes.putArray("indexes", writableArray)
       promise.resolve(resultsIndexes)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("INDEX_ERROR", e.message)
     }
   }
@@ -367,7 +371,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
       CollectionManager.purgeDocument(docId, collectionName, scopeName, name)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DOCUMENT_ERROR", e.message)
     }
   }
@@ -401,7 +405,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         writableMap.putNull("concurrencyControlResult")
       }
       promise.resolve(writableMap)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DOCUMENT_ERROR", e.message)
     }
   }
@@ -422,7 +426,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
       CollectionManager.setDocumentExpiration(expiration, docId, collectionName, scopeName, name)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DOCUMENT_ERROR", e.message)
     }
   }
@@ -440,7 +444,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     try {
       DatabaseManager.changeEncryptionKey(name, newKey)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -456,7 +460,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     try {
       DatabaseManager.closeDatabase(name)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -480,7 +484,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val databaseConfig = DataAdapter.getDatabaseConfig(directory, encryptionKey)
       DatabaseManager.copy(path, newName, databaseConfig, this.context)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -496,7 +500,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     try {
       DatabaseManager.delete(name)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -516,7 +520,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     try {
       DatabaseManager.deleteWithPath(name, path)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -536,7 +540,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     try {
       val exists = DatabaseManager.exists(name, directory)
       promise.resolve(exists)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -552,7 +556,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     try {
       val path = DatabaseManager.getPath(name)
       promise.resolve(path)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -575,7 +579,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         this.context
       )
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -593,7 +597,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val mType = DataAdapter.adaptMaintenanceTypeFromInt(maintenanceType.toInt())
       DatabaseManager.performMaintenance(databaseName, mType)
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("DATABASE_ERROR", e.message)
     }
   }
@@ -604,7 +608,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     try {
       val path = FileSystemHelper.fileGetDefaultPath(this.context)
       promise.resolve(path)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("FILE_ERROR", e.message)
     }
   }
@@ -622,7 +626,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
       LoggingManager.setLogLevel(domain, logLevel.toInt())
       promise.resolve(null)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("LOGGING_ERROR", e.message)
     }
   }
@@ -643,7 +647,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val resultsMap = Arguments.createMap()
       resultsMap.putString("data", results)
       promise.resolve(resultsMap)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("QUERY_ERROR", e.message)
     }
   }
@@ -663,8 +667,216 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       val resultsMap = Arguments.createMap()
       resultsMap.putString("data", results)
       promise.resolve(resultsMap)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       promise.reject("QUERY_ERROR", e.message)
+    }
+  }
+
+  // Replicator Functions
+
+  @ReactMethod
+  fun replicator_Cleanup(
+    replicatorId: String,
+    promise: Promise) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise)) {
+          return@launch
+        }
+        ReplicatorManager.cleanUp(replicatorId)
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_Create(
+    config: ReadableMap,
+    promise: Promise) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        val replicatorConfig = DataAdapter.adaptReadableMapToReplicatorConfig(config)
+        val replicatorId = ReplicatorManager.createReplicator(replicatorConfig)
+        val map = Arguments.createMap()
+        map.putString("replicatorId", replicatorId)
+        context.runOnUiQueueThread {
+          promise.resolve(map)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_GetPendingDocumentIds(
+    replicatorId: String,
+    name: String,
+    scopeName: String,
+    collectionName: String,
+    promise: Promise){
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise) ||
+          !DataValidation.validateCollection(collectionName, scopeName, name, promise) ) {
+          return@launch
+        }
+        val ids = ReplicatorManager.pendingDocIs(replicatorId, collectionName, scopeName, name)
+        val writeableMap = Arguments.createMap()
+        val writableArray = Arguments.fromList(ids.toList())
+        writeableMap.putArray("pendingDocumentIds", writableArray)
+        context.runOnUiQueueThread {
+          promise.resolve(writeableMap)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_GetStatus(
+    replicatorId: String,
+    promise: Promise) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise)) {
+          return@launch
+        }
+        val status = ReplicatorManager.getStatus(replicatorId)
+        val resultMap = DataAdapter.adaptReplicatorStatusToMap(status)
+        context.runOnUiQueueThread {
+          promise.resolve(resultMap)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_IsDocumentPending(
+    documentId: String,
+    replicatorId: String,
+    name: String,
+    scopeName: String,
+    collectionName: String,
+    promise: Promise){
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise) ||
+          !DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
+          !DataValidation.validateDocumentId(documentId, promise)) {
+          return@launch
+        }
+        val isPending = ReplicatorManager.isDocumentPending(documentId, replicatorId, collectionName, scopeName, name)
+        val map = Arguments.createMap()
+        map.putBoolean("isPending", isPending)
+        context.runOnUiQueueThread {
+          promise.resolve(map)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_RemoveChangeListener(
+    changeListenerToken: String,
+    replicatorId: String,
+    promise: Promise) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+          return@launch
+        }
+        ReplicatorManager.removeChangeListener(replicatorId, changeListenerToken)
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_ResetCheckpoint(
+    replicatorId: String,
+    promise: Promise){
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+          return@launch
+        }
+        ReplicatorManager.resetCheckpoint(replicatorId)
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_Start(
+    replicatorId: String,
+    promise: Promise) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+          return@launch
+        }
+        ReplicatorManager.start(replicatorId)
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun replicator_Stop(
+    replicatorId: String,
+    promise: Promise) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+          return@launch
+        }
+        ReplicatorManager.stop(replicatorId)
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
     }
   }
 
@@ -674,19 +886,28 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     name: String,
     promise: Promise
   ) {
-    try {
-      if (!DataValidation.validateDatabaseName(name, promise)) {
-        return
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateDatabaseName(name, promise)) {
+          return@launch
+        }
+        val scopeValue = DatabaseManager.defaultScope(name)
+        scopeValue?.let { scope ->
+          val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
+          context.runOnUiQueueThread {
+            promise.resolve(scopeMap)
+            return@runOnUiQueueThread
+          }
+        }
+
+        context.runOnUiQueueThread {
+          promise.reject("SCOPE_ERROR", "Error getting default scope")
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("SCOPE_ERROR", e.message)
+        }
       }
-      val scopeValue = DatabaseManager.defaultScope(name)
-      scopeValue?.let { scope ->
-        val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
-        promise.resolve(scopeMap)
-        return
-      }
-      promise.reject("SCOPE_ERROR", "Error getting default scope")
-    } catch (e: Exception) {
-      promise.reject("SCOPE_ERROR", e.message)
     }
   }
 
@@ -696,21 +917,27 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     name: String,
     promise: Promise
   ) {
-    try {
-      if (!DataValidation.validateScope(scopeName, name, promise)) {
-        return
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateScope(scopeName, name, promise)) {
+          return@launch
+        }
+        val scopeValue = DatabaseManager.getScope(name, scopeName)
+        scopeValue?.let { scope ->
+          val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
+          context.runOnUiQueueThread {
+            promise.resolve(scopeMap)
+            return@runOnUiQueueThread
+          }
+        }
+        context.runOnUiQueueThread {
+          promise.reject("SCOPE_ERROR", "Error getting scope")
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("SCOPE_ERROR", e.message)
+        }
       }
-      val scopeValue = DatabaseManager.getScope(name, scopeName)
-      scopeValue?.let { scope ->
-        val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
-        promise.resolve(scopeMap)
-        return
-      }
-      promise.reject("SCOPE_ERROR", "Error getting scope")
-    } catch (e: Exception) {
-      promise.reject("SCOPE_ERROR", e.message)
-    } catch (e: Exception) {
-      promise.reject("SCOPE_ERROR", e.message)
     }
   }
 
@@ -719,23 +946,27 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     name: String,
     promise: Promise
   ) {
-    try {
-      if (!DataValidation.validateDatabaseName(name, promise)) {
-        return
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateDatabaseName(name, promise)) {
+          return@launch
+        }
+        val scopes = DatabaseManager.scopes(name)
+        val scopeList = Arguments.createArray()
+        scopes.forEach { scope ->
+          val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
+          scopeList.pushMap(scopeMap)
+        }
+        val resultsScopes: WritableMap = Arguments.createMap()
+        resultsScopes.putArray("scopes", scopeList)
+        context.runOnUiQueueThread {
+          promise.resolve(resultsScopes)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("SCOPE_ERROR", e.message)
+        }
       }
-      val scopes = DatabaseManager.scopes(name)
-      val scopeList = Arguments.createArray()
-      scopes.forEach { scope ->
-        val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
-        scopeList.pushMap(scopeMap)
-      }
-      val resultsScopes: WritableMap = Arguments.createMap()
-      resultsScopes.putArray("scopes", scopeList)
-      promise.resolve(resultsScopes)
-    } catch (e: Exception) {
-      promise.reject("SCOPE_ERROR", e.message)
-    } catch (e: Exception) {
-      promise.reject("SCOPE_ERROR", e.message)
     }
   }
 
