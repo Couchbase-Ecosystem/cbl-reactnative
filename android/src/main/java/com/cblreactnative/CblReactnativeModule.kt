@@ -28,6 +28,8 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
 
   // Property to hold the context
   private val context: ReactApplicationContext = reactContext
+  private val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  private val replicatorDocumentListeners: MutableMap<String, ListenerToken> = mutableMapOf()
 
   init {
     CouchbaseLite.init(context, true)
@@ -673,7 +675,36 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   }
 
   // Replicator Functions
-
+  @ReactMethod
+  fun replicator_AddChangeListener(
+    changeListenerToken: String,
+    replicatorId: String,
+    promise: Promise){
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+          return@launch
+        }
+        val replicator = ReplicatorManager.getReplicator(replicatorId)
+        val listener = replicator?.addChangeListener { change ->
+          val map = DataAdapter.adaptReplicatorStatusToMap(change.status)
+          context.runOnUiQueueThread {
+            sendEvent(context, "replicatorStatusChange", map)
+          }
+        }
+        listener?.let {
+          replicatorChangeListeners[changeListenerToken] = it
+        }
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("REPLICATOR_ERROR", e.message)
+        }
+      }
+    }
+  }
   @ReactMethod
   fun replicator_Cleanup(
     replicatorId: String,
@@ -805,7 +836,11 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         if (!DataValidation.validateReplicatorId(replicatorId, promise)){
           return@launch
         }
-        ReplicatorManager.removeChangeListener(replicatorId, changeListenerToken)
+        val changeListener = replicatorChangeListeners[changeListenerToken]
+        changeListener?.let {
+          changeListener.remove()
+          replicatorChangeListeners.remove(changeListenerToken)
+        }
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
