@@ -8,6 +8,7 @@ import org.json.JSONObject
 
 import com.couchbase.lite.*
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableType
 import org.json.JSONArray
 import java.net.URI
 import java.text.SimpleDateFormat
@@ -166,7 +167,7 @@ object DataAdapter {
   fun adaptReadableMapToReplicatorConfig(map: ReadableMap) : ReplicatorConfiguration {
     val target = map.getMap("target")
     val url = target?.getString("url")
-    val replicationTypeString = map.getString("replicationType")
+    val replicationTypeString = map.getString("replicatorType")
     if (url.isNullOrEmpty() || replicationTypeString.isNullOrEmpty()) {
       throw Exception("Replicator target url or replicator type is required")
     }
@@ -190,6 +191,23 @@ object DataAdapter {
     authenticatorMap?.let {
       val authenticator = adaptMapToAuthenticator(it)
       configBuilder.authenticator = authenticator
+    }
+
+    val headersType = map.getType("headers")
+    if (headersType == ReadableType.Map) {
+      val headers = map.getMap("headers")
+      headers?.let {
+        val headersMap = HashMap<String, String>()
+        val iterator = it.keySetIterator()
+        while (iterator.hasNextKey()) {
+          val key = iterator.nextKey()
+          val value = it.getString(key)
+          if (value != null) {
+            headersMap[key] = value
+          }
+        }
+        configBuilder.headers = headersMap
+      }
     }
     //handle adding collections config
     adaptCollectionsConfigFromMapForBuilder(map, configBuilder)
