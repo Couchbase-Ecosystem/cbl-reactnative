@@ -354,9 +354,9 @@ export class CblReactNativeEngine implements ICoreEngine {
   collection_GetIndexes(args: CollectionArgs): Promise<{ indexes: string[] }> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetIndexes(
-        args.name,
+        args.collectionName,
         args.scopeName,
-        args.collectionName
+        args.name
       ).then(
         (items: { indexes: string[] }) => {
           resolve(items);
@@ -474,7 +474,7 @@ export class CblReactNativeEngine implements ICoreEngine {
     return new Promise((resolve, reject) => {
       this.CblReactNative.database_Copy(
         args.path,
-        args.name,
+        args.newName,
         args.config.directory,
         args.config.encryptionKey
       ).then(

@@ -13,7 +13,6 @@ export default async function copy(
     const config = new DatabaseConfiguration();
     //calculate the database configuration required to create and open a database
     if (fileLocation !== '' || encryptionKey !== '') {
-      const config = new DatabaseConfiguration();
       if (fileLocation !== '') {
         config.directory = fileLocation;
       }

@@ -39,7 +39,10 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
-  private fun sendEvent(reactContext: ReactContext, eventName: String, params: WritableMap?) {
+  private fun sendEvent(
+    reactContext: ReactContext,
+    eventName: String,
+    params: WritableMap?) {
     reactContext
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
       .emit(eventName, params)
@@ -61,7 +64,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         }
         val col = DatabaseManager.createCollection(collectionName, scopeName, name)
         col?.let { collection ->
-          val colMap = DataAdapter.adaptCollectionToMap(collection, name)
+          val colMap = DataAdapter.cblCollectionToMap(collection, name)
           context.runOnUiQueueThread {
             promise.resolve(colMap)
           }
@@ -92,7 +95,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         if (!DataValidation.validateCollection(collectionName, scopeName, name, promise)) {
           return@launch
         }
-        val indexDto = DataAdapter.adaptMapToIndexDto(indexName, index)
+        val indexDto = DataAdapter.mapToIndexDto(indexName, index)
         if (indexDto.type == "value") {
           val idx = IndexBuilder.valueIndex(*indexDto.valueItems)
           CollectionManager.createIndex(indexName, idx, collectionName, scopeName, name)
@@ -162,7 +165,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
           }
           return@launch
         }
-        val concurrency = DataAdapter.adaptConcurrencyControlFromInt(concurrencyControl.toInt())
+        val concurrency = DataAdapter.intToConcurrencyControl(concurrencyControl.toInt())
         val result =
           CollectionManager.deleteDocument(docId, collectionName, scopeName, name, concurrency)
         context.runOnUiQueueThread {
@@ -254,7 +257,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         }
         val col = DatabaseManager.getCollection(collectionName, scopeName, name)
         col?.let { collection ->
-          val colMap = DataAdapter.adaptCollectionToMap(collection, name)
+          val colMap = DataAdapter.cblCollectionToMap(collection, name)
           context.runOnUiQueueThread {
             promise.resolve(colMap)
           }
@@ -285,7 +288,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         val cols = DatabaseManager.getCollections(scopeName, name)
         val colList = Arguments.createArray()
         cols?.forEach { collection ->
-          val colMap = DataAdapter.adaptCollectionToMap(collection, name)
+          val colMap = DataAdapter.cblCollectionToMap(collection, name)
           colList.pushMap(colMap)
         }
         val resultsCollections: WritableMap = Arguments.createMap()
@@ -339,7 +342,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       try {
         val col = DatabaseManager.defaultCollection(name)
         col?.let { collection ->
-          val colMap = DataAdapter.adaptCollectionToMap(collection, name)
+          val colMap = DataAdapter.cblCollectionToMap(collection, name)
           context.runOnUiQueueThread {
             promise.resolve(colMap)
           }
@@ -372,7 +375,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
           return@launch
         }
         val doc = CollectionManager.getDocument(docId, collectionName, scopeName, name)
-        val docMap = DataAdapter.adaptDocumentToMap(doc)
+        val docMap = DataAdapter.documentToMap(doc)
         context.runOnUiQueueThread {
           promise.resolve(docMap)
         }
@@ -421,8 +424,8 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun collection_GetIndexes(
     collectionName: String,
-    name: String,
     scopeName: String,
+    name: String,
     promise: Promise
   ) {
     GlobalScope.launch(Dispatchers.IO) {
@@ -498,9 +501,9 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         }
         if (concurrencyControlValue != null) {
           concurrencyControl =
-            DataAdapter.adaptConcurrencyControlFromInt(concurrencyControlValue.toInt())
+            DataAdapter.intToConcurrencyControl(concurrencyControlValue.toInt())
         }
-        val doc = document.toHashMap()
+        val doc = DataAdapter.toMap(document).toMap()
         val result = CollectionManager.saveDocument(
           docId,
           doc,
@@ -616,7 +619,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         if (!DataValidation.validatePath(path, promise)) {
           return@launch
         }
-        val databaseConfig = DataAdapter.getDatabaseConfig(directory, encryptionKey)
+        val databaseConfig = DataAdapter.toDatabaseConfigJson(directory, encryptionKey)
         DatabaseManager.copy(path, newName, databaseConfig, context)
         context.runOnUiQueueThread {
           promise.resolve(null)
@@ -737,7 +740,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         return@launch
       }
       try {
-        val databaseConfig = DataAdapter.getDatabaseConfig(directory, encryptionKey)
+        val databaseConfig = DataAdapter.toDatabaseConfigJson(directory, encryptionKey)
         DatabaseManager.openDatabase(
           name,
           databaseConfig,
@@ -765,7 +768,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         return@launch
       }
       try {
-        val mType = DataAdapter.adaptMaintenanceTypeFromInt(maintenanceType.toInt())
+        val mType = DataAdapter.intToMaintenanceType(maintenanceType.toInt())
         DatabaseManager.performMaintenance(databaseName, mType)
         context.runOnUiQueueThread {
           promise.resolve(null)
@@ -837,7 +840,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         ) {
           return@launch
         }
-        val queryParameters = DataAdapter.adaptReadableMapToParameters(parameters)
+        val queryParameters = DataAdapter.readableMapToParameters(parameters)
         val results = DatabaseManager.executeQuery(query, name, queryParameters)
         val resultsMap = Arguments.createMap()
         resultsMap.putString("data", results)
@@ -867,7 +870,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         ) {
           return@launch
         }
-        val queryParameters = DataAdapter.adaptReadableMapToParameters(parameters)
+        val queryParameters = DataAdapter.readableMapToParameters(parameters)
         val results = DatabaseManager.explainQuery(query, name, queryParameters)
         val resultsMap = Arguments.createMap()
         resultsMap.putString("data", results)
@@ -895,7 +898,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         }
         val replicator = ReplicatorManager.getReplicator(replicatorId)
         val listener = replicator?.addChangeListener { change ->
-          val map = DataAdapter.adaptReplicatorStatusToMap(change.status)
+          val map = DataAdapter.replicatorStatusToMap(change.status)
           context.runOnUiQueueThread {
             sendEvent(context, "replicatorStatusChange", map)
           }
@@ -940,7 +943,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     promise: Promise) {
     GlobalScope.launch(Dispatchers.IO) {
       try {
-        val replicatorConfig = DataAdapter.adaptReadableMapToReplicatorConfig(config)
+        val replicatorConfig = DataAdapter.readableMapToReplicatorConfig(config)
         val replicatorId = ReplicatorManager.createReplicator(replicatorConfig)
         val map = Arguments.createMap()
         map.putString("replicatorId", replicatorId)
@@ -993,7 +996,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
           return@launch
         }
         val status = ReplicatorManager.getStatus(replicatorId)
-        val resultMap = DataAdapter.adaptReplicatorStatusToMap(status)
+        val resultMap = DataAdapter.replicatorStatusToMap(status)
         context.runOnUiQueueThread {
           promise.resolve(resultMap)
         }
@@ -1136,7 +1139,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         }
         val scopeValue = DatabaseManager.defaultScope(name)
         scopeValue?.let { scope ->
-          val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
+          val scopeMap = DataAdapter.scopeToMap(scope, name)
           context.runOnUiQueueThread {
             promise.resolve(scopeMap)
             return@runOnUiQueueThread
@@ -1167,7 +1170,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         }
         val scopeValue = DatabaseManager.getScope(name, scopeName)
         scopeValue?.let { scope ->
-          val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
+          val scopeMap = DataAdapter.scopeToMap(scope, name)
           context.runOnUiQueueThread {
             promise.resolve(scopeMap)
             return@runOnUiQueueThread
@@ -1197,7 +1200,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         val scopes = DatabaseManager.scopes(name)
         val scopeList = Arguments.createArray()
         scopes.forEach { scope ->
-          val scopeMap = DataAdapter.adaptScopeToMap(scope, name)
+          val scopeMap = DataAdapter.scopeToMap(scope, name)
           scopeList.pushMap(scopeMap)
         }
         val resultsScopes: WritableMap = Arguments.createMap()

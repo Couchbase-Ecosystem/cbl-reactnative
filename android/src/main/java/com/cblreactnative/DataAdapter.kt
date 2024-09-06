@@ -18,28 +18,68 @@ import com.couchbase.lite.Collection as CBLCollection
 
 object DataAdapter {
 
-  fun adaptMaintenanceTypeFromInt(maintenanceType: Int): MaintenanceType {
-    return when (maintenanceType) {
-      0 -> MaintenanceType.COMPACT
-      1 -> MaintenanceType.REINDEX
-      2 -> MaintenanceType.INTEGRITY_CHECK
-      3 -> MaintenanceType.OPTIMIZE
-      4 -> MaintenanceType.FULL_OPTIMIZE
-      else -> MaintenanceType.FULL_OPTIMIZE
-    }
+  /**
+   * Converts a `CBLCollection` object to a `WritableMap`.
+   *
+   * This function takes a `CBLCollection` object and the associated database name, and converts them into a `WritableMap`
+   * that can be used in React Native. The resulting map includes the collection name and the scope information.
+   *
+   * @param collection The `CBLCollection` object to be converted.
+   * @param databaseName The name of the database associated with the collection.
+   * @return A `WritableMap` representation of the provided `CBLCollection` and database name.
+   */
+  fun cblCollectionToMap(collection: CBLCollection, databaseName: String)
+    : WritableMap {
+    val colMap: WritableMap = Arguments.createMap()
+    val scopeMap: WritableMap = scopeToMap(collection.scope, databaseName)
+    colMap.putString("name", collection.name)
+    colMap.putMap("scope", scopeMap)
+    return colMap
   }
 
+  /**
+   * Converts a `Date` object to an ISO 8601 string representation.
+   *
+   * This function takes a `Date` object and formats it into a string following the ISO 8601 standard.
+   * If the provided date is `null`, the function returns `null`.
+   *
+   * @param date The `Date` object to be converted. Can be `null`.
+   * @return A string representation of the date in ISO 8601 format, or `null` if the date is `null`.
+   */
+  fun dateToISOString(date: Date?): String? {
+    if (date == null) {
+      return null
+    }
+    val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+    return format.format(date)
+  }
+
+  /**
+   * Converts a `Document` to a `WritableMap`.
+   *
+   * This function is used to adapt a Couchbase Lite `Document` to a `WritableMap` that can be
+   * used in React Native to send to Javascript via the Native Bridge. It iterates through the entries
+   * of the provided `Document` and converts any nested maps that represent blobs into their properties.
+   * A developer needing the blob would need to manually call the Collection `getBlobContent` method.
+   *
+   * @param document The `Document` to be converted. If the document is `null`, an empty `WritableMap` is returned.
+   * @return A `WritableMap` representation of the provided `Document`.
+   * @throws Exception If there is an error during the conversion.
+   */
   @Throws(Exception::class)
-  fun adaptDocumentToMap(document: Document?): WritableMap {
+  fun documentToMap(document: Document?): WritableMap {
     if (document == null) {
       return Arguments.createMap()
     }
     val map = document.toMap()
     //fix blob - only return properties, to get the content they will have to call getBlobContent
     for (key in map.keys) {
-      if (map[key] is Blob) {
-        val blob = map[key] as Blob
-        map[key] = blob.properties
+      val itemValue = map[key]
+      if (itemValue is Blob) {
+        document.getBlob(key)?.let { blob ->
+          val properties = blob.properties.toMap()
+          map[key] = properties
+        }
       }
     }
     map.remove("sequence")
@@ -51,44 +91,47 @@ object DataAdapter {
     return resultsMap
   }
 
-  @Throws(Exception::class)
-  fun adaptReadableMapToParameters(map: ReadableMap): Parameters? {
-    val queryParameters = Parameters()
-    val iterator = map.keySetIterator()
-    var count = 0
-    while (iterator.hasNextKey()) {
-      val key = iterator.nextKey()
-      val nestedMap = map.getMap(key)
-      val nestedType = nestedMap?.getString("type")
-      count += 1
-      when (nestedType) {
-        "int" -> queryParameters.setInt(key, nestedMap.getInt("value"))
-        "long" -> queryParameters.setLong(key, nestedMap.getLong("value"))
-        "float" -> queryParameters.setFloat(key, nestedMap.getDouble("value").toFloat())
-        "double" -> queryParameters.setDouble(key, nestedMap.getDouble("value"))
-        "boolean" -> queryParameters.setBoolean(key, nestedMap.getBoolean("value"))
-        "string" -> queryParameters.setString(key, nestedMap.getString("value"))
-        "date" -> {
-          val stringValue = map.getString("value")
-          stringValue?.let { strValue ->
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-            val date = dateFormat.parse(strValue)
-            date?.let { d ->
-              queryParameters.setDate(key, d)
-            }
-          }
-        }
-        else -> throw Exception("Error: Invalid parameter type")
-      }
+  /**
+   * Converts an integer value to a `MaintenanceType` enum.
+   *
+   * This function maps an integer value to the corresponding `MaintenanceType` enum.
+   * Supported integer values are:
+   * - 0: `COMPACT`
+   * - 1: `REINDEX`
+   * - 2: `INTEGRITY_CHECK`
+   * - 3: `OPTIMIZE`
+   * - 4: `FULL_OPTIMIZE`
+   * If the provided integer value does not match any supported maintenance type, `FULL_OPTIMIZE` is returned by default.
+   *
+   * @param maintenanceType The integer value representing the maintenance type.
+   * @return The corresponding `MaintenanceType` enum.
+   */
+  fun intToMaintenanceType(maintenanceType: Int): MaintenanceType {
+    return when (maintenanceType) {
+      0 -> MaintenanceType.COMPACT
+      1 -> MaintenanceType.REINDEX
+      2 -> MaintenanceType.INTEGRITY_CHECK
+      3 -> MaintenanceType.OPTIMIZE
+      4 -> MaintenanceType.FULL_OPTIMIZE
+      else -> MaintenanceType.FULL_OPTIMIZE
     }
-    if (count == 0) {
-      return  null
-    }
-    return queryParameters
   }
 
+  /**
+   * Converts a `ReadableMap` to an `IndexDto` object.
+   *
+   * This function reads the necessary fields from the provided `ReadableMap` and constructs an
+   * `IndexDto` object (Index Data Transformation Object).
+   * It handles the index name, type, and various configuration options such as ignore accents and language.
+   * Additionally, it sets up the value index properties and full-text index properties if provided.
+   *
+   * @param indexName The name of the index.
+   * @param indexMap The `ReadableMap` containing the index configuration.
+   * @return An `IndexDto` object based on the provided configuration.
+   * @throws Exception If the required fields (index name or index type) are missing or invalid.
+   */
   @Throws(Exception::class)
-  fun adaptMapToIndexDto(
+  fun mapToIndexDto(
     indexName: String,
     indexMap: ReadableMap
   ): IndexDto {
@@ -96,8 +139,6 @@ object DataAdapter {
     val indexProperties = indexMap.getArray("items")
     val valueIndexProperties = mutableListOf<ValueIndexItem>()
     val fullTextIndexProperties = mutableListOf<FullTextIndexItem>()
-    val ignoreAccents = indexMap.getBoolean("ignoreAccents")
-    val language = indexMap.getString("language")
 
     if (indexName.isEmpty()) {
       throw Exception("Error: Index name must be provided")
@@ -105,19 +146,35 @@ object DataAdapter {
     if (indexType.isNullOrEmpty()) {
       throw Exception("Error: Index type must be provided")
     }
+
+    var ignoreAccents: Boolean? = null
+    var language: String? = null
+    if (indexMap.hasKey("ignoreAccents")) {
+      ignoreAccents = indexMap.getBoolean("ignoreAccents")
+    }
+    if (indexMap.hasKey("language")) {
+      language = indexMap.getString("language")
+    }
+
     indexProperties?.let { ip ->
       if (indexType == "value") {
-        for (i in 0 until ip.size()) {
-          valueIndexProperties.add(ValueIndexItem.property(indexProperties.getString(i)))
+        for (countValue in 0 until ip.size()) {
+          val arItems = indexProperties.getArray(countValue)
+          for (countArray in 0 until arItems.size()) {
+            val item = arItems.getString(countArray)
+            valueIndexProperties.add(ValueIndexItem.property(item))
+          }
         }
       } else {
-
-        for (i in 0 until ip.size()) {
-          fullTextIndexProperties.add(FullTextIndexItem.property(indexProperties.getString(i)))
+        for (countValue in 0 until ip.size()) {
+          val arItems = indexProperties.getArray(countValue)
+          for (countArray in 0 until arItems.size()) {
+            val item = arItems.getString(countArray)
+            fullTextIndexProperties.add(FullTextIndexItem.property(item))
+          }
         }
       }
     }
-
     return IndexDto(
       indexName,
       indexType,
@@ -128,15 +185,19 @@ object DataAdapter {
     )
   }
 
-  fun dateToISOString(date: Date?): String? {
-    if (date == null) {
-      return null
-    }
-    val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-    return format.format(date)
-  }
-
-  fun adaptConcurrencyControlFromInt(concurrencyControl: Int): ConcurrencyControl {
+  /**
+   * Converts an integer value to a `ConcurrencyControl` enum.
+   *
+   * This function maps an integer value to the corresponding `ConcurrencyControl` enum.
+   * Supported integer values are:
+   * - 0: `LAST_WRITE_WINS`
+   * - 1: `FAIL_ON_CONFLICT`
+   * If the provided integer value does not match any supported concurrency control type, `LAST_WRITE_WINS` is returned by default.
+   *
+   * @param concurrencyControl The integer value representing the concurrency control type.
+   * @return The corresponding `ConcurrencyControl` enum.
+   */
+  fun intToConcurrencyControl(concurrencyControl: Int): ConcurrencyControl {
     return when (concurrencyControl) {
       0 -> ConcurrencyControl.LAST_WRITE_WINS
       1 -> ConcurrencyControl.FAIL_ON_CONFLICT
@@ -144,77 +205,60 @@ object DataAdapter {
     }
   }
 
-  fun adaptCollectionToMap(collection: CBLCollection, databaseName: String)
-    : WritableMap {
-    val colMap: WritableMap = Arguments.createMap()
-    val scopeMap: WritableMap = adaptScopeToMap(collection.scope, databaseName)
-    colMap.putString("name", collection.name)
-    colMap.putMap("scope", scopeMap)
-    return colMap
-  }
-
-  fun adaptScopeToMap(
-    scope: Scope,
-    databaseName: String
-  ): WritableMap {
-    val scopeMap: WritableMap = Arguments.createMap()
-    scopeMap.putString("name", scope.name)
-    scopeMap.putString("databaseName", databaseName)
-    return scopeMap
-  }
-
-  @Throws(Exception::class)
-  fun adaptReadableMapToReplicatorConfig(map: ReadableMap) : ReplicatorConfiguration {
-    val target = map.getMap("target")
-    val url = target?.getString("url")
-    val replicationTypeString = map.getString("replicatorType")
-    if (url.isNullOrEmpty() || replicationTypeString.isNullOrEmpty()) {
-      throw Exception("Replicator target url or replicator type is required")
+  /**
+   * Converts a `ReadableMap` to an `Authenticator` object.  Authentication is required for Replicator Authentication.
+   *
+   * This function reads the `type` and `data` fields from the provided `ReadableMap` and creates
+   * an appropriate `Authenticator` object based on the type. Supported types include `basic` and `session`.
+   *
+   * @param map The `ReadableMap` containing the authenticator configuration.
+   * @return An `Authenticator` object based on the provided configuration.
+   * @throws IllegalArgumentException If the `type` or `data` fields are missing or invalid, or if the required fields for the specific authenticator type are missing.
+   */
+  private fun readableMapToAuthenticator(map: ReadableMap): Authenticator? {
+    val type = map.getString("type")
+    val data = map.getMap("data")
+    if (type.isNullOrEmpty() || data == null) {
+      throw IllegalArgumentException("Authenticator type and data are required")
     }
-    val replicatorType = adaptStringToReplicatorType(replicationTypeString)
-    val uri = URI(url)
-    val endpoint = URLEndpoint(uri)
-    val continuous = map.getBoolean("continuous")
-    val acceptParentDomainCookies = map.getBoolean("acceptParentDomainCookies")
-    val acceptSelfSignedCerts = map.getBoolean("acceptSelfSignedCerts")
-    val autoPurgeEnabled = map.getBoolean("autoPurgeEnabled")
-
-    val configBuilder = ReplicatorConfigurationFactory.newConfig(
-      target = endpoint,
-      continuous = continuous,
-      acceptParentDomainCookies = acceptParentDomainCookies,
-      acceptOnlySelfSignedServerCertificate = acceptSelfSignedCerts,
-      enableAutoPurge = autoPurgeEnabled,
-      type = replicatorType,
-    )
-    val authenticatorMap = map.getMap("authenticator")
-    authenticatorMap?.let {
-      val authenticator = adaptMapToAuthenticator(it)
-      configBuilder.authenticator = authenticator
-    }
-
-    val headersType = map.getType("headers")
-    if (headersType == ReadableType.Map) {
-      val headers = map.getMap("headers")
-      headers?.let {
-        val headersMap = HashMap<String, String>()
-        val iterator = it.keySetIterator()
-        while (iterator.hasNextKey()) {
-          val key = iterator.nextKey()
-          val value = it.getString(key)
-          if (value != null) {
-            headersMap[key] = value
-          }
+    when (type) {
+      "basic" -> {
+        val username = data.getString("username")
+        val password = data.getString("password")
+        if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
+          throw IllegalArgumentException("Username and password are required")
         }
-        configBuilder.headers = headersMap
+        return BasicAuthenticator(username, password.toCharArray())
       }
+
+      "session" -> {
+        val sessionId = data.getString("sessionId")
+        val cookieName = data.getString("cookieName")
+        if (sessionId.isNullOrEmpty() || cookieName.isNullOrEmpty()) {
+          throw IllegalArgumentException("SessionId and cookieName are required")
+        }
+        return SessionAuthenticator(sessionId, cookieName)
+      }
+
+      else -> throw IllegalArgumentException("Invalid authenticator type")
     }
-    //handle adding collections config
-    adaptCollectionsConfigFromMapForBuilder(map, configBuilder)
-    return configBuilder
   }
 
-  private fun adaptCollectionsConfigFromMapForBuilder(map: ReadableMap, configBuilder: ReplicatorConfiguration) {
+  /**
+   * Converts a `ReadableMap` to a `ReplicatorConfiguration` by adding collection configurations.
+   *
+   * This function reads the `collectionConfig` field from the provided `ReadableMap` and parses it into
+   * a list of collections and their respective configurations. It then adds these collections and configurations
+   * to the provided `ReplicatorConfiguration` object.
+   *
+   * @param map The `ReadableMap` containing the collection configuration.
+   * @param configBuilder The `ReplicatorConfiguration` object to which the collections and configurations will be added.
+   * @throws IllegalArgumentException If the `collectionConfig` field is missing, empty, or contains invalid data.
+   */
+  private fun readableMapToCollectionConfig(
+    map: ReadableMap,
+    configBuilder: ReplicatorConfiguration
+  ) {
     val configJson = map.getString("collectionConfig")
     if (configJson.isNullOrEmpty()) {
       throw IllegalArgumentException("Collection configuration is required")
@@ -273,7 +317,128 @@ object DataAdapter {
     }
   }
 
-  fun adaptReplicatorStatusToMap(status: ReplicatorStatus): WritableMap {
+  /**
+   * Converts a `ReadableMap` to a `Parameters` object.
+   *
+   * This function iterates through the entries of the provided `ReadableMap` and converts
+   * each entry to the appropriate type in the `Parameters` object. Supported types include
+   * `int`, `long`, `float`, `double`, `boolean`, `string`, and `date`.
+   *
+   * @param map The `ReadableMap` to be converted.
+   * @return A `Parameters` object containing the converted entries from the `ReadableMap`, or `null` if the map is empty.
+   * @throws Exception If there is an error during the conversion, particularly if an unsupported type is encountered.
+   */
+  @Throws(Exception::class)
+  fun readableMapToParameters(map: ReadableMap): Parameters? {
+    val queryParameters = Parameters()
+    val iterator = map.keySetIterator()
+    var count = 0
+    while (iterator.hasNextKey()) {
+      val key = iterator.nextKey()
+      val nestedMap = map.getMap(key)
+      val nestedType = nestedMap?.getString("type")
+      count += 1
+      when (nestedType) {
+        "int" -> queryParameters.setInt(key, nestedMap.getInt("value"))
+        "long" -> queryParameters.setLong(key, nestedMap.getLong("value"))
+        "float" -> queryParameters.setFloat(key, nestedMap.getDouble("value").toFloat())
+        "double" -> queryParameters.setDouble(key, nestedMap.getDouble("value"))
+        "boolean" -> queryParameters.setBoolean(key, nestedMap.getBoolean("value"))
+        "string" -> queryParameters.setString(key, nestedMap.getString("value"))
+        "date" -> {
+          val stringValue = map.getString("value")
+          stringValue?.let { strValue ->
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+            val date = dateFormat.parse(strValue)
+            date?.let { d ->
+              queryParameters.setDate(key, d)
+            }
+          }
+        }
+
+        else -> throw Exception("Error: Invalid parameter type")
+      }
+    }
+    if (count == 0) {
+      return null
+    }
+    return queryParameters
+  }
+
+  /**
+   * Converts a `ReadableMap` to a `ReplicatorConfiguration` object.
+   *
+   * This function reads the necessary fields from the provided `ReadableMap` and constructs a `ReplicatorConfiguration`
+   * object. It handles the target URL, replicator type, and various configuration options such as continuous replication,
+   * cookie acceptance, and certificate acceptance. Additionally, it sets up the authenticator and headers if provided,
+   * and adds collection configurations to the replicator configuration.
+   *
+   * @param map The `ReadableMap` containing the replicator configuration.
+   * @return A `ReplicatorConfiguration` object based on the provided configuration.
+   * @throws Exception If the required fields (target URL or replicator type) are missing or invalid.
+   */
+  @Throws(Exception::class)
+  fun readableMapToReplicatorConfig(map: ReadableMap): ReplicatorConfiguration {
+    val target = map.getMap("target")
+    val url = target?.getString("url")
+    val replicationTypeString = map.getString("replicatorType")
+    if (url.isNullOrEmpty() || replicationTypeString.isNullOrEmpty()) {
+      throw Exception("Replicator target url or replicator type is required")
+    }
+    val replicatorType = stringToReplicatorType(replicationTypeString)
+    val uri = URI(url)
+    val endpoint = URLEndpoint(uri)
+    val continuous = map.getBoolean("continuous")
+    val acceptParentDomainCookies = map.getBoolean("acceptParentDomainCookies")
+    val acceptSelfSignedCerts = map.getBoolean("acceptSelfSignedCerts")
+    val autoPurgeEnabled = map.getBoolean("autoPurgeEnabled")
+
+    val configBuilder = ReplicatorConfigurationFactory.newConfig(
+      target = endpoint,
+      continuous = continuous,
+      acceptParentDomainCookies = acceptParentDomainCookies,
+      acceptOnlySelfSignedServerCertificate = acceptSelfSignedCerts,
+      enableAutoPurge = autoPurgeEnabled,
+      type = replicatorType,
+    )
+    val authenticatorMap = map.getMap("authenticator")
+    authenticatorMap?.let {
+      val authenticator = readableMapToAuthenticator(it)
+      configBuilder.authenticator = authenticator
+    }
+
+    val headersType = map.getType("headers")
+    if (headersType == ReadableType.Map) {
+      val headers = map.getMap("headers")
+      headers?.let {
+        val headersMap = HashMap<String, String>()
+        val iterator = it.keySetIterator()
+        while (iterator.hasNextKey()) {
+          val key = iterator.nextKey()
+          val value = it.getString(key)
+          if (value != null) {
+            headersMap[key] = value
+          }
+        }
+        configBuilder.headers = headersMap
+      }
+    }
+    //handle adding collections config
+    readableMapToCollectionConfig(map, configBuilder)
+    return configBuilder
+  }
+
+  /**
+   * Converts a `ReplicatorStatus` object to a `WritableMap` used to return value back
+   * to React Native to Javascript on the Native Bridge.
+   *
+   * This function takes a `ReplicatorStatus` object and converts it into a `WritableMap` that can be
+   * used in React Native. The resulting map includes the activity level, progress, and any error information.
+   *
+   * @param status The `ReplicatorStatus` object to be converted.
+   * @return A `WritableMap` representation of the provided `ReplicatorStatus`.
+   */
+  fun replicatorStatusToMap(status: ReplicatorStatus): WritableMap {
     val resultMap = Arguments.createMap()
     val progressMap = Arguments.createMap()
     val errorMap = Arguments.createMap()
@@ -289,7 +454,37 @@ object DataAdapter {
     return resultMap
   }
 
-  private fun adaptStringToReplicatorType(strValue :String): ReplicatorType {
+  /**
+   * Converts a `Scope` object to a `WritableMap`.
+   *
+   * This function takes a `Scope` object and the associated database name, and converts them into a `WritableMap`
+   * that can be used in React Native. The resulting map includes the scope name and the database name.
+   *
+   * @param scope The `Scope` object to be converted.
+   * @param databaseName The name of the database associated with the scope.
+   * @return A `WritableMap` representation of the provided `Scope` and database name.
+   */
+  fun scopeToMap(
+    scope: Scope,
+    databaseName: String
+  ): WritableMap {
+    val scopeMap: WritableMap = Arguments.createMap()
+    scopeMap.putString("name", scope.name)
+    scopeMap.putString("databaseName", databaseName)
+    return scopeMap
+  }
+
+  /**
+   * Converts a string representation of a replicator type to a `ReplicatorType` enum.
+   *
+   * This function takes a string value and maps it to the corresponding `ReplicatorType` enum.
+   * Supported string values are "PUSH", "PULL", and "PUSH_AND_PULL".
+   *
+   * @param strValue The string representation of the replicator type.
+   * @return The corresponding `ReplicatorType` enum.
+   * @throws IllegalArgumentException If the provided string value does not match any supported replicator type.
+   */
+  private fun stringToReplicatorType(strValue: String): ReplicatorType {
     return when (strValue) {
       "PUSH" -> ReplicatorType.PUSH
       "PULL" -> ReplicatorType.PULL
@@ -298,34 +493,17 @@ object DataAdapter {
     }
   }
 
-  private fun adaptMapToAuthenticator(map: ReadableMap): Authenticator? {
-    val type = map.getString("type")
-    val data = map.getMap("data")
-    if (type.isNullOrEmpty() || data == null) {
-      throw IllegalArgumentException("Authenticator type and data are required")
-    }
-    when (type) {
-      "basic" -> {
-        val username = data.getString("username")
-        val password = data.getString("password")
-        if (username.isNullOrEmpty() || password.isNullOrEmpty()) {
-          throw IllegalArgumentException("Username and password are required")
-        }
-        return BasicAuthenticator(username, password.toCharArray())
-      }
-      "session" -> {
-        val sessionId = data.getString("sessionId")
-        val cookieName = data.getString("cookieName")
-        if(sessionId.isNullOrEmpty() || cookieName.isNullOrEmpty()) {
-          throw IllegalArgumentException("SessionId and cookieName are required")
-        }
-        return SessionAuthenticator(sessionId, cookieName)
-      }
-      else -> throw IllegalArgumentException("Invalid authenticator type")
-    }
-  }
-
-  fun getDatabaseConfig(
+  /**
+   * Converts the provided directory and encryption key into a JSON object representing the database configuration.
+   *
+   * This function creates a JSON object containing the directory and encryption key for the database configuration.
+   * If either the directory or encryption key is `null`, they will be omitted from the resulting JSON object.
+   *
+   * @param directory The directory where the database files are stored. Can be `null`.
+   * @param encryptionKey The encryption key used to secure the database. Can be `null`.
+   * @return A `JSONObject` containing the database configuration.
+   */
+  fun toDatabaseConfigJson(
     directory: String?,
     encryptionKey: String?
   ): JSONObject {
@@ -337,5 +515,46 @@ object DataAdapter {
       databaseConfig.put("encryptionKey", encryptionKey)
     }
     return databaseConfig
+  }
+
+  /**
+   * Converts a `ReadableMap` to a `Map<String, Any>`.
+   *
+   * This function is used when sending a document to be saved in the database from Javascript
+   * React Native.  It iterates through the entries of the provided `ReadableMap` and converts
+   * any `Blob` objects into a map of  the properties of a blob. A developer needing the blob content
+   * would need to manually call the Collection `getBlobContent` method.
+   *
+   * @param readableMap The `ReadableMap` to be converted.
+   * @return A `Map<String, Any>` representation of the provided `ReadableMap`.
+   * @throws Exception If there is an error during the conversion, particularly if the blob data is invalid.
+   */
+  @Throws(Exception::class)
+  fun toMap(readableMap: ReadableMap): Map<String, Any> {
+    val map = readableMap.toHashMap()
+    for ((key, value) in map) {
+      if (value is HashMap<*, *>) {
+        if (value.containsKey("_type") && value["_type"] == "blob") {
+          val nestedMap = value["data"] as HashMap<*, *>
+          val contentType = nestedMap["contentType"] as String
+          //value["data"] 'should be' an array of integers - need to convert it because React Native serializes it into
+          //an the ArrayList<Double>
+          val rawList = nestedMap["data"] as? ArrayList<*>
+          val doubleList = rawList?.filterIsInstance<Double>()?.takeIf { it.size == rawList.size } as? ArrayList<Double>
+          val intData = doubleList?.map{ it.toInt()}?.toIntArray()
+          if (intData == null) {
+            throw Exception("Error: Invalid blob data")
+          } else {
+            val data = ByteArray(intData.size)
+            for (i in intData.indices) {
+              data[i] = intData[i].toByte()
+            }
+            val blob = Blob(contentType, data)
+            map[key] = blob
+          }
+        }
+      }
+    }
+    return map
   }
 }
