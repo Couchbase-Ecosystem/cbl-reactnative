@@ -799,6 +799,40 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   }
 
   // Logging Functions
+
+ @ReactMethod
+ fun database_SetFileLoggingConfig(
+   name: String,
+   directory: String,
+   logLevel: Double,
+   maxSize: Double,
+   maxRotateCount: Double,
+   shouldUsePlainText: Boolean,
+   promise: Promise
+ ) {
+   GlobalScope.launch(Dispatchers.IO) {
+     try {
+        if (!DataValidation.validateDatabaseName(name, promise)) {
+          return@launch
+        }
+        LoggingManager.setFileLoggingConfig(
+          directory,
+          logLevel.toInt(),
+          maxSize.toLong(),
+          maxRotateCount.toInt(),
+          shouldUsePlainText
+        )
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+     } catch (e: Throwable) {
+       context.runOnUiQueueThread {
+         promise.reject("LOGGING_ERROR", e.message)
+       }
+     }
+   }
+ }
+
   @ReactMethod
   fun database_SetLogLevel(
     domain: String,
