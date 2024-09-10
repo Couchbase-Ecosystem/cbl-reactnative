@@ -339,8 +339,8 @@ object DataAdapter {
       val nestedType = nestedMap?.getString("type")
       count += 1
       when (nestedType) {
-        "int" -> queryParameters.setInt(key, nestedMap.getInt("value"))
-        "long" -> queryParameters.setLong(key, nestedMap.getLong("value"))
+        "int" -> queryParameters.setInt(key, nestedMap.getDouble("value").toInt())
+        "long" -> queryParameters.setLong(key, nestedMap.getDouble("value").toLong())
         "float" -> queryParameters.setFloat(key, nestedMap.getDouble("value").toFloat())
         "double" -> queryParameters.setDouble(key, nestedMap.getDouble("value"))
         "boolean" -> queryParameters.setBoolean(key, nestedMap.getBoolean("value"))

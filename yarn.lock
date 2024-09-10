@@ -2675,7 +2675,7 @@ camelcase@^7.0.1:
 caniuse-lite@^1.0.30001640:
   version "1.0.30001640"
 
-"cbl-reactnative-example@file:/Users/aaron.labeau/Developer/Couchbase/cbl-reactnative/example":
+"cbl-reactnative-example@file:/Users/labeaaa/Developer/couchbase/cbl-reactnative/example":
   version "0.0.1"
   resolved "file:example"
   dependencies:

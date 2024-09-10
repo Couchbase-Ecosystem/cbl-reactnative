@@ -26,7 +26,7 @@
     },
     "plugins": [
       "expo-router",
-      "./cbl-reactnative-plugin.js"
+      "cbl-reactnative"
     ],
     "experiments": {
       "typedRoutes": true
