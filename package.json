@@ -1,6 +1,6 @@
 {
   "name": "cbl-reactnative",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Couchbase Lite Enterprise for React Native",
   "main": "./lib/commonjs/index.cjs",
   "source": "./src/index.tsx",
@@ -14,7 +14,6 @@
     }
   },
   "files": [
-    "src/plugin.config.js",
     "src",
     "lib",
     "android",
@@ -30,7 +29,8 @@
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
-    "!**/.*"
+    "!**/.*",
+    "!src/cblite-js/cblite-tests"
   ],
   "scripts": {
     "example": "yarn workspace expo-example",
