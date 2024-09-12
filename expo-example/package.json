@@ -1,7 +1,7 @@
 {
   "name": "expo-example",
   "main": "expo-router/entry",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "scripts": {
     "prebuild": "cd .. && npm run build && cd expo-example && expo prebuild",
     "prebuild:clean": "cd .. && npm run build && cd expo-example && expo prebuild --clean",
@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "cbl-reactnative": "file:..",
-    "expo": "~51.0.30",
+    "expo": "~51.0.32",
     "@expo/vector-icons": "^14.0.2",
-    "expo-dev-client": "~4.0.24",
+    "expo-dev-client": "~4.0.26",
     "expo-font": "~12.0.9",
     "expo-linking": "~6.3.1",
     "expo-router": "~3.5.23",

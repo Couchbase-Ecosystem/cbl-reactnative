@@ -39,6 +39,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
+  /*
   private fun sendEvent(
     reactContext: ReactContext,
     eventName: String,
@@ -47,6 +48,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
       .emit(eventName, params)
   }
+   */
 
   // Collection Functions
   @ReactMethod
@@ -934,7 +936,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         val listener = replicator?.addChangeListener { change ->
           val map = DataAdapter.replicatorStatusToMap(change.status)
           context.runOnUiQueueThread {
-            sendEvent(context, "replicatorStatusChange", map)
+            //sendEvent(context, "replicatorStatusChange", map)
           }
         }
         listener?.let {

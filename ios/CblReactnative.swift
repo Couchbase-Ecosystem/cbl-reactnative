@@ -4,7 +4,7 @@ import CouchbaseLiteSwift
 @objc(
     CblReactnative
 )
-class CblReactnative: RCTEventEmitter {
+class CblReactnative: NSObject {
     
     // MARK: - Member Properties
     private var hasListeners = false
@@ -28,6 +28,9 @@ class CblReactnative: RCTEventEmitter {
     }
     // MARK: - Setup Notifications
     
+    /*
+     * used for notifications
+     
     override func startObserving() {
         hasListeners = true
     }
@@ -43,7 +46,8 @@ class CblReactnative: RCTEventEmitter {
     @objc override static func requiresMainQueueSetup() -> Bool {
         return false
     }
-    
+    */
+
     // MARK: - Collection Functions
     
     @objc(collection_CreateCollection:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
@@ -1168,7 +1172,7 @@ class CblReactnative: RCTEventEmitter {
                 resultData.setValue(token, forKey: "token")
                 resultData.setValue(statusJson, forKey: "status")
                 DispatchQueue.main.async {
-                    self.sendEvent(withName: "replicatorStatusChange", body: resultData)
+                    //self.sendEvent(withName: "replicatorStatusChange", body: resultData)
                 }
             })
             self.replicatorChangeListeners[token] = listener

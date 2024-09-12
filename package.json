@@ -1,6 +1,6 @@
 {
   "name": "cbl-reactnative",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "description": "Couchbase Lite Enterprise for React Native",
   "main": "./lib/commonjs/index.cjs",
   "source": "./src/index.tsx",
