@@ -4,6 +4,5 @@ export default async function get(
   collection: Collection,
   documentId: string
 ): Promise<Document> {
-  const doc = await collection.document(documentId);
-  return doc;
+  return await collection.document(documentId);
 }

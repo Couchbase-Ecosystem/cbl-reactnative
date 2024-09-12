@@ -8,8 +8,7 @@ export default async function getCollection(
 ): Promise<Collection> {
   if (databaseName in databases) {
     const database = databases[databaseName];
-    const collection = await database.collection(collectionName, scopeName);
-    return collection;
+    return await database.collection(collectionName, scopeName);
   } else {
     throw new Error('Error: Database not in Context, open Database first');
   }

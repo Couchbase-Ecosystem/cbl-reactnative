@@ -35,7 +35,6 @@ import {
   DatabaseSetLogLevelArgs,
   DocumentChangeListenerArgs,
   DocumentExpirationResult,
-  DocumentGetBlobContentArgs,
   DocumentResult,
   QueryChangeListenerArgs,
   QueryExecuteArgs,
@@ -47,6 +46,7 @@ import {
   ReplicatorDocumentPendingArgs,
   ScopeArgs,
   ScopesResult,
+  DocumentGetBlobContentArgs,
 } from './cblite-js/cblite/core-types';
 
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
@@ -62,11 +62,13 @@ export class CblReactNativeEngine implements ICoreEngine {
   _defaultScopeName = '_default';
 
   //event name mapping for the native side of the module
+  /*
   _eventReplicatorStatusChange = 'replicatorStatusChange';
   _eventReplicatorDocumentChange = 'replicatorDocumentChange';
   _eventCollectionChange = 'collectionChange';
   _eventCollectionDocumentChange = 'collectionDocumentChange';
   _eventQueryChange = 'queryChange';
+   */
 
   //used to listen to replicator change events for both status and document changes
   private _isReplicatorStatusChangeEventSetup: boolean = false;
@@ -97,7 +99,7 @@ export class CblReactNativeEngine implements ICoreEngine {
         }
       );
 
-  private _eventEmitter = new NativeEventEmitter(this.CblReactNative);
+  //private _eventEmitter = new NativeEventEmitter(this.CblReactNative);
 
   constructor() {
     EngineLocator.registerEngine(EngineLocator.key, this);
@@ -106,6 +108,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   //startListeningEvents - used to listen to events from the native side of the module.  Implements Native change listeners for Couchbase Lite
   startListeningEvents = (event: string, callback: any) => {
     console.log(`::DEBUG:: Registering listener for event: ${event}`);
+    /*
     return this._eventEmitter.addListener(
       event,
       (data) => {
@@ -116,6 +119,7 @@ export class CblReactNativeEngine implements ICoreEngine {
       },
       this
     );
+     */
   };
 
   collection_AddChangeListener(
@@ -797,6 +801,7 @@ export class CblReactNativeEngine implements ICoreEngine {
     }
     //if the event listener is not setup, then set up the listener.
     //Event listener only needs to be setup once for any replicators in memory
+    /*
     if (!this._isReplicatorStatusChangeEventSetup) {
       this._replicatorStatusChangeSubscription = this.startListeningEvents(
         this._eventReplicatorStatusChange,
@@ -825,10 +830,9 @@ export class CblReactNativeEngine implements ICoreEngine {
           }
         }
       );
-      const count = this._eventEmitter.listenerCount('replicatorStatusChange');
-      console.log(`::DEBUG::Replicator Status Change Listener count: ${count}`);
       this._isReplicatorStatusChangeEventSetup = true;
     }
+     */
     //add token to change listener map
     this._replicatorChangeListeners.set(args.changeListenerToken, lcb);
     return new Promise((resolve, reject) => {

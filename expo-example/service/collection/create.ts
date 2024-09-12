@@ -5,6 +5,5 @@ export default async function create(
   scopeName: string,
   collectionName: string
 ): Promise<Collection> {
-  const collection = await database.createCollection(collectionName, scopeName);
-  return collection;
+  return await database.createCollection(collectionName, scopeName);
 }

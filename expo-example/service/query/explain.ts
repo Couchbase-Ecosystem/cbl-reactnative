@@ -9,6 +9,5 @@ export default async function explain(
   if (parameters instanceof Parameters) {
     query.addParameter(parameters);
   }
-  const results = await query.explain();
-  return results;
+  return await query.explain();
 }
