@@ -1,7 +1,36 @@
 {
   "name": "cbl-reactnative",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Couchbase Lite Enterprise for React Native",
+  "author": "Dev Experience/Ecosystem Team @ Couchbase",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Couchbase-Ecosystem/cbl-reactnative/issues"
+  },
+  "homepage": "https://cbl-reactnative.dev/",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "keywords": [
+    "react-native",
+    "couchbase",
+    "couchbase mobile",
+    "couchbase lite",
+    "ios",
+    "android"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Couchbase-Ecosystem/cbl-reactnative.git"
+  },
+  "scripts": {
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint \"**/*.{js,ts,tsx}\"",
+    "clean": "del-cli android/build expo-example/android/build expo-example/android/app/build expo-example/ios/build lib",
+    "build": "bob build",
+    "release": "release-it"
+  },
   "main": "./lib/commonjs/index.cjs",
   "source": "./src/index.tsx",
   "module": "./lib/module/index.mjs",
@@ -29,35 +58,9 @@
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",
-    "!**/.*"
+    "!**/.*",
+    "!src/cblite-js/cblite-tests"
   ],
-  "scripts": {
-    "example": "yarn workspace expo-example",
-    "test": "jest",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "clean": "del-cli android/build expo-example/android/build expo-example/android/app/build expo-example/ios/build lib",
-    "build": "bob build",
-    "release": "release-it"
-  },
-  "keywords": [
-    "react-native",
-    "ios",
-    "android"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Couchbase-Ecosystem/cbl-reactnative.git"
-  },
-  "author": "Dev Experience/Ecosystem Team @ Couchbase",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/Couchbase-Ecosystem/cbl-reactnative/issues"
-  },
-  "homepage": "https://github.com/Couchbase-Ecosystem/cbl-reactnative#readme",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.0.2",
     "@evilmartians/lefthook": "^1.5.0",

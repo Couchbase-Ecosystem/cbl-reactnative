@@ -4,11 +4,12 @@
     "paths": {
       "cbl-reactnative": [
         "./src/index",
-        "./src/cblite-js/cblite/index"
+        "./src/cblite-js/cblite/index",
       ]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
+    "allowJs": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
@@ -30,8 +31,8 @@
     "verbatimModuleSyntax": false
   },
   "exclude": [
-    "src/cblite-js/cblite/src/util/uuid-ionic.ts",
-    "example",
-    "expo-example",
+    "./src/cblite-js/cblite-tests",
+    "./example",
+    "./expo-example",
   ]
 }

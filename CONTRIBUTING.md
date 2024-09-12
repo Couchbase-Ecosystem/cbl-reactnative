@@ -1,72 +1,89 @@
-[!CAUTION]
-This document was pre-generated and isn't up-to-date - but will be updated shortly.  What I'm saying is following these instructions will not help you build the example app or project.
-
 # Contributing
 
 Contributions are always welcome, no matter how large or small!
 
 We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project. Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
 
-## Development workflow
+This guide provides instructions for contributing to this React Native - Native Module.
 
-This project is a monorepo managed using [Yarn workspaces](https://yarnpkg.com/features/workspaces). It contains the following packages:
 
-- The library package in the root directory.
-- An example app in the `expo-example/` directory.
+## Development Requirements
+- Javascript
+  - [Node 20](https://formulae.brew.sh/formula/node@20)
+    - LTS version is highly recommended
+- React Native
+  - [React Native - Getting Started](https://reactnative.dev/docs/environment-setup)
+    - You should note that while the library is a React Native - Native Module, React recommends all apps use Expo or another framework.  The provided example app is an Expo based app, so you will need to have knowledge on React, React Native, and Expo
+  - [Understanding on React Native - Native Module Development](https://reactnative.dev/docs/native-modules-intro)
+  - [Expo Setup](https://docs.expo.dev/get-started/set-up-your-environment/?platform=ios&device=physical&mode=development-build&buildEnv=local)
+    - The example app provided to test the Native Module is an expo based app, so you have to have your environment setup for expo
+    - For expo setup on the link provided above, you must select `Development build` and turn off `Build with Expo Appplication Services (EAS)` for proper instructions
+    - You should have a clear understanding of expo's [dev client environment](https://docs.expo.dev/guides/local-app-development/#local-builds-with-expo-dev-client).
+- IDEs
+  - [Visual Studio Code](https://code.visualstudio.com/download)
+  - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
+- iOS Development
+  - A modern Mac
+  - [XCode 15](https://developer.apple.com/xcode/) or higher installed and working
+  - [XCode Command Line Tools](https://developer.apple.com/download/more/) installed
+  - [Simulators](https://developer.apple.com/documentation/safari-developer-tools/installing-xcode-and-simulators) downloaded and working
+  - [Homebrew](https://brew.sh/)
+  - [Cocopods](https://formulae.brew.sh/formula/cocoapods)
 
-To get started with the project, run `yarn` in the root directory to install the required dependencies for each package:
+  - A valid Apple Developer account and certificates installed and working
+- Android Development
+  - [Android Studio](https://developer.android.com/studio?gad_source=1&gclid=CjwKCAjwzN-vBhAkEiwAYiO7oALYfxbMYW_zkuYoacS9TX16aItdvLYe6GB7_j1QwvXBjFDRkawfUBoComcQAvD_BwE&gclsrc=aw.ds) installed and working
+  - Android SDK 34 >= installed and working (with command line tools)
+  - Java SDK v17 installed and working with Android Studio
+  - An Android Emulator downloaded and working
 
+## Project Structure
+
+The root directory of the repository contains the following files and directories:
+- `android`:  This is the Native Module code for the Android platform.  It is written in Kotlin. The cbl-js-kotlin folder is a Git submodule and has shared code between this project and other projects like cbl-ionic.
+- `expo-example`: This is the example application for testing changes to the Native Module.  It is an Expo based app, and you can look at the `package.json` file to see the various commands available.  Note:  When the Native Module version is updated, the example app version should match.
+- `ios`: This is the Native Module code for the iOS platform.  It is written in Objective-C and Swift.  The `cbl-js-swift` folder is a Git submodule and has shared code between this project and other projects like cbl-ionic.
+- `src`: This is the Native Module source code in Typescript for the project. The `cblite-js` folder is a Git submodule and defines the entire API surface of the cblite-js library.  This library is shared between all similar projects like cbl-ionic.  `CblReactNativeEngine` is an implementation of the `cblite-js` library that is defined in the `ICoreEngine` interface in `cblite-js`.  `CblReactNativeEngine` is the bridge between the Native Module and the `cblite-js` library.
+
+## Development Workflow
+
+It's recommended that new APIs be defined in Typescript first to flush out the requirements for sending the data over the bridge, and then implemented in the Native Module.  The Native Module should be tested in the example app to ensure that it works as expected.
+
+Any breaking changes to the cblite-js library will require changes in other libraries like cbl-ionic, so it's important to remember that PRs that make changes to this library are less like to be approved without justification.
+
+If you want to use Android Studio or XCode to edit the native code, you can open the `expo-example/android` or `expo-example/ios` directories respectively in those editors. To edit the Objective-C or Swift files, open `expo-example/ios/expoexample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > cbl-reactnative`.
+
+To edit the Java or Kotlin files, open `expo-example/android` in Android studio and find the source files at `cbl-reactnative` under `Android`.
+
+**NOTE**:  Until you do an initial build both directories might not have the files required to build the project.
+
+## How to Build the Project
+
+Install the required packages
 ```sh
-yarn
+npm install
 ```
 
-> Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development.
-
-The [example app](/expo-example/) demonstrates usage of the library. You need to run it to test any changes you make.
-
-It is configured to use the local version of the library, so any changes you make to the library's source code will be reflected in the example app. Changes to the library's JavaScript code will be reflected in the example app without a rebuild, but native code changes will require a rebuild of the example app.
-
-If you want to use Android Studio or XCode to edit the native code, you can open the `example/android` or `example/ios` directories respectively in those editors. To edit the Objective-C or Swift files, open `example/ios/CblReactnativeExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > cbl-reactnative`.
-
-To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `cbl-reactnative` under `Android`.
-
-You can use various commands from the root directory to work with the project.
-
-To start the packager:
-
+To build the example app change to the expo-example folder:
 ```sh
-yarn example start
+cd .. expo-example
 ```
 
-To run the example app on Android:
-
+Android:
 ```sh
-yarn example android
+npm run android
 ```
 
-To run the example app on iOS:
+iOS:
 
 ```sh
-yarn example ios
+npm run ios
 ```
+Expo cache can sometimes break things.  Note when you make changes to Native Code you MUST do a new build to see the changes reflected as watchman doesn't watch Native Code changes, only changes to the local application.  So ANY Native Module code changes to the iOS, Android, or typescript code will require a new build.
 
-Make sure your code passes TypeScript and ESLint. Run the following to verify:
-
+You can manually clear the cache by running:
 ```sh
-yarn typecheck
-yarn lint
-```
-
-To fix formatting errors, run the following:
-
-```sh
-yarn lint --fix
-```
-
-Remember to add tests for your change if possible. Run the unit tests by:
-
-```sh
-yarn test
+npm run prebuild:clean
 ```
 
 ### Commit message convention
@@ -97,20 +114,28 @@ We use [release-it](https://github.com/release-it/release-it) to make it easier 
 To publish new versions, run the following:
 
 ```sh
-yarn release
+npm release
 ```
 
 ### Scripts
 
-The `package.json` file contains various scripts for common tasks:
+#### Native Module
+The root directory `package.json` file contains various scripts for common tasks:
 
-- `yarn`: setup project by installing dependencies.
-- `yarn typecheck`: type-check files with TypeScript.
-- `yarn lint`: lint files with ESLint.
-- `yarn test`: run unit tests with Jest.
-- `yarn example start`: start the Metro server for the example app.
-- `yarn example android`: run the example app on Android.
-- `yarn example ios`: run the example app on iOS.
+- `npm`: setup project by installing dependencies.
+- `npm typecheck`: type-check files with TypeScript.
+- `npm lint`: lint files with ESLint.
+- `npm clean`: clean the lib folder and the example app native ios and android build folders.
+- `npm build`: run a build using the React Native builder (bob)
+-
+#### Expo example app
+The `expo-example` directory `package.json` file contains various scripts for common tasks:
+
+- `prebuild`: setup project by installing dependencies along with the native dependencies.
+- `prebuild:clean`: cleans out all directories and cache first, then runs a prebuild
+- `start`: starts the expo server and provides the menu for running the app on various devices.
+- `android`: starts the expo server and runs the app on an android emulator or device.
+- `ios`: starts the expo server and runs the app on an iOS simulator or device.
 
 ### Sending a pull request
 

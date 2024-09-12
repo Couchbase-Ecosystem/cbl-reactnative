@@ -9,6 +9,5 @@ export default async function execute(
   if (parameters instanceof Parameters) {
     query.addParameter(parameters);
   }
-  const resultSet = await query.execute();
-  return resultSet;
+  return await query.execute();
 }

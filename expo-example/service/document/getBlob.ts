@@ -11,8 +11,7 @@ export default async function getBlob(
     const blobText = await doc.getBlobContent(key, collection);
     if (blobText !== undefined && blobText !== null) {
       const buffer = Buffer.from(blobText);
-      const text = buffer.toString('utf-8');
-      return text;
+      return buffer.toString('utf-8');
     }
   } catch (error) {
     // @ts-ignore

@@ -12,7 +12,8 @@
         "example/android",
         "!example/android/.gradle",
         "!example/android/build",
-        "!example/android/app/build"
+        "!example/android/app/build",
+        "!src/cblite-js/cblite-tests"
       ],
       "outputs": []
     },
@@ -26,7 +27,8 @@
         "example/package.json",
         "example/ios",
         "!example/ios/build",
-        "!example/ios/Pods"
+        "!example/ios/Pods",
+        "!src/cblite-js/cblite-tests"
       ],
       "outputs": []
     }

@@ -8,7 +8,6 @@ export default async function listCollections(
   if (scope === null || scope === undefined || scope.name !== scopeName) {
     throw new Error(`Error: No Scope found for name ${scopeName}.`);
   } else {
-    const collections = await database.collections(scope);
-    return collections;
+    return await database.collections(scope);
   }
 }
