@@ -59,6 +59,14 @@ To edit the Java or Kotlin files, open `expo-example/android` in Android studio 
 
 ## How to Build the Project
 
+Fork and clone this repo.  You will need to also clone all the submodules for the shared libraries and tests and update them with the latest version of each of those modules code.  **IF YOU DON'T PULL SUBMODULES IT WON'T BUILD**
+
+```sh
+git clone --recurse-submodules git@github.com:Couchbase-Ecosystem/cbl-reactnative.git
+cd cbl-reactnative
+git submodule update --remote --recursive
+```
+
 Install the required packages
 ```sh
 npm install
