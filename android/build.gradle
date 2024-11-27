@@ -3,8 +3,8 @@ buildscript {
   def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["CblReactnative_kotlinVersion"]
 
   repositories {
-    maven {url 'https://mobile.maven.couchbase.com/maven2/dev/'}
     google()
+    maven {url 'https://mobile.maven.couchbase.com/maven2/dev/'}
     mavenCentral()
   }
 
@@ -50,7 +50,7 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.cbl.reactnative"
+    namespace "com.cblreactnative"
     sourceSets {
       main {
         manifest.srcFile "src/main/AndroidManifestNew.xml"
@@ -90,8 +90,8 @@ repositories {
 
 allprojects {
   repositories {
-    maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
     google()
+    maven { url 'https://mobile.maven.couchbase.com/maven2/dev/' }
     mavenCentral()
   }
 }
@@ -107,6 +107,6 @@ dependencies {
   implementation "com.facebook.react:react-native:+"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
   implementation "org.json:json:20240303"
-  implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:3.1.9"
+  implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:3.2.1"
 }
 

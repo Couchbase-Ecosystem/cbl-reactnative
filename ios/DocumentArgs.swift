@@ -12,3 +12,8 @@ public class DocumentArgs {
     public var documentId: String = ""
     public var concurrencyControlValue: ConcurrencyControl? = nil
 }
+
+public class DocumentBlobArgs {
+    public var document: String = ""
+    public var blobs: String = ""
+}

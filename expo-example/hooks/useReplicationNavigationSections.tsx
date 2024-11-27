@@ -20,29 +20,9 @@ export function useReplicationNavigationSections() {
           path: '/replication/stop',
         },
         {
-          id: 4,
-          title: 'Pending Documents',
-          path: '/replication/pendingDocs',
-        },
-        {
-          id: 5,
-          title: 'Is Documents Pending',
-          path: '/replication/isPending',
-        },
-        {
-          id: 6,
-          title: 'Replicator Logs',
-          path: '/replication/logs',
-        },
-        {
           id: 7,
           title: 'Status Changes',
           path: '/replication/status',
-        },
-        {
-          id: 8,
-          title: 'Document Changes',
-          path: '/replication/documentChange',
         },
       ],
     },

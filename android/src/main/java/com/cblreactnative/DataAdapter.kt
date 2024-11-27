@@ -77,7 +77,9 @@ object DataAdapter {
       val itemValue = map[key]
       if (itemValue is Blob) {
         document.getBlob(key)?.let { blob ->
-          val properties = blob.properties.toMap()
+          val properties = blob.properties.toMutableMap()
+          val raw = blob.content?.toTypedArray()
+          properties["raw"] = raw
           map[key] = properties
         }
       }

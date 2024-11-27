@@ -5,11 +5,6 @@ export function useTestsNavigationSections() {
       icon: 'run',
       data: [
         {
-          id: 1,
-          title: 'All',
-          path: '/tests/all',
-        },
-        {
           id: 2,
           title: 'Console Logging',
           path: '/tests/console',

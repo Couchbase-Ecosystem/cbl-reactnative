@@ -119,7 +119,8 @@ RCT_EXTERN_METHOD(collection_PurgeDocument:
   withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(collection_Save:
-  (NSDictionary *) document
+  (NSString *) document
+  withBlobs: (NSString *) blobs
   withDocumentId: (NSString *) docId
   fromDatabaseWithName:(NSString *) name
   fromScopeWithName:(NSString *) scopeName

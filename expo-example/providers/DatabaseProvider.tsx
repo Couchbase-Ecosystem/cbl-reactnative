@@ -45,6 +45,7 @@ const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
   );
 
   const engine = new CblReactNativeEngine();
+  engine.debugConsole = true;  //very noisy, only use for debugging
 
   return (
     <DatabaseContext.Provider value={databasesValue}>

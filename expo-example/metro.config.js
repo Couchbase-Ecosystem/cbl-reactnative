@@ -15,4 +15,13 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
+const { resolver } = config;
+
+config.resolver = {
+  ...resolver,
+  extraNodeModules: {
+    'cblite-js': __dirname + '/node_modules/cbl-reactnative',
+  },
+};
+
 module.exports = config;

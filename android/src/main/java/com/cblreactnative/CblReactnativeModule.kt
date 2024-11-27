@@ -52,7 +52,6 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
 
   // Collection Functions
   @ReactMethod
-
   fun collection_CreateCollection(
     collectionName: String,
     name: String,
@@ -484,7 +483,8 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun collection_Save(
-    document: ReadableMap,
+    document: String,
+    blobs: String,
     docId: String,
     name: String,
     scopeName: String,
@@ -505,21 +505,23 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
           concurrencyControl =
             DataAdapter.intToConcurrencyControl(concurrencyControlValue.toInt())
         }
-        val doc = DataAdapter.toMap(document).toMap()
         val result = CollectionManager.saveDocument(
           docId,
-          doc,
+          document,
+          blobs,
           concurrencyControl,
           collectionName,
           scopeName,
           name
         )
-        writableMap.putString("_id", result.first)
-        if (result.second != null) {
-          writableMap.putBoolean("concurrencyControlResult", result.second!!)
+        writableMap.putString("_id", result._id)
+        if (result._concurrencyControl != null) {
+          writableMap.putBoolean("concurrencyControlResult", result._concurrencyControl)
         } else {
           writableMap.putNull("concurrencyControlResult")
         }
+        writableMap.putString("_revId", result._revId)
+        writableMap.putInt("_sequence", result._sequence.toInt())
         context.runOnUiQueueThread {
           promise.resolve(writableMap)
         }

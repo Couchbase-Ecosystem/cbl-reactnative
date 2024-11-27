@@ -8,6 +8,7 @@ import ReplicatorIdActionForm from '@/components/ReplicatorIdActionForm/Replicat
 import { useStyleScheme } from '@/components/Themed/Themed';
 import { NativeEventEmitter, NativeModules, SafeAreaView } from 'react-native';
 import ResultListView from '@/components/ResultsListView/ResultsListView';
+import MessageQueue from 'react-native/Libraries/BatchedBridge/MessageQueue';
 
 export default function ReplicatorStatusScreen() {
   //debug the message queue
@@ -17,7 +18,7 @@ export default function ReplicatorStatusScreen() {
       message.method === 'emit' &&
       message.module === 'RCTDeviceEventEmitter'
     ) {
-      console.log(`::MESSAGE-QUEUE:: ${message}`);
+      console.log(`::MESSAGE-QUEUE:: ${message.args}`);
     }
   };
 
@@ -40,7 +41,7 @@ export default function ReplicatorStatusScreen() {
       setSelectedReplicatorId(replicatorId);
       try {
         //debug the message queue
-        //MessageQueue.spy(spyMessageQueue);
+        MessageQueue.spy(spyMessageQueue);
         const token = statusToken[replicatorId];
         if (token === undefined) {
           setInformationMessages((prev) => [

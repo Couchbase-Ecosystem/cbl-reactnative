@@ -8,6 +8,9 @@
       ]
     }
   },
+  "paths": {
+    "cblite-js": ["./node_modules/cbl-reactnative"]
+  },
   "include": [
     "**/*.ts",
     "**/*.tsx",

@@ -8,7 +8,7 @@ export default async function getBlob(
 ): Promise<string> {
   try {
     const doc = await collection.document(documentId);
-    const blobText = await doc.getBlobContent(key, collection);
+    const blobText = await doc.getBlob(key)?.bytes;
     if (blobText !== undefined && blobText !== null) {
       const buffer = Buffer.from(blobText);
       return buffer.toString('utf-8');

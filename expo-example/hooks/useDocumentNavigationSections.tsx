@@ -18,11 +18,6 @@ export function useDocumentNavigationSections() {
           path: '/document/expiration',
         },
         {
-          id: 6,
-          title: 'Load Sample Documents',
-          path: '/document/batch',
-        },
-        {
           id: 7,
           title: 'Set Blob',
           path: '/document/blob/setBlob',
@@ -31,11 +26,6 @@ export function useDocumentNavigationSections() {
           id: 8,
           title: 'Get Blob',
           path: '/document/blob/getBlob',
-        },
-        {
-          id: 9,
-          title: 'Listen to Document Changes',
-          path: '/document/change',
         },
       ],
     },
