@@ -76,7 +76,20 @@ public class DataAdapter {
         args.documentId = documentArgs.1
         return (isError, args)
     }
-    
+
+    public func adaptDocumentBlobStrings(document: NSString, blobs: NSString, reject: @escaping RCTPromiseRejectBlock) -> (Bool, DocumentBlobArgs) {
+        let args = DocumentBlobArgs()
+        let documentArgs = self.adaptNonEmptyString(value: document, propertyName: "document", reject: reject)
+        let blobsArgs = self.adaptNonEmptyString(value: blobs, propertyName: "blobs", reject: reject)
+
+        if documentArgs.0 || blobsArgs.0 {
+            return (documentArgs.0, args)
+        }
+        args.document = documentArgs.1
+        args.blobs = blobsArgs.1
+        return (false, args)
+    }
+
     public func adaptScopeArgs(name:NSString, scopeName: NSString, reject: @escaping RCTPromiseRejectBlock) -> (Bool, ScopeArgs){
         var isError = false
         let args = ScopeArgs()
@@ -97,7 +110,7 @@ public class DataAdapter {
         return (isError, args)
     }
     
-    public func adaptCollectionToNSDictionary(_ collection: Collection, databaseName: NSString) -> NSDictionary {
+    public func adaptCollectionToNSDictionary(_ collection: Collection, databaseName: String) -> NSDictionary {
         let dict:NSDictionary = [
             "name": collection.name as NSString,
             "scope": [
@@ -108,7 +121,7 @@ public class DataAdapter {
         return dict
     }
     
-    public func adaptCollectionsToNSDictionaryString(_ collections: [Collection]?, databaseName: NSString) -> NSArray {
+    public func adaptCollectionsToNSDictionaryString(_ collections: [Collection]?, databaseName: String) -> NSArray {
         let data = NSMutableArray()
         if let cols = collections {
             for collection in cols {
@@ -120,7 +133,7 @@ public class DataAdapter {
         return result
     }
     
-    public func adaptScopeToNSDictionary(_ scope: Scope, databaseName: NSString) -> NSDictionary {
+    public func adaptScopeToNSDictionary(_ scope: Scope, databaseName: String) -> NSDictionary {
         let dict:NSDictionary = [
             "name": scope.name as NSString,
             "databaseName": databaseName
@@ -129,7 +142,7 @@ public class DataAdapter {
         
     }
     
-    public func adaptScopesToNSDictionary(_ scopes: [Scope]?, databaseName: NSString) -> NSArray {
+    public func adaptScopesToNSDictionary(_ scopes: [Scope]?, databaseName: String) -> NSArray {
         let data = NSMutableArray()
         if let unwrappedScopes = scopes {
             for scope in unwrappedScopes {

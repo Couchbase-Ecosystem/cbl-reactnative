@@ -1,0 +1,16 @@
+.pageContainer {
+	display: flex;
+	flex-direction: column;
+	align-items:  flex-start;
+	padding-left: 16px;
+	padding-right: 16px;
+	padding-bottom: env(safe-area-inset-bottom, var(--ion-safe-area-bottom, 20px));
+  }
+
+  .pageContainer > :first-child {
+	margin-top: 0; /* Ensure the first child element has no top margin */
+  }
+
+  .wrap-text {
+	word-wrap: break-word;
+  }

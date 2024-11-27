@@ -10,7 +10,6 @@ export function useQueryNavigationSections() {
           path: '/query/sqlPlusPlus',
         },
         { id: 2, title: 'Query Parameters', path: '/query/parameters' },
-        { id: 3, title: 'Live Query', path: '/query/live' },
       ],
     },
   ];
