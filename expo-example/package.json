@@ -1,7 +1,7 @@
 {
   "name": "expo-example",
   "main": "expo-router/entry",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "scripts": {
     "clean": "npm run prebuild:clean",
     "prebuild": "cd .. && npm run build && cd expo-example && npx expo prebuild",
