@@ -1,11 +1,17 @@
 # Contributing
 
-Contributions are always welcome, no matter how large or small!
+Whether you have a fix for a typo in a component, a bugfix, or a new feature, we'd love to collaborate.
 
 We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project. Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).
 
-This guide provides instructions for contributing to this React Native - Native Module.
+## Steps for Contributing
 
+1. Sign the Contributor License Agreement:
+   1. [Join the code review site](http://review.couchbase.org/).
+   2. Log into the review site.
+   3. [Fill out the agreement](http://review.couchbase.org/#/settings/agreements) under *Settings > Agreements*.
+
+And while we welcome questions, we prefer to answer questions on our [developer forums](https://forums.couchbase.com/) rather than in Github issues.
 
 ## Development Requirements
 - Javascript
