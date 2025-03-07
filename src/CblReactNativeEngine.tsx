@@ -95,10 +95,18 @@ export class CblReactNativeEngine implements ICoreEngine {
         }
       );
 
-  _eventEmitter = new NativeEventEmitter(this.CblReactNative);
+  _eventEmitter: NativeEventEmitter;
 
-  constructor() {
+  constructor(customEventEmitter?: NativeEventEmitter) {
     EngineLocator.registerEngine(EngineLocator.key, this);
+
+    if (customEventEmitter) {
+      this.debugLog('Using provided custom event emitter');
+      this._eventEmitter = customEventEmitter;
+      return;
+    }
+
+    this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
   }
 
   //private logging function
@@ -430,13 +438,17 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  // eslint-disable-next-line
-  collection_RemoveChangeListener(args: CollectionChangeListenerArgs): Promise<void> {
+  collection_RemoveChangeListener(
+    // eslint-disable-next-line
+    args: CollectionChangeListenerArgs
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
-  // eslint-disable-next-line
-  collection_RemoveDocumentChangeListener(args: CollectionChangeListenerArgs): Promise<void> {
+  collection_RemoveDocumentChangeListener(
+    // eslint-disable-next-line
+    args: CollectionChangeListenerArgs
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
@@ -830,12 +842,18 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   // eslint-disable-next-line
-  file_GetFileNamesInDirectory(args: { path: string; }): Promise<{ files: string[] }> {
+  file_GetFileNamesInDirectory(args: {
+    path: string;
+  }): Promise<{ files: string[] }> {
     return Promise.resolve({ files: [] });
   }
 
-  // eslint-disable-next-line
-  query_AddChangeListener( args: QueryChangeListenerArgs, lcb: ListenerCallback): Promise<void> {
+  query_AddChangeListener(
+    // eslint-disable-next-line
+    args: QueryChangeListenerArgs,
+    // eslint-disable-next-line
+    lcb: ListenerCallback
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
@@ -875,8 +893,10 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  // eslint-disable-next-line
-  query_RemoveChangeListener( args: QueryRemoveChangeListenerArgs): Promise<void> {
+  query_RemoveChangeListener(
+    // eslint-disable-next-line
+    args: QueryRemoveChangeListenerArgs
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
@@ -954,8 +974,12 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  // eslint-disable-next-line
-  replicator_AddDocumentChangeListener(args: ReplicationChangeListenerArgs, lcb: ListenerCallback): Promise<void> {
+  replicator_AddDocumentChangeListener(
+    // eslint-disable-next-line
+    args: ReplicationChangeListenerArgs,
+    // eslint-disable-next-line
+    lcb: ListenerCallback
+  ): Promise<void> {
     return Promise.resolve(undefined);
   }
 
