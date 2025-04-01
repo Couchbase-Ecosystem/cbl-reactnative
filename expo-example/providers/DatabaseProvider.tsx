@@ -5,9 +5,15 @@ import ReplicatorContext from '@/providers/ReplicatorContext';
 import ReplicatorStatusChangeContext from '@/providers/ReplicatorStatusChangeContext';
 import ReplicatorDocumentChangeContext from '@/providers/ReplicationDocumentChangeContext';
 import ReplicatorStatusTokenContext from './ReplicatorStatusTokenContext';
+import { NativeEventEmitter, NativeModules } from 'react-native';
 type DatabaseProviderProps = {
   children: ReactNode;
 };
+
+const eventEmitter = new NativeEventEmitter(NativeModules.CblReactnative);
+
+const engine = new CblReactNativeEngine(eventEmitter);
+engine.debugConsole = true;  //very noisy, only use for debugging
 
 const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
   // State to store for database, replication, and reporting
@@ -43,9 +49,6 @@ const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) => {
     () => ({ documentChangeMessages, setDocumentChangeMessages }),
     [documentChangeMessages, setDocumentChangeMessages]
   );
-
-  const engine = new CblReactNativeEngine();
-  engine.debugConsole = true;  //very noisy, only use for debugging
 
   return (
     <DatabaseContext.Provider value={databasesValue}>

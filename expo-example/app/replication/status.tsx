@@ -6,22 +6,11 @@ import start from '@/service/replicator/start';
 import stop from '@/service/replicator/stop';
 import ReplicatorIdActionForm from '@/components/ReplicatorIdActionForm/ReplicatorIdActionForm';
 import { useStyleScheme } from '@/components/Themed/Themed';
-import { NativeEventEmitter, NativeModules, SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import ResultListView from '@/components/ResultsListView/ResultsListView';
-import MessageQueue from 'react-native/Libraries/BatchedBridge/MessageQueue';
+
 
 export default function ReplicatorStatusScreen() {
-  //debug the message queue
-  const spyMessageQueue = (message: any) => {
-    if (
-      message.type === 0 &&
-      message.method === 'emit' &&
-      message.module === 'RCTDeviceEventEmitter'
-    ) {
-      console.log(`::MESSAGE-QUEUE:: ${message.args}`);
-    }
-  };
-
   const styles = useStyleScheme();
   const { statusChangeMessages, setStatusChangeMessages } = useContext(
     ReplicatorStatusChangeContext
@@ -40,8 +29,6 @@ export default function ReplicatorStatusScreen() {
       const replicatorId = replId.toString();
       setSelectedReplicatorId(replicatorId);
       try {
-        //debug the message queue
-        MessageQueue.spy(spyMessageQueue);
         const token = statusToken[replicatorId];
         if (token === undefined) {
           setInformationMessages((prev) => [
