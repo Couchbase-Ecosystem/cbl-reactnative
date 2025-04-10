@@ -47,6 +47,8 @@ import {
   ScopeArgs,
   ScopesResult,
   DocumentGetBlobContentArgs,
+  ReplicationFilterRegisterArgs,
+  ReplicationFilterUnregisterArgs,
 } from './cblite-js/cblite/core-types';
 
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
@@ -56,6 +58,7 @@ import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Scope } from './cblite-js/cblite/src/scope';
 
 import uuid from 'react-native-uuid';
+import { Document } from './cblite-js/cblite/src/document';
 
 export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
@@ -77,6 +80,9 @@ export class CblReactNativeEngine implements ICoreEngine {
   private _replicatorDocumentChangeListeners: Map<string, ListenerCallback> =
     new Map();
   private _isReplicatorDocumentChangeEventSetup: boolean = false;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private filterCallbacks: Map<string, (doc: any, flags: any) => boolean> =
+    new Map();
 
   private static readonly LINKING_ERROR =
     `The package 'cbl-reactnative' doesn't seem to be linked. Make sure: \n\n` +
@@ -107,6 +113,62 @@ export class CblReactNativeEngine implements ICoreEngine {
     }
 
     this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
+    // this.setupFilterEventListener();
+  }
+
+  private filterEventHandlerSetup = false;
+
+  private setupFilterEventHandling() {
+    // Only set up once
+    if (this.filterEventHandlerSetup) {
+      return;
+    }
+
+    console.log('Setting up filter event handler');
+
+    // Direct event listener registration
+    this._eventEmitter.addListener('evaluateFilter', (data) => {
+      console.log(`Got filter event for doc: ${data.document?._id}`);
+
+      try {
+        const { filterId, document, flags, callbackId } = data;
+        const callback = this.filterCallbacks.get(filterId);
+
+        let result = true; // Default to allowing replication
+
+        if (callback) {
+          const documentObj = new Document(
+            document._id,
+            document._sequence,
+            document._revId,
+            undefined,
+            document._data || {}
+          );
+
+          let flagsValue = 0;
+          console.log('flags:: ', flags);
+          if (flags.deleted) flagsValue |= 1;
+          if (flags.accessRemoved) flagsValue |= 2;
+
+          result = callback(documentObj, flagsValue);
+        }
+        console.log('callbackId', callbackId);
+        // Always send a response to avoid blocking native code
+        this.CblReactNative.sendFilterResult(callbackId, result).catch((err) =>
+          console.error('Error sending filter result:', err)
+        );
+      } catch (error) {
+        console.error('Error in filter event handler:', error);
+        if (data?.callbackId) {
+          this.CblReactNative.sendFilterResult(data.callbackId, true).catch(
+            (err) => console.error('Error sending fallback result:', err)
+          );
+        }
+      }
+    });
+
+    this.filterEventHandlerSetup = true;
+    console.log('Filter event handler setup complete');
   }
 
   //private logging function
@@ -998,6 +1060,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   replicator_Create(args: ReplicatorCreateArgs): Promise<ReplicatorArgs> {
+    this.setupFilterEventHandling();
     return new Promise((resolve, reject) => {
       this.CblReactNative.replicator_Create(args.config).then(
         (results: ReplicatorArgs) => {
@@ -1134,6 +1197,97 @@ export class CblReactNativeEngine implements ICoreEngine {
         (error: any) => {
           reject(error);
         }
+      );
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private handleFilterEvaluation = (data: any) => {
+    const { filterId, document, flags, callbackId } = data;
+
+    console.log(`⚙️ Processing filter for doc: ${document._id}`);
+
+    try {
+      const callback = this.filterCallbacks.get(filterId);
+
+      // Default to allowing replication
+      let result = true;
+
+      if (callback) {
+        // Create document-like object
+        const doc = {
+          getId: () => document._id,
+          getSequence: () => document._sequence,
+          getRevisionID: () => document._revId,
+          // Add minimal methods
+          getBoolean: (key: string) => {
+            return !!document._data?.[key];
+          },
+          getString: (key: string) => {
+            return typeof document._data?.[key] === 'string'
+              ? document._data[key]
+              : null;
+          },
+        };
+
+        // Convert flags to enum value
+        let flagsValue = 0;
+        if (flags.deleted) flagsValue |= 1; // DocumentFlags.DELETED
+        if (flags.accessRemoved) flagsValue |= 2; // DocumentFlags.ACCESS_REMOVED
+
+        result = callback(doc, flagsValue);
+      }
+
+      console.log(`✅ Filter result for ${document._id}: ${result}`);
+
+      // Send result back
+      console.log(`📤 Sending result for callback: ${callbackId}`);
+      this.CblReactNative.sendFilterResult(callbackId, result)
+        .then(() => console.log(`✓ Result sent for doc: ${document._id}`))
+        .catch((err) =>
+          console.error(`❌ Failed to send result for ${document._id}:`, err)
+        );
+    } catch (error) {
+      console.error(`❌ Error in filter for doc ${document._id}:`, error);
+
+      // Always respond even on error
+      if (callbackId) {
+        console.log(`⚠️ Sending fallback response for callback: ${callbackId}`);
+        this.CblReactNative.sendFilterResult(callbackId, true).catch((err) =>
+          console.error('❌ Failed to send fallback result:', err)
+        );
+      }
+    }
+  };
+
+  replication_RegisterFilter(
+    args: ReplicationFilterRegisterArgs,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    callback: (doc: any, flags: any) => boolean
+  ): Promise<void> {
+    // Store callback in our map
+    this.filterCallbacks.set(args.filterId, callback);
+
+    // Just register the filter ID with native code
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replication_RegisterFilter(
+        args.filterId,
+        args.filterType
+      ).then(resolve, reject);
+    });
+  }
+
+  replication_UnregisterFilter(
+    args: ReplicationFilterUnregisterArgs
+  ): Promise<void> {
+    // Remove from our callback map
+    this.filterCallbacks.delete(args.filterId);
+
+    // Unregister from native
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replication_UnregisterFilter(args.filterId).then(
+        resolve,
+        reject
       );
     });
   }
