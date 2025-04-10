@@ -17,6 +17,7 @@ class CblReactnative: RCTEventEmitter {
   var queryChangeListeners = [String: Any]()
   
   var replicatorChangeListeners = [String: Any]()
+  var replicatorDocumentChangeListeners = [String: Any]()
   
   var queryCount: Int = 0
   var replicatorCount: Int = 0
@@ -1011,6 +1012,37 @@ class CblReactnative: RCTEventEmitter {
       resolve(nil)
     }
   }
+
+  @objc(replicator_AddDocumentChangeListener:withReplicatorId:withResolver:withRejecter:)
+func replicator_AddDocumentChangeListener(
+  changeListenerToken: NSString,
+  replicatorId: NSString,
+  resolve: @escaping RCTPromiseResolveBlock,
+  reject: @escaping RCTPromiseRejectBlock)
+{
+  var errorMessage = ""
+  let replId = String(replicatorId)
+  let token = String(changeListenerToken)
+  
+  backgroundQueue.async {
+    guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
+      errorMessage = "No such replicator found for id \(replId)"
+      reject("REPLICATOR_ERROR", errorMessage, nil)
+      return
+    }
+    
+    let listener = replicator.addDocumentReplicationListener(withQueue: self.backgroundQueue, { change in
+      let documentJson = ReplicatorHelper.generateReplicationJson(change.documents, isPush: change.isPush)
+      let resultData = NSMutableDictionary()
+      resultData.setValue(token, forKey: "token")
+      resultData.setValue(documentJson, forKey: "documents")
+      self.logger.debug ("::SWIFT DEBUG:: Sending event \(self.kReplicatorDocumentChange), with data: \(resultData)")
+      self.sendEvent(withName: self.kReplicatorDocumentChange, body: resultData)
+    })
+    self.replicatorDocumentChangeListeners[token] = listener
+    resolve(nil)
+  }
+}
   
   @objc(replicator_Cleanup:withResolver:withRejecter:)
   func replicator_Cleanup(

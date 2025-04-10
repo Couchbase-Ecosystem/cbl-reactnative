@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Replicator } from 'cbl-reactnative';
-import ReplicatorStatusChangeContext from '@/providers/ReplicatorStatusChangeContext';
+import ReplicatorDocumentChangeContext from '@/providers/ReplicationDocumentChangeContext';
 import ReplicatorStatusTokenContext from '@/providers/ReplicatorStatusTokenContext';
 import start from '@/service/replicator/start';
 import stop from '@/service/replicator/stop';
@@ -9,17 +9,17 @@ import { useStyleScheme } from '@/components/Themed/Themed';
 import { SafeAreaView } from 'react-native';
 import ResultListView from '@/components/ResultsListView/ResultsListView';
 
-
-export default function ReplicatorStatusScreen() {
+export default function DocumentReplicationScreen() {
   const styles = useStyleScheme();
-  const { statusChangeMessages, setStatusChangeMessages } = useContext(
-    ReplicatorStatusChangeContext
+  const { documentChangeMessages, setDocumentChangeMessages } = useContext(
+    ReplicatorDocumentChangeContext
   )!;
   const { statusToken, setStatusToken } = useContext(
     ReplicatorStatusTokenContext
   )!;
   const [informationMessages, setInformationMessages] = useState<string[]>([]);
   const [selectedReplicatorId, setSelectedReplicatorId] = useState<string>('');
+  const [documentTokens, setDocumentTokens] = useState<Record<string, string>>({});
 
   function reset() {}
 
@@ -29,34 +29,43 @@ export default function ReplicatorStatusScreen() {
       const replicatorId = replId.toString();
       setSelectedReplicatorId(replicatorId);
       try {
-        const token = statusToken[replicatorId];
+        const token = documentTokens[replicatorId];
         if (token === undefined) {
           setInformationMessages((prev) => [
             ...prev,
-            `::Information: Replicator <${replicatorId}> Starting Status Change listener...`,
+            `::Information: Replicator <${replicatorId}> Starting Document Change listener...`,
           ]);
           const date = new Date().toISOString();
-          const changeToken = await replicator.addChangeListener((change) => {
-            const newMessage = [
-              `${date}::Status:: Replicator <${replicator.getId()}> status changed: ${change.status}`,
-            ];
-            setInformationMessages((prev) => [...prev, ...newMessage]);
+          const changeToken = await replicator.addDocumentChangeListener((documentReplication) => {
+            const docs = documentReplication.documents;
+            const direction = documentReplication.isPush ? 'PUSH' : 'PULL';
+            
+            const newMessages = docs.map(doc => {
+              const flags = doc.flags ? doc.flags.join(', ') : 'none';
+              const error = doc.error ? `, Error: ${doc.error}` : '';
+              return `${date}::Doc:: ${direction} - Scope: ${doc.scopeName}, Collection: ${doc.collectionName}, ID: ${doc.id}, Flags: ${flags}${error}`;
+            });
+            
+            setInformationMessages((prev) => [...prev, ...newMessages]);
           });
-          setStatusToken((prev) => {
+          
+          setDocumentTokens((prev) => {
             return {
               ...prev,
               [replicatorId]: changeToken,
             };
           });
+          
           setInformationMessages((prev) => [
             ...prev,
-            `::Information: Replicator <${replicatorId}> Starting Replicator...`,
+            `::Information: Replicator <${replicatorId}> Document listener registered, starting replicator...`,
           ]);
+          
           await start(replicator, false);
         } else {
           setInformationMessages((prev) => [
             ...prev,
-            `::Information: Replicator <${replicatorId}> Status Change already running with token: <${token}>.`,
+            `::Information: Replicator <${replicatorId}> Document Change already running with token: <${token}>.`,
           ]);
         }
       } catch (error) {
@@ -84,26 +93,26 @@ export default function ReplicatorStatusScreen() {
           `::Information: Stopping Replicator with replicatorId: <${replicatorId}>.`,
         ]);
         await stop(replicator);
-        setStatusToken((prev) => {
-          const newStatusToken = { ...prev };
-          delete newStatusToken[replicatorId];
-          return newStatusToken;
-        });
-        setInformationMessages((prev) => [
-          ...prev,
-          `::Information: Stopped Replicator with replicatorId: <${replicatorId}>.`,
-        ]);
-
-        const token = statusToken[replicatorId];
-        setInformationMessages((prev) => [
-          ...prev,
-          `::Information: Removing change listener with token <${token}> from Replicator with replicatorId: <${replicatorId}>.`,
-        ]);
-        await replicator.removeChangeListener(token);
-        setInformationMessages((prev) => [
-          ...prev,
-          `::Information: Removed change listener with token <${token}> from Replicator with replicatorId: <${replicatorId}>.`,
-        ]);
+        
+        const token = documentTokens[replicatorId];
+        if (token) {
+          setInformationMessages((prev) => [
+            ...prev,
+            `::Information: Removing document change listener with token <${token}> from Replicator with replicatorId: <${replicatorId}>.`,
+          ]);
+        //   await replicator.removeDocumentChangeListener(token);
+          
+          setDocumentTokens((prev) => {
+            const newTokens = { ...prev };
+            delete newTokens[replicatorId];
+            return newTokens;
+          });
+          
+          setInformationMessages((prev) => [
+            ...prev,
+            `::Information: Removed document change listener with token <${token}> from Replicator with replicatorId: <${replicatorId}>.`,
+          ]);
+        }
       } else {
         setInformationMessages((prev) => [
           ...prev,
@@ -119,19 +128,20 @@ export default function ReplicatorStatusScreen() {
     }
   }
 
-  const filteredStatusChangeMessages =
-    statusChangeMessages[selectedReplicatorId] || [];
+  const filteredDocumentChangeMessages =
+    documentChangeMessages[selectedReplicatorId] || [];
   const combinedMessages = [
     ...informationMessages,
-    ...filteredStatusChangeMessages,
+    ...filteredDocumentChangeMessages,
   ];
+  
   return (
     <SafeAreaView style={styles.container}>
       <ReplicatorIdActionForm
         handleUpdatePressed={update}
         handleResetPressed={reset}
         handleStopPressed={stopReplicator}
-        screenTitle="Replicator Status"
+        screenTitle="Document Replication"
       />
       <ResultListView useScrollView={true} messages={combinedMessages} />
     </SafeAreaView>

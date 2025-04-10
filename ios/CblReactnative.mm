@@ -232,6 +232,12 @@ RCT_EXTERN_METHOD(replicator_AddChangeListener:
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(replicator_AddDocumentChangeListener:
+  (NSString *)changeListenerToken
+  withReplicatorId:(NSString *)replicatorId
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(replicator_Cleanup:
   (NSString *)replicatorId
   withResolver:(RCTPromiseResolveBlock)resolve

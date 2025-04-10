@@ -20,6 +20,11 @@ export function useReplicationNavigationSections() {
           path: '/replication/stop',
         },
         {
+          id: 3,
+          title: 'Replicator Documents Status',
+          path: '/replication/documentStatus',
+        },
+        {
           id: 7,
           title: 'Status Changes',
           path: '/replication/status',
