@@ -1145,6 +1145,17 @@ export class CblReactNativeEngine implements ICoreEngine {
   replicator_RemoveChangeListener(
     args: ReplicationChangeListenerArgs
   ): Promise<void> {
+    if (this._replicatorDocumentChangeListeners.has(args.changeListenerToken)) {
+      this._replicatorDocumentChangeListeners.delete(args.changeListenerToken);
+      // Remove any subscription with the doc suffix
+      if (this._emitterSubscriptions.has(args.changeListenerToken + '_doc')) {
+        this._emitterSubscriptions
+          .get(args.changeListenerToken + '_doc')
+          ?.remove();
+        this._emitterSubscriptions.delete(args.changeListenerToken + '_doc');
+      }
+    }
+
     //remove the event subscription or you will have a leak
     if (this._emitterSubscriptions.has(args.changeListenerToken)) {
       this._emitterSubscriptions.get(args.changeListenerToken)?.remove();

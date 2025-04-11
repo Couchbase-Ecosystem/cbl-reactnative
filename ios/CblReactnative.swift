@@ -1197,13 +1197,18 @@ func replicator_AddDocumentChangeListener(
       }
       backgroundQueue.async {
         if let listener = self.replicatorChangeListeners[token] as? ListenerToken {
-          replicator.removeChangeListener(withToken: listener)
-          self.replicatorChangeListeners.removeValue(forKey: token)
-          resolve(nil)
-          
-        } else {
-          reject("REPLICATOR_ERROR", "No such replicator listener found with token \(token)", nil)
-        }
+        replicator.removeChangeListener(withToken: listener)
+        self.replicatorChangeListeners.removeValue(forKey: token)
+        resolve(nil)
+        return
+      } else if let listener = self.replicatorDocumentChangeListeners[token] as? ListenerToken {
+        replicator.removeChangeListener(withToken: listener)
+        self.replicatorDocumentChangeListeners.removeValue(forKey: token)
+        resolve(nil)
+        return
+      } else {
+        reject("REPLICATOR_ERROR", "No such listener found with token \(token)", nil)
+      }
         
       }
     }
