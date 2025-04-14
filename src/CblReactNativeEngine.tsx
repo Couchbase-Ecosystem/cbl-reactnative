@@ -1201,65 +1201,6 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private handleFilterEvaluation = (data: any) => {
-    const { filterId, document, flags, callbackId } = data;
-
-    console.log(`⚙️ Processing filter for doc: ${document._id}`);
-
-    try {
-      const callback = this.filterCallbacks.get(filterId);
-
-      // Default to allowing replication
-      let result = true;
-
-      if (callback) {
-        // Create document-like object
-        const doc = {
-          getId: () => document._id,
-          getSequence: () => document._sequence,
-          getRevisionID: () => document._revId,
-          // Add minimal methods
-          getBoolean: (key: string) => {
-            return !!document._data?.[key];
-          },
-          getString: (key: string) => {
-            return typeof document._data?.[key] === 'string'
-              ? document._data[key]
-              : null;
-          },
-        };
-
-        // Convert flags to enum value
-        let flagsValue = 0;
-        if (flags.deleted) flagsValue |= 1; // DocumentFlags.DELETED
-        if (flags.accessRemoved) flagsValue |= 2; // DocumentFlags.ACCESS_REMOVED
-
-        result = callback(doc, flagsValue);
-      }
-
-      console.log(`✅ Filter result for ${document._id}: ${result}`);
-
-      // Send result back
-      console.log(`📤 Sending result for callback: ${callbackId}`);
-      this.CblReactNative.sendFilterResult(callbackId, result)
-        .then(() => console.log(`✓ Result sent for doc: ${document._id}`))
-        .catch((err) =>
-          console.error(`❌ Failed to send result for ${document._id}:`, err)
-        );
-    } catch (error) {
-      console.error(`❌ Error in filter for doc ${document._id}:`, error);
-
-      // Always respond even on error
-      if (callbackId) {
-        console.log(`⚠️ Sending fallback response for callback: ${callbackId}`);
-        this.CblReactNative.sendFilterResult(callbackId, true).catch((err) =>
-          console.error('❌ Failed to send fallback result:', err)
-        );
-      }
-    }
-  };
-
   replication_RegisterFilter(
     args: ReplicationFilterRegisterArgs,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
