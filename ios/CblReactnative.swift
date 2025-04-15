@@ -7,7 +7,7 @@ import React
   CblReactnative
 )
 class CblReactnative: RCTEventEmitter {
-  
+  static var shared: CblReactnative!
   // MARK: - Member Properties
   private var hasListeners = false
   var databaseChangeListeners = [String: Any]()
@@ -30,6 +30,8 @@ class CblReactnative: RCTEventEmitter {
 
   override init() {
     super.init()
+
+    CblReactnative.shared = self
   }
   // MARK: - Setup Notifications
   
@@ -39,13 +41,15 @@ class CblReactnative: RCTEventEmitter {
   let kQueryChange = "queryChange"
   let kReplicatorStatusChange = "replicatorStatusChange"
   let kReplicatorDocumentChange = "replicatorDocumentChange"
+  let kReplicatorFilterEvent = "evaluateFilter"
   
   override func supportedEvents() -> [String]! {
     return [kCollectionChange,
             kCollectionDocumentChange,
             kQueryChange,
             kReplicatorStatusChange,
-            kReplicatorDocumentChange]
+            kReplicatorDocumentChange,
+            kReplicatorFilterEvent]
     }
   
    @objc override static func moduleName() -> String! {
@@ -55,6 +59,9 @@ class CblReactnative: RCTEventEmitter {
    @objc override static func requiresMainQueueSetup() -> Bool {
      return false
    }
+
+  // MARK: Replicator filters
+  private var filterPendingResults = [String: DispatchGroup]()
   
   // MARK: - Collection Functions
   
@@ -1238,6 +1245,131 @@ class CblReactnative: RCTEventEmitter {
         }
       }
     }
+
+@objc(replication_RegisterFilter:withFilterType:withResolver:withRejecter:)
+func replication_RegisterFilter(
+  filterId: NSString,
+  filterType: NSString,
+  resolve: @escaping RCTPromiseResolveBlock,
+  reject: @escaping RCTPromiseRejectBlock
+) -> Void {
+  resolve(nil)
+}
+
+@objc(replication_UnregisterFilter:withResolver:withRejecter:)
+func replication_UnregisterFilter(
+  filterId: NSString,
+  resolve: @escaping RCTPromiseResolveBlock,
+  reject: @escaping RCTPromiseRejectBlock
+) -> Void {
+  resolve(nil)
+}
+
+@objc(sendFilterResult:withResult:withResolver:withRejecter:)
+func sendFilterResult(
+  callbackId: NSString,
+  result: NSNumber,
+  resolve: @escaping RCTPromiseResolveBlock,
+  reject: @escaping RCTPromiseRejectBlock
+) -> Void {
+  let callbackIdStr = String(callbackId)
+  
+  // Post a notification with the result
+  NotificationCenter.default.post(
+    name: NSNotification.Name("FilterResult_\(callbackIdStr)"),
+    object: nil,
+    userInfo: ["result": result.boolValue]
+  )
+  
+  resolve(nil)
+}
+
+func evaluateFilter(filterId: String, document: Document, flags: DocumentFlags) -> Bool {
+  let docId = document.id
+  
+  // Check basic conditions first to avoid unnecessary processing
+  // if !hasListeners {
+  //   self.logger.debug("No event listeners - JS side may not receive events")
+  //   return true
+  // }
+  
+  self.logger.debug("Filter evaluation for doc: \(docId)")
+  
+  // Generate callback ID
+  let callbackId = UUID().uuidString
+  
+  // Create dispatch group
+  let group = DispatchGroup()
+  group.enter()
+  
+  // Default result
+  var result = true
+  var responseReceived = false
+  
+  // Add observer
+  let observer = NotificationCenter.default.addObserver(
+    forName: NSNotification.Name("FilterResult_\(callbackId)"),
+    object: nil,
+    queue: nil
+  ) { [weak self] notification in
+    guard let self = self else { return }
+    
+    if let userInfo = notification.userInfo,
+       let filterResult = userInfo["result"] as? Bool {
+      result = filterResult
+      responseReceived = true
+    }
+    group.leave()
+  }
+  
+  // Include full document data
+  var docDict: [String: Any] = [
+    "_id": document.id,
+    "_sequence": document.sequence
+  ]
+  if let revId = document.revisionID {
+    docDict["_revId"] = revId
+  }
+  
+  // Convert document data to map
+  docDict["_data"] = MapHelper.documentToMap(document)
+  
+  // Flags
+  let flagsDict: [String: Bool] = [
+    "deleted": flags.contains(.deleted),
+    "accessRemoved": flags.contains(.accessRemoved)
+  ]
+  
+  // Event data
+  let body: [String: Any] = [
+    "filterId": filterId,
+    "document": docDict,
+    "flags": flagsDict,
+    "callbackId": callbackId
+  ]
+  
+  // Send event
+  self.sendEvent(withName: kReplicatorFilterEvent, body: body)
+  self.logger.debug("Sent filter event for doc: \(docId)")
+  
+  // Shorter timeout (5 seconds) for better performance with many documents
+  let waitResult = group.wait(timeout: .now() + 20.0)
+  
+  // Clean up
+  NotificationCenter.default.removeObserver(observer)
+  
+  if waitResult == .timedOut {
+    self.logger.debug("Filter timeout for doc: \(docId)")
+    return true
+  }
+  
+  if !responseReceived {
+    self.logger.debug("No response received for doc: \(docId)")
+    return true
+  }
+  
+  return result
+}
   
   // MARK: - Scope Functions
   
@@ -1329,4 +1461,5 @@ extension Notification.Name {
   static let queryChange = Notification.Name("queryChange")
   static let replicatorStatusChange = Notification.Name("replicatorStatusChange")
   static let replicatorDocumentChange = Notification.Name("replicatorDocumentChange")
+  static let replicatorFilterEvent = Notification.Name("evaluateFilter")
 }

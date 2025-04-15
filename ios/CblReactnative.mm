@@ -302,6 +302,21 @@ RCT_EXTERN_METHOD(scope_GetScopes:(NSString *)name
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
+// MARK: - Replicator Filters  
+RCT_EXTERN_METHOD(replication_RegisterFilter:(NSString *)filterId
+                  withFilterType:(NSString *)filterType
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(replication_UnregisterFilter:(NSString *)filterId
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(sendFilterResult:(NSString *)callbackId
+                  withResult:(nonnull NSNumber *)result
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
 + (BOOL)requiresMainQueueSetup
 {
     return NO;
