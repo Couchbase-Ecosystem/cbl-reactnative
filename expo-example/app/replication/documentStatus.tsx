@@ -35,8 +35,8 @@ export default function DocumentReplicationScreen() {
             ...prev,
             `::Information: Replicator <${replicatorId}> Starting Document Change listener...`,
           ]);
-          const date = new Date().toISOString();
           const changeToken = await replicator.addDocumentChangeListener((documentReplication) => {
+            const date = new Date().toISOString();
             const docs = documentReplication.documents;
             const direction = documentReplication.isPush ? 'PUSH' : 'PULL';
             
@@ -100,7 +100,7 @@ export default function DocumentReplicationScreen() {
             ...prev,
             `::Information: Removing document change listener with token <${token}> from Replicator with replicatorId: <${replicatorId}>.`,
           ]);
-        //   await replicator.removeDocumentChangeListener(token);
+          await replicator.removeChangeListener(token);
           
           setDocumentTokens((prev) => {
             const newTokens = { ...prev };
