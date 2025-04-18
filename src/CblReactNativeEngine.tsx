@@ -78,6 +78,8 @@ export class CblReactNativeEngine implements ICoreEngine {
     new Map();
   private _isReplicatorDocumentChangeEventSetup: boolean = false;
 
+  private _collectionChangeListeners: Map<string, ListenerCallback> = new Map();
+
   private static readonly LINKING_ERROR =
     `The package 'cbl-reactnative' doesn't seem to be linked. Make sure: \n\n` +
     Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -133,12 +135,45 @@ export class CblReactNativeEngine implements ICoreEngine {
   };
 
   collection_AddChangeListener(
-    // eslint-disable-next-line
     args: CollectionChangeListenerArgs,
-    // eslint-disable-next-line
     lcb: ListenerCallback
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      const token = args.changeListenerToken;
+      const subscriptionKey = `${args.name}.${args.scopeName}.${args.collectionName}_${token}`;
+
+      if (this._collectionChangeListeners.has(token)) {
+        reject(new Error('Change listener token already exists'));
+        return;
+      }
+
+      const subscription = this.startListeningEvents(
+        this._eventCollectionChange,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (results: any) => {
+          if (results.token === token) {
+            this.debugLog(
+              `::DEBUG:: Received collection change event for token: ${token}`
+            );
+            lcb(results);
+          }
+        }
+      );
+
+      this._emitterSubscriptions.set(subscriptionKey, subscription);
+      this._collectionChangeListeners.set(token, lcb);
+
+      this.CblReactNative.collection_AddChangeListener(
+        token,
+        args.collectionName,
+        args.name,
+        args.scopeName
+      ).then(
+        () => resolve(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error: any) => reject(error)
+      );
+    });
   }
 
   // eslint-disable-next-line
@@ -442,7 +477,47 @@ export class CblReactNativeEngine implements ICoreEngine {
     // eslint-disable-next-line
     args: CollectionChangeListenerArgs
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      const token = args.changeListenerToken;
+      const collectionId = `${args.name}.${args.scopeName}.${args.collectionName}`;
+      const subscriptionKey = `${collectionId}_${token}`;
+
+      // Remove the subscription
+      if (this._emitterSubscriptions.has(subscriptionKey)) {
+        this._emitterSubscriptions.get(subscriptionKey)?.remove();
+        this._emitterSubscriptions.delete(subscriptionKey);
+      }
+
+      // Remove the listener from the collection listeners map
+      if (this._collectionChangeListeners.has(token)) {
+        this._collectionChangeListeners.delete(token);
+      } else {
+        reject(new Error(`No listener found with token: ${token}`));
+        return;
+      }
+
+      // Remove the listener from the native side
+      this.CblReactNative.collection_RemoveChangeListener(
+        token,
+        args.collectionName,
+        args.name,
+        args.scopeName
+      ).then(
+        () => {
+          this.debugLog(
+            `::DEBUG:: collection_RemoveChangeListener completed for token: ${token}`
+          );
+          resolve();
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error: any) => {
+          this.debugLog(
+            `::DEBUG:: collection_RemoveChangeListener Error: ${error}`
+          );
+          reject(error);
+        }
+      );
+    });
   }
 
   collection_RemoveDocumentChangeListener(

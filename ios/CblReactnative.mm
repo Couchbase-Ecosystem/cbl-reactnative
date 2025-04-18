@@ -5,6 +5,24 @@
 
 // MARK: - Collection Functions
 
+RCT_EXTERN_METHOD(
+  collection_AddChangeListener:(NSString *)changeListenerToken
+  fromCollectionWithName:(NSString *)collectionName
+  fromDatabaseWithName:(NSString *)name
+  fromScopeWithName:(NSString *)scopeName
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+  collection_RemoveChangeListener:(NSString *)changeListenerToken
+  fromCollectionWithName:(NSString *)collectionName
+  fromDatabaseWithName:(NSString *)name
+  fromScopeWithName:(NSString *)scopeName
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
 RCT_EXTERN_METHOD(collection_CreateCollection:
   (NSString *) collectionName
   fromDatabaseWithName:(NSString *) name
