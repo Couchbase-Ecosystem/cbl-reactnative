@@ -46,6 +46,11 @@ export function useCollectionNavigationSections() {
           title: 'List Collections',
           path: '/collection/list',
         },
+        {
+          id: 14,
+          title: 'Collection Change Listener',
+          path: '/collection/changeListener',
+        },
       ],
     },
     {
