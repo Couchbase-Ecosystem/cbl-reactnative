@@ -975,12 +975,86 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   replicator_AddDocumentChangeListener(
-    // eslint-disable-next-line
     args: ReplicationChangeListenerArgs,
-    // eslint-disable-next-line
     lcb: ListenerCallback
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    //need to track the listener callback for later use due to how React Native events work
+    if (
+      this._replicatorDocumentChangeListeners.has(args.changeListenerToken) ||
+      this._emitterSubscriptions.has(args.changeListenerToken + '_doc')
+    ) {
+      throw new Error(
+        'ERROR: changeListenerToken already exists and is registered to listen to document callbacks, cannot add a new one'
+      );
+    }
+
+    // Set up document change listener if not already done
+    if (!this._isReplicatorDocumentChangeEventSetup) {
+      const docSubscription = this._eventEmitter.addListener(
+        this._eventReplicatorDocumentChange,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (results: any) => {
+          this.debugLog(
+            `::DEBUG:: Received event ${this._eventReplicatorDocumentChange}`
+          );
+          const token = results.token as string;
+          const data = results?.documents;
+          const error = results?.error;
+
+          if (token === undefined || token === null || token.length === 0) {
+            this.debugLog(
+              '::ERROR:: No token to resolve back to proper callback for Replicator Document Change'
+            );
+            throw new Error(
+              'ERROR: No token to resolve back to proper callback'
+            );
+          }
+
+          const callback = this._replicatorDocumentChangeListeners.get(token);
+          if (callback !== undefined) {
+            callback(data, error);
+          } else {
+            this.debugLog(
+              `Error: Could not find callback method for document change token: ${token}.`
+            );
+            throw new Error(
+              `Error: Could not find callback method for document change token: ${token}.`
+            );
+          }
+        }
+      );
+
+      this._emitterSubscriptions.set(
+        this._eventReplicatorDocumentChange,
+        docSubscription
+      );
+      this._isReplicatorDocumentChangeEventSetup = true;
+    }
+
+    return new Promise((resolve, reject) => {
+      this.CblReactNative.replicator_AddDocumentChangeListener(
+        args.changeListenerToken,
+        args.replicatorId
+      ).then(
+        () => {
+          this._replicatorDocumentChangeListeners.set(
+            args.changeListenerToken,
+            lcb
+          );
+          this.debugLog(
+            `::DEBUG:: replicator_AddDocumentChangeListener added successfully with token: ${args.changeListenerToken}`
+          );
+          resolve();
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error: any) => {
+          this._replicatorDocumentChangeListeners.delete(
+            args.changeListenerToken
+          );
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_Cleanup(args: ReplicatorArgs): Promise<void> {
@@ -1071,6 +1145,17 @@ export class CblReactNativeEngine implements ICoreEngine {
   replicator_RemoveChangeListener(
     args: ReplicationChangeListenerArgs
   ): Promise<void> {
+    if (this._replicatorDocumentChangeListeners.has(args.changeListenerToken)) {
+      this._replicatorDocumentChangeListeners.delete(args.changeListenerToken);
+      // Remove any subscription with the doc suffix
+      if (this._emitterSubscriptions.has(args.changeListenerToken + '_doc')) {
+        this._emitterSubscriptions
+          .get(args.changeListenerToken + '_doc')
+          ?.remove();
+        this._emitterSubscriptions.delete(args.changeListenerToken + '_doc');
+      }
+    }
+
     //remove the event subscription or you will have a leak
     if (this._emitterSubscriptions.has(args.changeListenerToken)) {
       this._emitterSubscriptions.get(args.changeListenerToken)?.remove();
