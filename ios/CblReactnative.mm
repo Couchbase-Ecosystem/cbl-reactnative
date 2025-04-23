@@ -15,10 +15,18 @@ RCT_EXTERN_METHOD(
 )
 
 RCT_EXTERN_METHOD(
-  collection_RemoveChangeListener:(NSString *)changeListenerToken
+  collection_AddDocumentChangeListener:(NSString *)changeListenerToken
+  forDocumentWithId:(NSString *)documentId
   fromCollectionWithName:(NSString *)collectionName
   fromDatabaseWithName:(NSString *)name
   fromScopeWithName:(NSString *)scopeName
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
+
+RCT_EXTERN_METHOD(
+  collection_RemoveChangeListener:(NSString *)changeListenerToken
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject
 )
