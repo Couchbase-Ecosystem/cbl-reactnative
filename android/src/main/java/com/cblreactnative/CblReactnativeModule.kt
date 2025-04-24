@@ -745,13 +745,15 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
       try {
         val databaseConfig = DataAdapter.toDatabaseConfigJson(directory, encryptionKey)
-        DatabaseManager.openDatabase(
+        val databaseUniqueName = DatabaseManager.openDatabase(
           name,
           databaseConfig,
           context
         )
         context.runOnUiQueueThread {
-          promise.resolve(null)
+          val result = Arguments.createMap()
+          result.putString("databaseUniqueName", databaseUniqueName)
+          promise.resolve(result)
         }
       } catch (e: Throwable) {
         context.runOnUiQueueThread {

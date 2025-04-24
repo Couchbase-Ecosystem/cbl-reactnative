@@ -803,8 +803,10 @@ class CblReactnative: RCTEventEmitter {
     let hashConfig = AnyHashable(config)
     backgroundQueue.async {
       do {
-        try DatabaseManager.shared.open(databaseName, databaseConfig: hashConfig as? [AnyHashable : Any])
-        resolve(nil)
+        let databaseUniqueName = try DatabaseManager.shared.open(databaseName, databaseConfig: hashConfig as? [AnyHashable : Any])
+
+        let resultDict: [String: Any] = ["databaseUniqueName": databaseUniqueName]
+        resolve(resultDict)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       } catch {

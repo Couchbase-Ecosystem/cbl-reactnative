@@ -711,7 +711,9 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  database_Open(args: DatabaseOpenArgs): Promise<void> {
+  database_Open(
+    args: DatabaseOpenArgs
+  ): Promise<{ databaseUniqueName: string }> {
     this.debugLog(
       `::DEBUG:: database_Open: ${args.name} ${args.config.directory} ${args.config.encryptionKey}`
     );
@@ -721,9 +723,9 @@ export class CblReactNativeEngine implements ICoreEngine {
         args.config.directory,
         args.config.encryptionKey
       ).then(
-        () => {
+        (databaseUniqueName) => {
           this.debugLog(`::DEBUG:: database_Open completed`);
-          resolve();
+          resolve(databaseUniqueName);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (error: any) => {
