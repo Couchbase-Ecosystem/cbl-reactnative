@@ -51,6 +51,11 @@ export function useCollectionNavigationSections() {
           title: 'Collection Change Listener',
           path: '/collection/changeListener',
         },
+        {
+          id: 15,
+          title: 'Collection Document Change Listener',
+          path: '/collection/documentChangeListener',
+        },
       ],
     },
     {
