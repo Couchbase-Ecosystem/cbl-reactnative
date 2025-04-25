@@ -170,7 +170,12 @@ export class CblReactNativeEngine implements ICoreEngine {
       ).then(
         () => resolve(),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error: any) => reject(error)
+        (error: any) => {
+          this._emitterSubscriptions.delete(token);
+          this._collectionChangeListeners.delete(token);
+          subscription.remove();
+          reject(error);
+        }
       );
     });
   }

@@ -146,11 +146,8 @@ class CblReactnative: RCTEventEmitter {
           resultData.setValue(token, forKey: "token")
           resultData.setValue(change.documentID, forKey: "documentId")
       
-          let collectionData = NSMutableDictionary()
-          collectionData.setValue(collection.name, forKey: "name")
-          collectionData.setValue(collection.scope.name, forKey: "scopeName") 
-          collectionData.setValue(args.databaseName, forKey: "databaseName")
-          resultData.setValue(collectionData, forKey: "collection")
+          let collectionDict = DataAdapter.shared.adaptCollectionToNSDictionary(collection, databaseName: args.databaseName)
+          resultData.setValue(collectionDict, forKey: "collection")
         
           resultData.setValue(change.database.name, forKey: "database")
       
