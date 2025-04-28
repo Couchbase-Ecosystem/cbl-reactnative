@@ -11,6 +11,7 @@ export default function DatabaseScopeCollectionActionForm({
   collectionName,
   setCollectionName,
   handleUpdatePressed,
+  handleStopPressed,
   style,
 }: DatabaseScopeCollectionActionFormProps) {
   const icons = [
@@ -18,6 +19,14 @@ export default function DatabaseScopeCollectionActionForm({
       iconName: 'play',
       onPress: handleUpdatePressed,
     },
+    ...(handleStopPressed
+      ? [
+          {
+            iconName: 'stop',
+            onPress: handleStopPressed,
+          },
+        ]
+      : []),
   ];
   return (
     <>
