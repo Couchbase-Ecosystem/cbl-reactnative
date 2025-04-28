@@ -20,7 +20,7 @@ export default function CollectionStatusScreen() {
 
   const styles = useStyleScheme();
   const navigation = useNavigation();
-  useNavigationBarTitleOption('Collection Change Listener', navigation);
+  useNavigationBarTitleOption('Live Query', navigation);
   const [informationMessages, setInformationMessages] = useState<string[]>([]);
 
   async function update(): Promise<void> {
