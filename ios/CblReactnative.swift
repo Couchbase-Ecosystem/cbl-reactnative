@@ -58,6 +58,143 @@ class CblReactnative: RCTEventEmitter {
    }
   
   // MARK: - Collection Functions
+  @objc(collection_AddChangeListener:fromCollectionWithName:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
+  func collection_AddChangeListener(
+    changeListenerToken: NSString,
+    collectionName: NSString,
+    name: NSString, 
+    scopeName: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+
+    if isError || isTokenError {
+      return
+    }
+
+    backgroundQueue.async {
+      do {
+        guard let collection = try CollectionManager.shared.getCollection(
+          args.collectionName, 
+          scopeName: args.scopeName, 
+          databaseName: args.databaseName
+        ) else {
+          reject("DATABASE_ERROR", "Could not find collection", nil)
+          return
+        }
+    
+        let listener = collection.addChangeListener(queue: self.backgroundQueue) { [weak self] (change) in
+          guard let self = self else { return }
+        
+          // Format the data to match the CollectionChange interface
+          let resultData = NSMutableDictionary()
+          resultData.setValue(token, forKey: "token")
+          resultData.setValue(change.documentIDs, forKey: "documentIDs")
+        
+          // Use DataAdapter to convert the Collection to a consistent dictionary format
+          let collectionDict = DataAdapter.shared.adaptCollectionToNSDictionary(collection, databaseName: args.databaseName)
+          resultData.setValue(collectionDict, forKey: "collection")
+      
+          self.sendEvent(withName: self.kCollectionChange, body: resultData)
+        }
+    
+        self.collectionChangeListeners[token] = listener
+        resolve(nil)
+      } catch let error as NSError {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      } catch {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+  @objc(collection_AddDocumentChangeListener:forDocumentWithId:fromCollectionWithName:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
+  func collection_AddDocumentChangeListener(
+    changeListenerToken: NSString,
+    documentId: NSString,
+    collectionName: NSString,
+    name: NSString,
+    scopeName: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isDocIdError, docId) = DataAdapter.shared.adaptNonEmptyString(value: documentId, propertyName: "documentId", reject: reject)
+
+    if isError || isTokenError || isDocIdError {
+      return
+    }
+
+    backgroundQueue.async {
+      do {
+        guard let collection = try CollectionManager.shared.getCollection(
+          args.collectionName, 
+          scopeName: args.scopeName, 
+          databaseName: args.databaseName
+        ) else {
+          reject("DATABASE_ERROR", "Could not find collection", nil)
+          return
+        }
+    
+        let listener = collection.addDocumentChangeListener(id: docId, queue: self.backgroundQueue) { [weak self] (change) in
+          guard let self = self else { return }
+      
+          let resultData = NSMutableDictionary()
+          resultData.setValue(token, forKey: "token")
+          resultData.setValue(change.documentID, forKey: "documentId")
+      
+          let collectionDict = DataAdapter.shared.adaptCollectionToNSDictionary(collection, databaseName: args.databaseName)
+          resultData.setValue(collectionDict, forKey: "collection")
+        
+          resultData.setValue(change.database.name, forKey: "database")
+      
+          self.sendEvent(withName: self.kCollectionDocumentChange, body: resultData)
+        }
+    
+        self.collectionDocumentChangeListeners[token] = listener
+        resolve(nil)
+      } catch let error as NSError {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      } catch {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+
+  @objc(collection_RemoveChangeListener:withResolver:withRejecter:)
+  func collection_RemoveChangeListener(
+    changeListenerToken: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    let token = String(changeListenerToken)
+  
+    backgroundQueue.async {
+      // Check for collection change listeners
+      if let listener = self.collectionChangeListeners[token] as? ListenerToken {
+        listener.remove()
+        self.collectionChangeListeners.removeValue(forKey: token)
+        resolve(nil)
+        return
+      }
+    
+      // Check for document change listeners
+      if let listener = self.collectionDocumentChangeListeners[token] as? ListenerToken {
+        listener.remove()
+        self.collectionDocumentChangeListeners.removeValue(forKey: token)
+        resolve(nil)
+        return
+      }
+    
+      // No listener found with this token
+      reject("DATABASE_ERROR", "No listener found for token \(token)", nil)
+    }
+  }
+
   
   @objc(collection_CreateCollection:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
   func collection_CreateCollection(

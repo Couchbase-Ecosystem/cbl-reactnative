@@ -1,6 +1,6 @@
 android/
 build/
-expo-example/
+# expo-example/
 node_modules/
 dist/
 lib/

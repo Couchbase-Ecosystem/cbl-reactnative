@@ -6,5 +6,6 @@ export type DatabaseScopeCollectionActionFormProps = {
   collectionName: string;
   setCollectionName: (arg: string) => void;
   handleUpdatePressed: () => void;
+  handleStopPressed?: () => void;
   style?: object;
 };
