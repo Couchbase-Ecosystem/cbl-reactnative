@@ -38,7 +38,7 @@ export default function CollectionStatusScreen() {
       return;
     }
 
-    if (isListenerAdded || !!token) {
+    if (isListenerAdded && !!token) {
       setInformationMessages((prev) => [
         ...prev,
         `::Information: Query Change listener already started`,
