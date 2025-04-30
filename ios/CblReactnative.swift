@@ -1041,6 +1041,87 @@ class CblReactnative: RCTEventEmitter {
   }
   
   // MARK: - SQL++ Query Functions
+  @objc(query_AddChangeListener:withQuery:withParameters:fromDatabaseWithName:withResolver:withRejecter:)
+  func query_AddChangeListener(
+    changeListenerToken: NSString,
+    query: NSString,
+    parameters: NSDictionary,
+    name: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    let (isError, databaseName) = DataAdapter.shared.adaptDatabaseName(name: name, reject: reject)
+    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isQueryError, queryString) = DataAdapter.shared.adaptNonEmptyString(value: query, propertyName: "query", reject: reject)
+  
+    if isError || isTokenError || isQueryError {
+      return
+    }
+    
+    backgroundQueue.async {
+      do {
+        guard let database = DatabaseManager.shared.getDatabase(databaseName) else {
+          reject("DATABASE_ERROR", "Could not find database with name \(databaseName)", nil)
+          return
+        }
+    
+        let query = try database.createQuery(queryString)
+      
+        if parameters.count > 0 {
+          let params = try QueryHelper.getParamatersFromJson(parameters as? [String: Any] ?? [:])
+          query.parameters = params
+        }
+      
+        let listener = query.addChangeListener(withQueue: self.backgroundQueue) { [weak self] (change) in
+          guard let self = self else { return }
+        
+          let resultData = NSMutableDictionary()
+          resultData.setValue(token, forKey: "token")
+        
+          if let results = change.results {
+            // Convert results to JSON format
+            let resultJSONs = results.map { $0.toJSON() }
+            let jsonArray = "[" + resultJSONs.joined(separator: ",") + "]"
+            resultData.setValue(jsonArray, forKey: "data")
+          }
+        
+          if let error = change.error {
+            resultData.setValue(error.localizedDescription, forKey: "error")
+          }
+        
+          self.sendEvent(withName: self.kQueryChange, body: resultData)
+        }
+      
+        self.queryChangeListeners[token] = listener
+        resolve(nil)
+      } catch let error as NSError {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      } catch {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+  @objc(query_RemoveChangeListener:withResolver:withRejecter:)
+  func query_RemoveChangeListener(
+    changeListenerToken: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    let token = String(changeListenerToken)
+  
+    backgroundQueue.async {
+      if let listener = self.queryChangeListeners[token] as? ListenerToken {
+        listener.remove()
+        self.queryChangeListeners.removeValue(forKey: token)
+        resolve(nil)
+        return
+      }
+    
+      reject("DATABASE_ERROR", "No query listener found for token \(token)", nil)
+    }
+  }
+
   @objc(query_Execute:
           withParameters:
           fromDatabaseWithName:

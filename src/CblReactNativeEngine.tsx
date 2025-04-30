@@ -79,6 +79,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   private _isReplicatorDocumentChangeEventSetup: boolean = false;
 
   private _collectionChangeListeners: Map<string, ListenerCallback> = new Map();
+  private _queryChangeListeners: Map<string, ListenerCallback> = new Map();
 
   private static readonly LINKING_ERROR =
     `The package 'cbl-reactnative' doesn't seem to be linked. Make sure: \n\n` +
@@ -993,12 +994,49 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   query_AddChangeListener(
-    // eslint-disable-next-line
     args: QueryChangeListenerArgs,
-    // eslint-disable-next-line
     lcb: ListenerCallback
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      const token = args.changeListenerToken;
+
+      if (this._queryChangeListeners.has(token)) {
+        reject(new Error('Query change listener token already exists'));
+        return;
+      }
+
+      const subscription = this.startListeningEvents(
+        this._eventQueryChange,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (results: any) => {
+          if (results.token === token) {
+            this.debugLog(
+              `::DEBUG:: Received query change event for token: ${token}`
+            );
+            lcb(results);
+          }
+        }
+      );
+
+      this._emitterSubscriptions.set(token, subscription);
+      this._queryChangeListeners.set(token, lcb);
+
+      this.CblReactNative.query_AddChangeListener(
+        token,
+        args.query,
+        args.parameters,
+        args.name
+      ).then(
+        () => resolve(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error: any) => {
+          this._emitterSubscriptions.delete(token);
+          this._queryChangeListeners.delete(token);
+          subscription.remove();
+          reject(error);
+        }
+      );
+    });
   }
 
   query_Execute(args: QueryExecuteArgs): Promise<Result> {
@@ -1038,10 +1076,37 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   query_RemoveChangeListener(
-    // eslint-disable-next-line
     args: QueryRemoveChangeListenerArgs
   ): Promise<void> {
-    return Promise.resolve(undefined);
+    return new Promise((resolve, reject) => {
+      const token = args.changeListenerToken;
+
+      if (this._emitterSubscriptions.has(token)) {
+        this._emitterSubscriptions.get(token)?.remove();
+        this._emitterSubscriptions.delete(token);
+      }
+
+      if (this._queryChangeListeners.has(token)) {
+        this._queryChangeListeners.delete(token);
+      } else {
+        reject(new Error(`No query listener found with token: ${token}`));
+        return;
+      }
+
+      this.CblReactNative.query_RemoveChangeListener(token).then(
+        () => {
+          this.debugLog(
+            `::DEBUG:: query_RemoveChangeListener completed for token: ${token}`
+          );
+          resolve();
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error: any) => {
+          this.debugLog(`::DEBUG:: query_RemoveChangeListener Error: ${error}`);
+          reject(error);
+        }
+      );
+    });
   }
 
   replicator_AddChangeListener(
