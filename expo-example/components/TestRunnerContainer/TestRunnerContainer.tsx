@@ -11,6 +11,7 @@ import TestCurrentRunningView from '@/components/TestCurrentRunningView/TestCurr
 import TestResultItem from '@/components/TestResultItem/TestResultItem';
 import { FlatList } from '@gluestack-ui/themed';
 import { ITestResult, TestCase } from '../../cblite-js-tests/cblite-tests/e2e';
+import { Text } from 'react-native';
 
 const MemoizedTestToolbarHeaderView = memo(TestToolbarHeaderView);
 const MemoizedTestCurrentRunningView = memo(TestCurrentRunningView);
@@ -19,13 +20,13 @@ const MemoizedTestResultItem = memo(TestResultItem);
 
 interface ContainerProps<T extends new () => TestCase> {
   navigationTitle: string;
-  collapseTitle: string;
+  subTitle: string;
   testCases: T[];
 }
 
 function TestRunnerContainer<T extends new () => TestCase>({
   navigationTitle,
-  collapseTitle,
+  subTitle,
   testCases,
 }: ContainerProps<T>) {
   const styles = useStyleScheme();
@@ -41,23 +42,26 @@ function TestRunnerContainer<T extends new () => TestCase>({
     failedCount,
     runTests,
     reset,
-    isRunning
+    isRunning,
   } = useTestRunner(testCases);
 
   useNavigationBarTitleResetOption(navigationTitle, navigation, reset);
 
-  const icons = React.useMemo(() => [
-    {
-      iconName: 'stop',
-      onPress: () => setShouldCancel(true),
-      disabled: !isRunning,
-    },
-    {
-      iconName: 'play',
-      onPress: runTests,
-      disabled: isRunning,
-    },
-  ], [isRunning, setShouldCancel, runTests]);
+  const icons = React.useMemo(
+    () => [
+      {
+        iconName: 'stop',
+        onPress: () => setShouldCancel(true),
+        disabled: !isRunning,
+      },
+      {
+        iconName: 'play',
+        onPress: runTests,
+        disabled: isRunning,
+      },
+    ],
+    [isRunning, setShouldCancel, runTests]
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -67,7 +71,8 @@ function TestRunnerContainer<T extends new () => TestCase>({
         icons={icons}
         style={localStyles}
       />
-      { isRunning && (
+      <Text style={{ paddingTop: 10, paddingLeft: 15 }}>{subTitle}</Text>
+      {isRunning && (
         <MemoizedTestCurrentRunningView
           currentTestName={currentMessage?.testName || ''}
           style={localStyles}

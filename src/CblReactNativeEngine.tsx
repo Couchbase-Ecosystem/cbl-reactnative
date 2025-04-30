@@ -61,6 +61,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
   _defaultScopeName = '_default';
   debugConsole = false;
+  platform = Platform.OS;
 
   //event name mapping for the native side of the module
 
