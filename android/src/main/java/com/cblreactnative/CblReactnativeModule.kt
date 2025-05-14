@@ -5,6 +5,7 @@ import cbl.js.kotiln.CollectionManager
 import cbl.js.kotiln.FileSystemHelper
 import cbl.js.kotiln.LoggingManager
 import cbl.js.kotiln.ReplicatorManager
+import cbl.js.kotiln.ReplicatorHelper
 import com.couchbase.lite.*
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -39,7 +40,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
-  /*
+
   private fun sendEvent(
     reactContext: ReactContext,
     eventName: String,
@@ -48,7 +49,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
       .emit(eventName, params)
   }
-   */
+
 
   // Collection Functions
   @ReactMethod
@@ -926,36 +927,74 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   }
 
   // Replicator Functions
-  @ReactMethod
-  fun replicator_AddChangeListener(
-    changeListenerToken: String,
-    replicatorId: String,
-    promise: Promise){
-    GlobalScope.launch(Dispatchers.IO) {
-      try {
-        if (!DataValidation.validateReplicatorId(replicatorId, promise)){
-          return@launch
-        }
-        val replicator = ReplicatorManager.getReplicator(replicatorId)
-        val listener = replicator?.addChangeListener { change ->
-          val map = DataAdapter.replicatorStatusToMap(change.status)
-          context.runOnUiQueueThread {
-            //sendEvent(context, "replicatorStatusChange", map)
-          }
-        }
-        listener?.let {
-          replicatorChangeListeners[changeListenerToken] = it
-        }
+@ReactMethod
+fun replicator_AddChangeListener(
+  changeListenerToken: String,
+  replicatorId: String,
+  promise: Promise){
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+        return@launch
+      }
+      val replicator = ReplicatorManager.getReplicator(replicatorId)
+      val listener = replicator?.addChangeListener { change ->
+        val statusMap = ReplicatorHelper.generateReplicatorStatusMap(change.status)
+        val resultMap = Arguments.createMap()
+        resultMap.putString("token", changeListenerToken)
+        resultMap.putMap("status", statusMap)
         context.runOnUiQueueThread {
-          promise.resolve(null)
+          sendEvent(context, "replicatorStatusChange", resultMap)
         }
-      } catch (e: Throwable) {
-        context.runOnUiQueueThread {
-          promise.reject("REPLICATOR_ERROR", e.message)
-        }
+      }
+      listener?.let {
+        replicatorChangeListeners[changeListenerToken] = it
+      }
+      context.runOnUiQueueThread {
+        promise.resolve(null)
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("REPLICATOR_ERROR", e.message)
       }
     }
   }
+}
+
+@ReactMethod
+fun replicator_AddDocumentChangeListener(
+  changeListenerToken: String,
+  replicatorId: String,
+  promise: Promise){
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+        return@launch
+      }
+      val replicator = ReplicatorManager.getReplicator(replicatorId)
+      val listener = replicator?.addDocumentReplicationListener { change ->
+        val documentMap = ReplicatorHelper.generateDocumentReplicationMap(change.documents, change.isPush)
+        val resultMap = Arguments.createMap()
+        resultMap.putString("token", changeListenerToken)
+        resultMap.putMap("documents", documentMap)
+        context.runOnUiQueueThread {
+          sendEvent(context, "replicatorDocumentChange", resultMap)
+        }
+      }
+      listener?.let {
+        replicatorDocumentListeners[changeListenerToken] = it
+      }
+      context.runOnUiQueueThread {
+        promise.resolve(null)
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("REPLICATOR_ERROR", e.message)
+      }
+    }
+  }
+}
+
   @ReactMethod
   fun replicator_Cleanup(
     replicatorId: String,
@@ -977,26 +1016,27 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  @ReactMethod
-  fun replicator_Create(
-    config: ReadableMap,
-    promise: Promise) {
-    GlobalScope.launch(Dispatchers.IO) {
-      try {
-        val replicatorConfig = DataAdapter.readableMapToReplicatorConfig(config)
-        val replicatorId = ReplicatorManager.createReplicator(replicatorConfig)
-        val map = Arguments.createMap()
-        map.putString("replicatorId", replicatorId)
-        context.runOnUiQueueThread {
-          promise.resolve(map)
-        }
-      } catch (e: Throwable) {
-        context.runOnUiQueueThread {
-          promise.reject("REPLICATOR_ERROR", e.message)
-        }
+@ReactMethod
+fun replicator_Create(
+  config: ReadableMap,
+  promise: Promise) {
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      // Use the ReplicatorHelper to create a configuration from the ReadableMap
+      val replicatorConfig = ReplicatorHelper.replicatorConfigFromJson(config)
+      val replicatorId = ReplicatorManager.createReplicator(replicatorConfig)
+      val map = Arguments.createMap()
+      map.putString("replicatorId", replicatorId)
+      context.runOnUiQueueThread {
+        promise.resolve(map)
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("REPLICATOR_ERROR", e.message)
       }
     }
   }
+}
 
   @ReactMethod
   fun replicator_GetPendingDocumentIds(
@@ -1077,31 +1117,50 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  @ReactMethod
-  fun replicator_RemoveChangeListener(
-    changeListenerToken: String,
-    replicatorId: String,
-    promise: Promise) {
-    GlobalScope.launch(Dispatchers.IO) {
-      try {
-        if (!DataValidation.validateReplicatorId(replicatorId, promise)){
-          return@launch
-        }
-        val changeListener = replicatorChangeListeners[changeListenerToken]
-        changeListener?.let {
-          changeListener.remove()
-          replicatorChangeListeners.remove(changeListenerToken)
-        }
+@ReactMethod
+fun replicator_RemoveChangeListener(
+  changeListenerToken: String,
+  replicatorId: String,
+  promise: Promise) {
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+        return@launch
+      }
+
+      // Check for replicator change listeners
+      if (replicatorChangeListeners.containsKey(changeListenerToken)) {
+        val listener = replicatorChangeListeners[changeListenerToken]
+        listener?.remove()
+        replicatorChangeListeners.remove(changeListenerToken)
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
-      } catch (e: Throwable) {
+        return@launch
+      }
+
+      // Check for document change listeners
+      if (replicatorDocumentListeners.containsKey(changeListenerToken)) {
+        val listener = replicatorDocumentListeners[changeListenerToken]
+        listener?.remove()
+        replicatorDocumentListeners.remove(changeListenerToken)
         context.runOnUiQueueThread {
-          promise.reject("REPLICATOR_ERROR", e.message)
+          promise.resolve(null)
         }
+        return@launch
+      }
+
+      // If no listener found
+      context.runOnUiQueueThread {
+        promise.reject("REPLICATOR_ERROR", "No such listener found with token $changeListenerToken")
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("REPLICATOR_ERROR", e.message)
       }
     }
   }
+}
 
   @ReactMethod
   fun replicator_ResetCheckpoint(
