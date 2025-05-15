@@ -31,6 +31,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   private val context: ReactApplicationContext = reactContext
   private val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
   private val replicatorDocumentListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  private val collectionChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
 
   init {
     CouchbaseLite.init(context, true)
@@ -560,6 +561,126 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
     }
   }
+  @ReactMethod
+fun collection_AddChangeListener(
+  changeListenerToken: String,
+  collectionName: String,
+  name: String,
+  scopeName: String,
+  promise: Promise
+) {
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      if (!DataValidation.validateCollection(collectionName, scopeName, name, promise)) {
+        return@launch
+      }
+      val collection = DatabaseManager.getCollection(collectionName, scopeName, name)
+      if (collection == null) {
+        context.runOnUiQueueThread {
+          promise.reject("DATABASE_ERROR", "Could not find collection")
+        }
+        return@launch
+      }
+      val listener = collection.addChangeListener { change ->
+        val resultMap = Arguments.createMap()
+        resultMap.putString("token", changeListenerToken)
+        
+        val docIdsArray = Arguments.createArray()
+        change.documentIDs.forEach { docIdsArray.pushString(it) }
+        resultMap.putArray("documentIDs", docIdsArray)
+        
+        val collectionMap = DataAdapter.cblCollectionToMap(collection, name)
+        resultMap.putMap("collection", collectionMap)
+        context.runOnUiQueueThread {
+          sendEvent(context, "collectionChange", resultMap)
+        }
+      }
+      collectionChangeListeners[changeListenerToken] = listener
+      context.runOnUiQueueThread {
+        promise.resolve(null)
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("DATABASE_ERROR", e.message)
+      }
+    }
+  }
+}
+
+@ReactMethod
+fun collection_RemoveChangeListener(
+  changeListenerToken: String,
+  promise: Promise
+) {
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      if (collectionChangeListeners.containsKey(changeListenerToken)) {
+        val listener = collectionChangeListeners[changeListenerToken]
+        listener?.remove()
+        collectionChangeListeners.remove(changeListenerToken)
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } else {
+        context.runOnUiQueueThread {
+          promise.reject("COLLECTION_ERROR", "No such listener found with token $changeListenerToken")
+        }
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("COLLECTION_ERROR", e.message)
+      }
+    }
+  }
+}
+
+@ReactMethod
+fun collection_AddDocumentChangeListener(
+  changeListenerToken: String,
+  documentId: String,
+  collectionName: String,
+  name: String,
+  scopeName: String,
+  promise: Promise
+) {
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      if (!DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
+          !DataValidation.validateDocumentId(documentId, promise)
+      ) {
+        return@launch
+      }
+      val collection = DatabaseManager.getCollection(collectionName, scopeName, name)
+      if (collection == null) {
+        context.runOnUiQueueThread {
+          promise.reject("DATABASE_ERROR", "Could not find collection")
+        }
+        return@launch
+      }
+      val listener = collection.addDocumentChangeListener(documentId) { change ->
+        val resultMap = Arguments.createMap()
+        resultMap.putString("token", changeListenerToken)
+        resultMap.putString("documentId", change.documentID)
+        val collectionMap = DataAdapter.cblCollectionToMap(collection, name)
+        resultMap.putMap("collection", collectionMap)
+        
+        resultMap.putString("database", name)
+        context.runOnUiQueueThread {
+          sendEvent(context, "collectionDocumentChange", resultMap)
+        }
+      }
+      
+      collectionChangeListeners[changeListenerToken] = listener
+      context.runOnUiQueueThread {
+        promise.resolve(null)
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("DATABASE_ERROR", e.message)
+      }
+    }
+  }
+}
 
   // Database Functions
   @ReactMethod
