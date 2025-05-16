@@ -14,6 +14,7 @@ import java.net.URI
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import com.couchbase.lite.Collection as CBLCollection
 
 object DataAdapter {
@@ -336,36 +337,43 @@ object DataAdapter {
     val iterator = map.keySetIterator()
     var count = 0
     while (iterator.hasNextKey()) {
-      val key = iterator.nextKey()
-      val nestedMap = map.getMap(key)
-      val nestedType = nestedMap?.getString("type")
-      count += 1
-      when (nestedType) {
-        "int" -> queryParameters.setInt(key, nestedMap.getDouble("value").toInt())
-        "long" -> queryParameters.setLong(key, nestedMap.getDouble("value").toLong())
-        "float" -> queryParameters.setFloat(key, nestedMap.getDouble("value").toFloat())
-        "double" -> queryParameters.setDouble(key, nestedMap.getDouble("value"))
-        "boolean" -> queryParameters.setBoolean(key, nestedMap.getBoolean("value"))
-        "string" -> queryParameters.setString(key, nestedMap.getString("value"))
-        "date" -> {
-          val stringValue = map.getString("value")
-          stringValue?.let { strValue ->
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
-            val date = dateFormat.parse(strValue)
-            date?.let { d ->
-              queryParameters.setDate(key, d)
+        val key = iterator.nextKey()
+        val nestedMap = map.getMap(key)
+        val nestedType = nestedMap?.getString("type")
+        count += 1
+        when (nestedType) {
+            "int" -> queryParameters.setInt(key, nestedMap.getDouble("value").toInt())
+            "long" -> queryParameters.setLong(key, nestedMap.getDouble("value").toLong())
+            "float" -> queryParameters.setFloat(key, nestedMap.getDouble("value").toFloat())
+            "double" -> queryParameters.setDouble(key, nestedMap.getDouble("value"))
+            "boolean" -> queryParameters.setBoolean(key, nestedMap.getBoolean("value"))
+            "string" -> queryParameters.setString(key, nestedMap.getString("value"))
+            "date" -> {
+                val stringValue = nestedMap.getString("value")
+                stringValue?.let { strValue ->
+                    val date = parseIsoDate(strValue)
+                    date?.let { d ->
+                        queryParameters.setDate(key, d)
+                    }
+                }
             }
-          }
+            "value" -> {
+                val value = nestedMap.getDynamic("value")
+                when (value.type) {
+                    ReadableType.Boolean -> queryParameters.setBoolean(key, value.asBoolean())
+                    ReadableType.Number -> queryParameters.setDouble(key, value.asDouble())
+                    ReadableType.String -> queryParameters.setString(key, value.asString())
+                    else -> queryParameters.setValue(key, value)
+                }
+            }
+            else -> throw Exception("Error: Invalid parameter type: $nestedType")
         }
-
-        else -> throw Exception("Error: Invalid parameter type")
-      }
     }
     if (count == 0) {
-      return null
+        return null
     }
     return queryParameters
-  }
+}
 
   /**
    * Converts a `ReadableMap` to a `ReplicatorConfiguration` object.
@@ -559,4 +567,21 @@ object DataAdapter {
     }
     return map
   }
+
+  private fun parseIsoDate(dateString: String): Date? {
+    val formats = listOf(
+        "yyyy-MM-dd'T'HH:mm:ss.SSSX",    // Handles Z or +hh:mm
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",  // Handles Z
+        "yyyy-MM-dd'T'HH:mm:ssX",        // No milliseconds, with zone
+        "yyyy-MM-dd'T'HH:mm:ss"          // No milliseconds, no zone
+    )
+    for (format in formats) {
+        try {
+            val sdf = SimpleDateFormat(format, Locale.getDefault())
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            return sdf.parse(dateString)
+        } catch (_: Exception) { }
+    }
+    return null
+}
 }
