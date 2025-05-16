@@ -29,6 +29,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
 
   // Property to hold the context
   private val context: ReactApplicationContext = reactContext
+  private val queryChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
   private val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
   private val replicatorDocumentListeners: MutableMap<String, ListenerToken> = mutableMapOf()
   private val collectionChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
@@ -1046,6 +1047,88 @@ fun collection_AddDocumentChangeListener(
       }
     }
   }
+
+  @ReactMethod
+  fun query_AddChangeListener(
+    changeListenerToken: String,
+    query: String,
+    parameters: ReadableMap?,
+    name: String,
+    promise: Promise
+  ) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateDatabaseName(name, promise) || !DataValidation.validateQuery(query, promise)) {
+          return@launch
+        }
+        val database = DatabaseManager.getDatabase(name)
+        if (database == null) {
+          context.runOnUiQueueThread {
+            promise.reject("DATABASE_ERROR", "Could not find database with name $name")
+          }
+          return@launch
+        }
+        val queryObj = database.createQuery(query)
+        if (parameters != null && parameters.keySetIterator().hasNextKey()) {
+          val params = DataAdapter.readableMapToParameters(parameters)
+          queryObj.parameters = params
+        }
+        val listener = queryObj.addChangeListener { change ->
+          val resultMap = Arguments.createMap()
+          resultMap.putString("token", changeListenerToken)
+          change.results?.let { results ->
+            val resultList = mutableListOf<String>()
+            for (result in results) {
+              resultList.add(result.toJSON())
+            }
+            val jsonArray = "[" + resultList.joinToString(",") + "]"
+            resultMap.putString("data", jsonArray)
+          }
+          change.error?.let { error ->
+            resultMap.putString("error", error.localizedMessage)
+          }
+          context.runOnUiQueueThread {
+            sendEvent(context, "queryChange", resultMap)
+          }
+        }
+        queryChangeListeners[changeListenerToken] = listener
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("QUERY_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+fun query_RemoveChangeListener(
+  changeListenerToken: String,
+  promise: Promise
+) {
+  GlobalScope.launch(Dispatchers.IO) {
+    try {
+      if (queryChangeListeners.containsKey(changeListenerToken)) {
+        val listener = queryChangeListeners[changeListenerToken]
+        listener?.remove()
+        queryChangeListeners.remove(changeListenerToken)
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } else {
+        context.runOnUiQueueThread {
+          promise.reject("QUERY_ERROR", "No query listener found for token $changeListenerToken")
+        }
+      }
+    } catch (e: Throwable) {
+      context.runOnUiQueueThread {
+        promise.reject("QUERY_ERROR", e.message)
+      }
+    }
+  }
+}
 
   // Replicator Functions
 @ReactMethod

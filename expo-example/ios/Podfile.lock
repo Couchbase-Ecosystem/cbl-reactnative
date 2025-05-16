@@ -1,6 +1,6 @@
 PODS:
   - boost (1.84.0)
-  - cbl-reactnative (0.2.3):
+  - cbl-reactnative (0.5.0):
     - CouchbaseLite-Swift-Enterprise (= 3.2.1)
     - DoubleConversion
     - glog
@@ -2185,7 +2185,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
-  cbl-reactnative: aec81403856ac5f91d3792b18da6a67551402f76
+  cbl-reactnative: f3508d36c0f5c6846d7e3f77175a603a4ea15b2c
   CouchbaseLite-Swift-Enterprise: 6a1eddeed0b450d00d2336bcf60c9a71e228f0e4
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   EXConstants: 277129d9a42ba2cf1fad375e7eaa9939005c60be
