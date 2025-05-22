@@ -523,8 +523,12 @@ class CblReactnative: RCTEventEmitter {
         }
         var data:[String: Any] = [:]
         let documentJson = doc.toJSON()
-        if let jsonData = documentJson.data(using: .utf8),
-           let jsonDict = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] {
+        if !documentJson.isEmpty {
+            guard let jsonData = documentJson.data(using: .utf8),
+                  let jsonDict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else {
+                reject("DOCUMENT_ERROR", "Failed to parse document JSON", nil)
+                return
+            }
             data["_data"] = jsonDict
         } else {
             data["_data"] = [:]
