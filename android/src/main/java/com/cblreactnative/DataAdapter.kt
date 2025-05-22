@@ -56,45 +56,6 @@ object DataAdapter {
   }
 
   /**
-   * Converts a `Document` to a `WritableMap`.
-   *
-   * This function is used to adapt a Couchbase Lite `Document` to a `WritableMap` that can be
-   * used in React Native to send to Javascript via the Native Bridge. It iterates through the entries
-   * of the provided `Document` and converts any nested maps that represent blobs into their properties.
-   * A developer needing the blob would need to manually call the Collection `getBlobContent` method.
-   *
-   * @param document The `Document` to be converted. If the document is `null`, an empty `WritableMap` is returned.
-   * @return A `WritableMap` representation of the provided `Document`.
-   * @throws Exception If there is an error during the conversion.
-   */
-  @Throws(Exception::class)
-  fun documentToMap(document: Document?): WritableMap {
-    if (document == null) {
-      return Arguments.createMap()
-    }
-    val map = document.toMap()
-    //fix blob - only return properties, to get the content they will have to call getBlobContent
-    for (key in map.keys) {
-      val itemValue = map[key]
-      if (itemValue is Blob) {
-        document.getBlob(key)?.let { blob ->
-          val properties = blob.properties.toMutableMap()
-          val raw = blob.content?.toTypedArray()
-          properties["raw"] = raw
-          map[key] = properties
-        }
-      }
-    }
-    map.remove("sequence")
-    val resultsMap = Arguments.createMap()
-    val documentMap: WritableMap = Arguments.makeNativeMap(map)
-    resultsMap.putString("_id", document.id)
-    resultsMap.putDouble("_sequence", document.sequence.toDouble())
-    resultsMap.putMap("_data", documentMap)
-    return resultsMap
-  }
-
-  /**
    * Converts an integer value to a `MaintenanceType` enum.
    *
    * This function maps an integer value to the corresponding `MaintenanceType` enum.
@@ -584,4 +545,54 @@ object DataAdapter {
     }
     return null
 }
+
+    /**
+     * Converts a `JSONObject` to a `Map<String, Any?>`.
+     *
+     * This function recursively converts a `JSONObject` into a Kotlin `Map<String, Any?>`.
+     * Nested `JSONObject` and `JSONArray` objects are also converted to `Map` and `List`, respectively.
+     *
+     * @param jsonObject The `JSONObject` to be converted.
+     * @return A `Map<String, Any?>` representation of the `JSONObject`.
+     */
+    fun jsonObjectToMap(jsonObject: JSONObject): Map<String, Any?> {
+        val map = mutableMapOf<String, Any?>()
+        val keys = jsonObject.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            val value = jsonObject.get(key)
+            map[key] = when (value) {
+                is JSONObject -> jsonObjectToMap(value) 
+                is JSONArray -> jsonArrayToList(value) 
+                JSONObject.NULL -> null
+                else -> value
+            }
+        }
+        return map
+    }
+
+    /**
+     * Converts a `JSONArray` to a `List<Any?>`.
+     *
+     * This function recursively converts a `JSONArray` into a Kotlin `List<Any?>`.
+     * Nested `JSONObject` and `JSONArray` objects are also converted to `Map` and `List`, respectively.
+     *
+     * @param jsonArray The `JSONArray` to be converted.
+     * @return A `List<Any?>` representation of the `JSONArray`.
+     */
+    fun jsonArrayToList(jsonArray: JSONArray): List<Any?> {
+        val list = mutableListOf<Any?>()
+        for (i in 0 until jsonArray.length()) {
+            val value = jsonArray.get(i)
+            list.add(
+                when (value) {
+                    is JSONObject -> jsonObjectToMap(value) 
+                    is JSONArray -> jsonArrayToList(value) 
+                    JSONObject.NULL -> null
+                    else -> value
+                }
+            )
+        }
+        return list
+    }
 }

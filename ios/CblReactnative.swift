@@ -357,7 +357,7 @@ class CblReactnative: RCTEventEmitter {
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
     let (isDocumentError, documentId) = DataAdapter.shared.adaptNonEmptyString(value: docId, propertyName: "docId", reject: reject)
     let (isKeyError, keyValue) = DataAdapter.shared.adaptNonEmptyString(value: key, propertyName: "key", reject: reject)
-    
+
     if isError || isDocumentError || isKeyError {
       return
     }
@@ -521,14 +521,21 @@ class CblReactnative: RCTEventEmitter {
           resolve(dict)
           return
         }
-        //convert document to map using shared library
         var data:[String: Any] = [:]
-        let documentMap = MapHelper.documentToMap(doc)
-        data["_data"] = documentMap
+        let documentJson = doc.toJSON()
+        if !documentJson.isEmpty {
+            guard let jsonData = documentJson.data(using: .utf8),
+                  let jsonDict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else {
+                reject("DOCUMENT_ERROR", "Failed to parse document JSON", nil)
+                return
+            }
+            data["_data"] = jsonDict
+        } else {
+            data["_data"] = [:]
+        }
         data["_id"] = documentId
         data["_sequence"] = doc.sequence
-        
-        //React Native requires NSDictionary - type cast it and return as NSDictionary instead
+
         let dict:NSDictionary = data as NSDictionary
         resolve(dict)
       } catch let error as NSError {
