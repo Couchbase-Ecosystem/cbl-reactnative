@@ -20,7 +20,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-
+import org.json.JSONObject
 
 @OptIn(DelicateCoroutinesApi::class)
 @Suppress("FunctionName")
@@ -370,26 +370,55 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     scopeName: String,
     collectionName: String,
     promise: Promise
-  ){
+) {
     GlobalScope.launch(Dispatchers.IO) {
-      try {
-        if (!DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
-          !DataValidation.validateDocumentId(docId, promise)
-        ) {
-          return@launch
+        try {
+            if (!DataValidation.validateCollection(collectionName, scopeName, name, promise) ||
+                !DataValidation.validateDocumentId(docId, promise)
+            ) {
+                return@launch
+            }
+
+            val doc = CollectionManager.getDocument(docId, collectionName, scopeName, name)
+            if (doc == null) {
+                context.runOnUiQueueThread {
+                    promise.resolve(Arguments.createMap()) 
+                }
+                return@launch
+            }
+
+            val documentJson = doc.toJSON()
+            if (!documentJson.isNullOrEmpty()) {
+                try {
+                    val test = JSONObject(documentJson)
+                    val map = DataAdapter.jsonObjectToMap(test)
+                    val documentMap = Arguments.makeNativeMap(map)
+                    val writableMap = Arguments.createMap()
+                    writableMap.putMap("_data", documentMap)
+
+                    writableMap.putString("_id", doc.id)
+                    writableMap.putDouble("_sequence", doc.sequence.toDouble())
+
+                    context.runOnUiQueueThread {
+                        promise.resolve(writableMap)
+                    }
+                } catch (e: Exception) {
+                    context.runOnUiQueueThread {
+                        promise.reject("DOCUMENT_ERROR", "Failed to parse document JSON: ${e.message}")
+                    }
+                }
+            } else {
+                context.runOnUiQueueThread {
+                    promise.resolve(Arguments.createMap()) 
+                }
+            }
+        } catch (e: Throwable) {
+            context.runOnUiQueueThread {
+                promise.reject("DOCUMENT_ERROR", e.message)
+            }
         }
-        val doc = CollectionManager.getDocument(docId, collectionName, scopeName, name)
-        val docMap = DataAdapter.documentToMap(doc)
-        context.runOnUiQueueThread {
-          promise.resolve(docMap)
-        }
-      } catch (e: Throwable) {
-        context.runOnUiQueueThread {
-          promise.reject("DOCUMENT_ERROR", e.message)
-        }
-      }
     }
-  }
+}
 
   @ReactMethod
   fun collection_GetDocumentExpiration(
