@@ -121,7 +121,18 @@ We use [TypeScript](https://www.typescriptlang.org/) for type checking, [ESLint]
 
 Our pre-commit hooks verify that the linter and tests pass when committing.
 
+## How to Release the project
+
+### Release Checklist
+- [ ] Update the version in `package.json`, and commit this change to main.
+- [ ] Build the project using `npm run build`.
+- [ ] Write release notes, and add them to a new [GitHub release](https://github.com/Couchbase-Ecosystem/cbl-reactnative/releases) (under a tag that corresponds to the new version number).
+- [ ] Publish the release notes to the [cbl-reactnative.dev](https://cbl-reactnative.dev) website by updating [this file](https://github.com/Couchbase-Ecosystem/cbl-reactnative-docs/blob/main/docs/ProductNotes/release-notes.md).
+- [ ] Publish the package to npm using `npm publish` (or `npm release` if using release-it).
+
 ### Publishing to npm
+
+**Note: currently release-it requires some secrets, and the most recent releases have been done manually, via `npm publish`. In the future, we'd like to use release-it, but for the time being manual publish seems to work the best.**
 
 We use [release-it](https://github.com/release-it/release-it) to make it easier to publish new versions. It handles common tasks like bumping version based on semver, creating tags and releases etc.
 
