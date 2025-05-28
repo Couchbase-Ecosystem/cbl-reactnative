@@ -124,9 +124,9 @@ Our pre-commit hooks verify that the linter and tests pass when committing.
 ## How to Release the project
 
 ### Release Checklist
-- [ ] Update the version in `package.json`.
+- [ ] Update the version in `package.json`, and commit this change to main.
 - [ ] Build the project using `npm run build`.
-- [ ] Write release notes, and add them to a new [GitHub release](https://github.com/Couchbase-Ecosystem/cbl-reactnative/releases) (tagged with the new version).
+- [ ] Write release notes, and add them to a new [GitHub release](https://github.com/Couchbase-Ecosystem/cbl-reactnative/releases) (under a tag that corresponds to the new version number).
 - [ ] Publish the release notes to the [cbl-reactnative.dev](https://cbl-reactnative.dev) website by updating [this file](https://github.com/Couchbase-Ecosystem/cbl-reactnative-docs/blob/main/docs/ProductNotes/release-notes.md).
 - [ ] Publish the package to npm using `npm publish` (or `npm release` if using release-it).
 
