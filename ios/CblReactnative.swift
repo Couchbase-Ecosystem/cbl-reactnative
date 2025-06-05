@@ -64,6 +64,17 @@ class CblReactnative: RCTEventEmitter {
   private var filterPendingResults = [String: DispatchGroup]()
   
   // MARK: - Collection Functions
+
+//   @objc(debug_GetFilterStatus:withRejecter:)
+// func debug_GetFilterStatus(
+//     resolve: @escaping RCTPromiseResolveBlock,
+//     reject: @escaping RCTPromiseRejectBlock
+// ) -> Void {
+//     backgroundQueue.async {
+//         let debugInfo = ReplicatorHelper.getFilterDebugInfo()
+//         resolve(["debugInfo": debugInfo])
+//     }
+// }
   
   @objc(collection_CreateCollection:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
   func collection_CreateCollection(
@@ -1028,6 +1039,7 @@ class CblReactnative: RCTEventEmitter {
       if isError {
         return
       }
+      print("🔵 Cleaning up by replicator_Cleanup")
       backgroundQueue.async {
         do {
           try ReplicatorManager.shared.cleanUp(repId)
@@ -1287,7 +1299,6 @@ func sendFilterResult(
 func evaluateFilter(filterId: String, document: Document, flags: DocumentFlags) -> Bool {
   let docId = document.id
   
-  // Check basic conditions first to avoid unnecessary processing
   // if !hasListeners {
   //   self.logger.debug("No event listeners - JS side may not receive events")
   //   return true
@@ -1295,7 +1306,6 @@ func evaluateFilter(filterId: String, document: Document, flags: DocumentFlags) 
   
   self.logger.debug("Filter evaluation for doc: \(docId)")
   
-  // Generate callback ID
   let callbackId = UUID().uuidString
   
   // Create dispatch group
@@ -1352,8 +1362,7 @@ func evaluateFilter(filterId: String, document: Document, flags: DocumentFlags) 
   self.sendEvent(withName: kReplicatorFilterEvent, body: body)
   self.logger.debug("Sent filter event for doc: \(docId)")
   
-  // Shorter timeout (5 seconds) for better performance with many documents
-  let waitResult = group.wait(timeout: .now() + 20.0)
+  let waitResult = group.wait(timeout: .now() + 1.0)
   
   // Clean up
   NotificationCenter.default.removeObserver(observer)

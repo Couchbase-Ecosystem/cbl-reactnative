@@ -47,8 +47,6 @@ import {
   ScopeArgs,
   ScopesResult,
   DocumentGetBlobContentArgs,
-  ReplicationFilterRegisterArgs,
-  ReplicationFilterUnregisterArgs,
 } from './cblite-js/cblite/core-types';
 
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
@@ -58,7 +56,6 @@ import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Scope } from './cblite-js/cblite/src/scope';
 
 import uuid from 'react-native-uuid';
-import { Document } from './cblite-js/cblite/src/document';
 
 export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
@@ -117,59 +114,6 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   private filterEventHandlerSetup = false;
-
-  private setupFilterEventHandling() {
-    // Only set up once
-    if (this.filterEventHandlerSetup) {
-      return;
-    }
-
-    console.log('Setting up filter event handler');
-
-    // Direct event listener registration
-    this._eventEmitter.addListener('evaluateFilter', (data) => {
-      console.log(`Got filter event for doc: ${data.document?._id}`);
-
-      try {
-        const { filterId, document, flags, callbackId } = data;
-        const callback = this.filterCallbacks.get(filterId);
-
-        let result = true; // Default to allowing replication
-
-        if (callback) {
-          const documentObj = new Document(
-            document._id,
-            document._sequence,
-            document._revId,
-            undefined,
-            document._data || {}
-          );
-
-          let flagsValue = 0;
-          console.log('flags:: ', flags);
-          if (flags.deleted) flagsValue |= 1;
-          if (flags.accessRemoved) flagsValue |= 2;
-
-          result = callback(documentObj, flagsValue);
-        }
-        console.log('callbackId', callbackId);
-        // Always send a response to avoid blocking native code
-        this.CblReactNative.sendFilterResult(callbackId, result).catch((err) =>
-          console.error('Error sending filter result:', err)
-        );
-      } catch (error) {
-        console.error('Error in filter event handler:', error);
-        if (data?.callbackId) {
-          this.CblReactNative.sendFilterResult(data.callbackId, true).catch(
-            (err) => console.error('Error sending fallback result:', err)
-          );
-        }
-      }
-    });
-
-    this.filterEventHandlerSetup = true;
-    console.log('Filter event handler setup complete');
-  }
 
   //private logging function
   private debugLog(message: string) {
@@ -1060,7 +1004,7 @@ export class CblReactNativeEngine implements ICoreEngine {
   }
 
   replicator_Create(args: ReplicatorCreateArgs): Promise<ReplicatorArgs> {
-    this.setupFilterEventHandling();
+    console.log('config: ', JSON.stringify(args.config, null, 2));
     return new Promise((resolve, reject) => {
       this.CblReactNative.replicator_Create(args.config).then(
         (results: ReplicatorArgs) => {
@@ -1197,38 +1141,6 @@ export class CblReactNativeEngine implements ICoreEngine {
         (error: any) => {
           reject(error);
         }
-      );
-    });
-  }
-
-  replication_RegisterFilter(
-    args: ReplicationFilterRegisterArgs,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callback: (doc: any, flags: any) => boolean
-  ): Promise<void> {
-    // Store callback in our map
-    this.filterCallbacks.set(args.filterId, callback);
-
-    // Just register the filter ID with native code
-    return new Promise((resolve, reject) => {
-      this.CblReactNative.replication_RegisterFilter(
-        args.filterId,
-        args.filterType
-      ).then(resolve, reject);
-    });
-  }
-
-  replication_UnregisterFilter(
-    args: ReplicationFilterUnregisterArgs
-  ): Promise<void> {
-    // Remove from our callback map
-    this.filterCallbacks.delete(args.filterId);
-
-    // Unregister from native
-    return new Promise((resolve, reject) => {
-      this.CblReactNative.replication_UnregisterFilter(args.filterId).then(
-        resolve,
-        reject
       );
     });
   }
