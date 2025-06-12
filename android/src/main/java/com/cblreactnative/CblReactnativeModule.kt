@@ -580,7 +580,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
         ) {
           return@launch
         }
-        CollectionManager.setDocumentExpiration(expiration, docId, collectionName, scopeName, name)
+        CollectionManager.setDocumentExpiration(docId, expiration, collectionName, scopeName, name)
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
