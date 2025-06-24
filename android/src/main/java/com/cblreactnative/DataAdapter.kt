@@ -517,7 +517,8 @@ object DataAdapter {
         if (value is HashMap<*, *> && value["_type"] == "blob") {
           val nestedMap = value["data"] as HashMap<*, *>
           val contentType = nestedMap["contentType"] as String
-          
+          //value["data"] 'should be' an array of integers - need to convert it because React Native serializes it into
+          //an the ArrayList<Double>
           val rawList = nestedMap["data"] as? ArrayList<*>
           val doubleList = rawList?.filterIsInstance<Double>()
             ?.takeIf { it.size == rawList.size } as? ArrayList<Double>
