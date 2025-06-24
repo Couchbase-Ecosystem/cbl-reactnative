@@ -123,18 +123,26 @@ object DataAdapter {
     indexProperties?.let { ip ->
       if (indexType == "value") {
         for (countValue in 0 until ip.size()) {
-          val arItems = indexProperties.getArray(countValue)
-          for (countArray in 0 until arItems.size()) {
-            val item = arItems.getString(countArray)
-            valueIndexProperties.add(ValueIndexItem.property(item))
+          val arItems = ip.getArray(countValue)
+          arItems?.let { items ->
+            for (countArray in 0 until items.size()) {
+              val item = items.getString(countArray)
+              item?.let { itemValue ->
+                valueIndexProperties.add(ValueIndexItem.property(itemValue))
+              }
+            }
           }
         }
       } else {
         for (countValue in 0 until ip.size()) {
-          val arItems = indexProperties.getArray(countValue)
-          for (countArray in 0 until arItems.size()) {
-            val item = arItems.getString(countArray)
-            fullTextIndexProperties.add(FullTextIndexItem.property(item))
+          val arItems = ip.getArray(countValue)
+          arItems?.let { items ->
+            for (countArray in 0 until items.size()) {
+              val item = items.getString(countArray)
+              item?.let { itemValue ->
+                fullTextIndexProperties.add(FullTextIndexItem.property(itemValue))
+              }
+            }
           }
         }
       }
@@ -502,31 +510,30 @@ object DataAdapter {
    */
   @Throws(Exception::class)
   fun toMap(readableMap: ReadableMap): Map<String, Any> {
-    val map = readableMap.toHashMap()
-    for ((key, value) in map) {
-      if (value is HashMap<*, *>) {
-        if (value.containsKey("_type") && value["_type"] == "blob") {
+    val resultMap = mutableMapOf<String, Any>()
+    
+    for ((key, value) in readableMap.toHashMap()) {
+      if (value != null) {
+        if (value is HashMap<*, *> && value["_type"] == "blob") {
           val nestedMap = value["data"] as HashMap<*, *>
           val contentType = nestedMap["contentType"] as String
           //value["data"] 'should be' an array of integers - need to convert it because React Native serializes it into
           //an the ArrayList<Double>
           val rawList = nestedMap["data"] as? ArrayList<*>
-          val doubleList = rawList?.filterIsInstance<Double>()?.takeIf { it.size == rawList.size } as? ArrayList<Double>
-          val intData = doubleList?.map{ it.toInt()}?.toIntArray()
-          if (intData == null) {
-            throw Exception("Error: Invalid blob data")
-          } else {
-            val data = ByteArray(intData.size)
-            for (i in intData.indices) {
-              data[i] = intData[i].toByte()
-            }
-            val blob = Blob(contentType, data)
-            map[key] = blob
-          }
+          val doubleList = rawList?.filterIsInstance<Double>()
+            ?.takeIf { it.size == rawList.size } as? ArrayList<Double>
+          val intData = doubleList?.map { it.toInt() }?.toIntArray()
+            ?: throw Exception("Error: Invalid blob data")
+          
+          val data = ByteArray(intData.size) { i -> intData[i].toByte() }
+          resultMap[key] = Blob(contentType, data)
+        } else {
+          resultMap[key] = value
         }
       }
     }
-    return map
+    
+    return resultMap
   }
 
   private fun parseIsoDate(dateString: String): Date? {
