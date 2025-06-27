@@ -23,13 +23,18 @@
     "type": "git",
     "url": "git+https://github.com/Couchbase-Ecosystem/cbl-reactnative.git"
   },
+  "bin": {
+    "cbl-reactnative-configure": "./scripts/configure-edition.js"
+  },
   "scripts": {
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli android/build expo-example/android/build expo-example/android/app/build expo-example/ios/build lib",
     "build": "bob build",
-    "release": "release-it"
+    "release": "release-it",
+    "configure:ce": "node scripts/configure-edition.js CE",
+    "configure:ee": "node scripts/configure-edition.js EE"
   },
   "main": "./lib/commonjs/index.js",
   "source": "./src/index.tsx",
@@ -48,6 +53,10 @@
     "android",
     "ios",
     "cpp",
+    "plugin",
+    "scripts",
+    "app.plugin.js",
+    "cbl-edition.json",
     "*.podspec",
     "!ios/build",
     "!android/build",

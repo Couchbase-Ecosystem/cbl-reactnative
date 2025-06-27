@@ -7,3 +7,6 @@ lib/
 src/cblite-js
 ios/
 bable.config.js
+scripts/
+plugin/
+app.plugin.js
