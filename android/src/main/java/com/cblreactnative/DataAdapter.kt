@@ -16,6 +16,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import com.couchbase.lite.Collection as CBLCollection
+import com.cblreactnative.CouchbaseReflectionHelper
 
 object DataAdapter {
 
@@ -376,10 +377,12 @@ object DataAdapter {
       target = endpoint,
       continuous = continuous,
       acceptParentDomainCookies = acceptParentDomainCookies,
-      acceptOnlySelfSignedServerCertificate = acceptSelfSignedCerts,
       enableAutoPurge = autoPurgeEnabled,
       type = replicatorType,
     )
+
+    CouchbaseReflectionHelper.setAcceptOnlySelfSignedServerCertificate(configBuilder, acceptSelfSignedCerts)
+
     val authenticatorMap = map.getMap("authenticator")
     authenticatorMap?.let {
       val authenticator = readableMapToAuthenticator(it)
