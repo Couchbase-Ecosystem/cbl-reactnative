@@ -27,7 +27,8 @@
     "plugins": [
       "expo-router",
       "./cbl-reactnative-plugin.js",
-      "expo-font"
+      "expo-font",
+      "cbl-reactnative"
     ],
     "experiments": {
       "typedRoutes": true
