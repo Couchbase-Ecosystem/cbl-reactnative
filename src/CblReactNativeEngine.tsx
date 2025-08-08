@@ -47,6 +47,10 @@ import {
   ScopeArgs,
   ScopesResult,
   DocumentGetBlobContentArgs,
+  URLEndpointListenerArgs,
+  URLEndpointListenerCreateArgs,
+  URLEndpointListenerStatus,
+  URLEndpointListenerTLSIdentityArgs,
 } from './cblite-js/cblite/core-types';
 
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
@@ -111,6 +115,21 @@ export class CblReactNativeEngine implements ICoreEngine {
     }
 
     this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
+  }
+  URLEndpointListener_createListener(args: URLEndpointListenerCreateArgs): Promise<{ listenerId: string; }> {
+    throw new Error('Method not implemented.');
+  }
+  URLEndpointListener_startListener(args: URLEndpointListenerArgs): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  URLEndpointListener_stopListener(args: URLEndpointListenerArgs): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  URLEndpointListener_getStatus(args: URLEndpointListenerArgs): Promise<URLEndpointListenerStatus> {
+    throw new Error('Method not implemented.');
+  }
+  URLEndpointListener_deleteIdentity(args: URLEndpointListenerTLSIdentityArgs): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 
   //private logging function
