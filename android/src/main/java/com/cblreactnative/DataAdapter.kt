@@ -123,11 +123,9 @@ object DataAdapter {
     indexProperties?.let { ip ->
       if (indexType == "value") {
         for (countValue in 0 until ip.size()) {
-          val arItems = ip.getArray(countValue)
-          arItems?.let { items ->
+          ip.getArray(countValue)?.let { items ->
             for (countArray in 0 until items.size()) {
-              val item = items.getString(countArray)
-              item?.let { itemValue ->
+              items.getString(countArray)?.let { itemValue ->
                 valueIndexProperties.add(ValueIndexItem.property(itemValue))
               }
             }
@@ -135,11 +133,9 @@ object DataAdapter {
         }
       } else {
         for (countValue in 0 until ip.size()) {
-          val arItems = ip.getArray(countValue)
-          arItems?.let { items ->
+          ip.getArray(countValue)?.let { items ->
             for (countArray in 0 until items.size()) {
-              val item = items.getString(countArray)
-              item?.let { itemValue ->
+              items.getString(countArray)?.let { itemValue ->
                 fullTextIndexProperties.add(FullTextIndexItem.property(itemValue))
               }
             }
@@ -514,17 +510,17 @@ object DataAdapter {
     
     for ((key, value) in readableMap.toHashMap()) {
       if (value != null) {
-        if (value is HashMap<*, *> && value["_type"] == "blob") {
-          val nestedMap = value["data"] as HashMap<*, *>
-          val contentType = nestedMap["contentType"] as String
-          //value["data"] 'should be' an array of integers - need to convert it because React Native serializes it into
-          //an the ArrayList<Double>
-          val rawList = nestedMap["data"] as? ArrayList<*>
-          val doubleList = rawList?.filterIsInstance<Double>()
-            ?.takeIf { it.size == rawList.size } as? ArrayList<Double>
-          val intData = doubleList?.map { it.toInt() }?.toIntArray()
-            ?: throw Exception("Error: Invalid blob data")
-          
+        if (value is Map<*, *> && value["_type"] == "blob") {
+          val nestedMap = value["data"] as? Map<*, *>
+              ?: throw Exception("Error: Invalid blob object")
+          val contentType = nestedMap["contentType"] as? String
+              ?: throw Exception("Error: Missing blob contentType")
+          val rawList = nestedMap["data"] as? List<*>
+              ?: throw Exception("Error: Missing blob data array")
+          val doubleList = rawList.filterIsInstance<Double>()
+              .takeIf { it.size == rawList.size }
+              ?: throw Exception("Error: Invalid blob data format")
+          val intData = doubleList.map { it.toInt() }.toIntArray()
           val data = ByteArray(intData.size) { i -> intData[i].toByte() }
           resultMap[key] = Blob(contentType, data)
         } else {
