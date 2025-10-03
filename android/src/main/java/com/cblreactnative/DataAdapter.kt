@@ -510,17 +510,17 @@ object DataAdapter {
     
     for ((key, value) in readableMap.toHashMap()) {
       if (value != null) {
-        if (value is Map<*, *> && value["_type"] == "blob") {
-          val nestedMap = value["data"] as? Map<*, *>
-              ?: throw Exception("Error: Invalid blob object")
-          val contentType = nestedMap["contentType"] as? String
-              ?: throw Exception("Error: Missing blob contentType")
-          val rawList = nestedMap["data"] as? List<*>
-              ?: throw Exception("Error: Missing blob data array")
-          val doubleList = rawList.filterIsInstance<Double>()
-              .takeIf { it.size == rawList.size }
-              ?: throw Exception("Error: Invalid blob data format")
-          val intData = doubleList.map { it.toInt() }.toIntArray()
+        if (value is HashMap<*, *> && value["_type"] == "blob") {
+          val nestedMap = value["data"] as HashMap<*, *>
+          val contentType = nestedMap["contentType"] as String
+          //value["data"] 'should be' an array of integers - need to convert it because React Native serializes it into
+          //an the ArrayList<Double>
+          val rawList = nestedMap["data"] as? ArrayList<*>
+          val doubleList = rawList?.filterIsInstance<Double>()
+            ?.takeIf { it.size == rawList.size } as? ArrayList<Double>
+          val intData = doubleList?.map { it.toInt() }?.toIntArray()
+            ?: throw Exception("Error: Invalid blob data")
+          
           val data = ByteArray(intData.size) { i -> intData[i].toByte() }
           resultMap[key] = Blob(contentType, data)
         } else {
