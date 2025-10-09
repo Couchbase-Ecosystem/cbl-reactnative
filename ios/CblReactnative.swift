@@ -794,8 +794,8 @@ class CblReactnative: RCTEventEmitter {
   func database_Copy(
     path: NSString,
     newName: NSString,
-    directory: NSString,
-    encryptionKey: NSString,
+    directory: Any?,
+    encryptionKey: Any?,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
@@ -812,15 +812,46 @@ class CblReactnative: RCTEventEmitter {
       return
     }
     
-    //create config to pass in
-    let config: [String: String?] = [
-      "encryptionKey": String(encryptionKey),
-      "directory": String(directory)
-    ]
-    let hashConfig = AnyHashable(config)
+    //create config to pass in - only include non-empty values
+    var config: [AnyHashable: Any] = [:]
+    
+    // Safely convert directory - only add if not nil/NSNull and not empty
+    if let directory = directory, !(directory is NSNull) {
+      // Convert to string, handling NSString, String, or other types
+      let dirStr: String
+      if let nsStr = directory as? NSString {
+        dirStr = nsStr as String
+      } else if let str = directory as? String {
+        dirStr = str
+      } else {
+        dirStr = String(describing: directory)
+      }
+      let trimmedDirStr = dirStr.trimmingCharacters(in: .whitespacesAndNewlines)
+      if !trimmedDirStr.isEmpty && trimmedDirStr != "undefined" && trimmedDirStr != "null" {
+        config["directory"] = trimmedDirStr
+      }
+    }
+    
+    // Safely convert encryptionKey - only add if not nil/NSNull and not empty
+    if let encryptionKey = encryptionKey, !(encryptionKey is NSNull) {
+      // Convert to string, handling NSString, String, or other types
+      let encKeyStr: String
+      if let nsStr = encryptionKey as? NSString {
+        encKeyStr = nsStr as String
+      } else if let str = encryptionKey as? String {
+        encKeyStr = str
+      } else {
+        encKeyStr = String(describing: encryptionKey)
+      }
+      let trimmedEncKeyStr = encKeyStr.trimmingCharacters(in: .whitespacesAndNewlines)
+      if !trimmedEncKeyStr.isEmpty && trimmedEncKeyStr != "undefined" && trimmedEncKeyStr != "null" {
+        config["encryptionKey"] = trimmedEncKeyStr
+      }
+    }
+    
     backgroundQueue.async {
       do {
-        try DatabaseManager.shared.copy(databasePath, newName: databaseName, databaseConfig: hashConfig as? [AnyHashable : Any])
+        try DatabaseManager.shared.copy(databasePath, newName: databaseName, databaseConfig: config)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -931,8 +962,8 @@ class CblReactnative: RCTEventEmitter {
   @objc(database_Open:withDirectory:withEncryptionKey: withResolver:withRejecter:)
   func database_Open(
     name: NSString,
-    directory: NSString,
-    encryptionKey: NSString,
+    directory: Any?,
+    encryptionKey: Any?,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
@@ -940,14 +971,47 @@ class CblReactnative: RCTEventEmitter {
     if isError {
       return
     }
-    let config: [String: String?] = [
-      "encryptionKey": String(encryptionKey),
-      "directory": String(directory)
-    ]
-    let hashConfig = AnyHashable(config)
+    
+    //create config to pass in - only include non-empty values
+    var config: [AnyHashable: Any] = [:]  
+    
+    // Safely convert directory - only add if not nil/NSNull and not empty
+    if let directory = directory, !(directory is NSNull) {
+      // Convert to string, handling NSString, String, or other types
+      let dirStr: String
+      if let nsStr = directory as? NSString {
+        dirStr = nsStr as String
+      } else if let str = directory as? String {
+        dirStr = str
+      } else {
+        dirStr = String(describing: directory)
+      }
+      let trimmedDirStr = dirStr.trimmingCharacters(in: .whitespacesAndNewlines)
+      if !trimmedDirStr.isEmpty && trimmedDirStr != "undefined" && trimmedDirStr != "null" {
+        config["directory"] = trimmedDirStr
+      }
+    }
+    
+    // Safely convert encryptionKey - only add if not nil/NSNull and not empty
+    if let encryptionKey = encryptionKey, !(encryptionKey is NSNull) {
+      // Convert to string, handling NSString, String, or other types
+      let encKeyStr: String
+      if let nsStr = encryptionKey as? NSString {
+        encKeyStr = nsStr as String
+      } else if let str = encryptionKey as? String {
+        encKeyStr = str
+      } else {
+        encKeyStr = String(describing: encryptionKey)
+      }
+      let trimmedEncKeyStr = encKeyStr.trimmingCharacters(in: .whitespacesAndNewlines)
+      if !trimmedEncKeyStr.isEmpty && trimmedEncKeyStr != "undefined" && trimmedEncKeyStr != "null" {
+        config["encryptionKey"] = trimmedEncKeyStr
+      }
+    }
+    
     backgroundQueue.async {
       do {
-        let databaseUniqueName = try DatabaseManager.shared.open(databaseName, databaseConfig: hashConfig as? [AnyHashable : Any])
+        let databaseUniqueName = try DatabaseManager.shared.open(databaseName, databaseConfig: config)
 
         let resultDict: [String: Any] = ["databaseUniqueName": databaseUniqueName]
         resolve(resultDict)

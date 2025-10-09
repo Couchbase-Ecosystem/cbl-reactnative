@@ -1,6 +1,6 @@
 PODS:
   - boost (1.84.0)
-  - cbl-reactnative (0.5.0):
+  - cbl-reactnative (0.6.1):
     - CouchbaseLite-Swift-Enterprise (= 3.2.1)
     - DoubleConversion
     - glog
@@ -27,20 +27,20 @@ PODS:
   - EXConstants (17.0.3):
     - ExpoModulesCore
   - EXJSONUtils (0.14.0)
-  - EXManifests (0.15.4):
+  - EXManifests (0.15.8):
     - ExpoModulesCore
   - Expo (52.0.11):
     - ExpoModulesCore
-  - expo-dev-client (5.0.4):
+  - expo-dev-client (5.0.20):
     - EXManifests
     - expo-dev-launcher
     - expo-dev-menu
     - expo-dev-menu-interface
     - EXUpdatesInterface
-  - expo-dev-launcher (5.0.16):
+  - expo-dev-launcher (5.0.35):
     - DoubleConversion
     - EXManifests
-    - expo-dev-launcher/Main (= 5.0.16)
+    - expo-dev-launcher/Main (= 5.0.35)
     - expo-dev-menu
     - expo-dev-menu-interface
     - ExpoModulesCore
@@ -66,7 +66,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - expo-dev-launcher/Main (5.0.16):
+  - expo-dev-launcher/Main (5.0.35):
     - DoubleConversion
     - EXManifests
     - expo-dev-launcher/Unsafe
@@ -95,7 +95,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - expo-dev-launcher/Unsafe (5.0.16):
+  - expo-dev-launcher/Unsafe (5.0.35):
     - DoubleConversion
     - EXManifests
     - expo-dev-menu
@@ -123,10 +123,10 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - expo-dev-menu (6.0.11):
+  - expo-dev-menu (6.0.25):
     - DoubleConversion
-    - expo-dev-menu/Main (= 6.0.11)
-    - expo-dev-menu/ReactNativeCompatibles (= 6.0.11)
+    - expo-dev-menu/Main (= 6.0.25)
+    - expo-dev-menu/ReactNativeCompatibles (= 6.0.25)
     - glog
     - hermes-engine
     - RCT-Folly (= 2024.01.01.00)
@@ -146,8 +146,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - expo-dev-menu-interface (1.9.2)
-  - expo-dev-menu/Main (6.0.11):
+  - expo-dev-menu-interface (1.9.3)
+  - expo-dev-menu/Main (6.0.25):
     - DoubleConversion
     - EXManifests
     - expo-dev-menu-interface
@@ -173,7 +173,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - expo-dev-menu/ReactNativeCompatibles (6.0.11):
+  - expo-dev-menu/ReactNativeCompatibles (6.0.25):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -194,7 +194,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - expo-dev-menu/SafeAreaView (6.0.11):
+  - expo-dev-menu/SafeAreaView (6.0.25):
     - DoubleConversion
     - ExpoModulesCore
     - glog
@@ -216,7 +216,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - expo-dev-menu/Vendored (6.0.11):
+  - expo-dev-menu/Vendored (6.0.25):
     - DoubleConversion
     - expo-dev-menu/SafeAreaView
     - glog
@@ -2185,17 +2185,17 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
-  cbl-reactnative: f3508d36c0f5c6846d7e3f77175a603a4ea15b2c
+  cbl-reactnative: 9eee8c5a18460cfb06d338ea1f6415145d47063e
   CouchbaseLite-Swift-Enterprise: 6a1eddeed0b450d00d2336bcf60c9a71e228f0e4
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
   EXConstants: 277129d9a42ba2cf1fad375e7eaa9939005c60be
   EXJSONUtils: 01fc7492b66c234e395dcffdd5f53439c5c29c93
-  EXManifests: 8de88191fe548cd5aeafa4228ed92283b483b923
+  EXManifests: a19d50504b8826546a4782770317bc83fffec87d
   Expo: 8948e8e417f699ed125a80389e150aabbae404bf
-  expo-dev-client: efd9785534d9facffebd23bb9d105e5eb71fd04f
-  expo-dev-launcher: 4f0e42fcb65ad340370ff2fe23df9791b22ec502
-  expo-dev-menu: 0755441fcaa71f7094cefd2cebab1c0de0dfad33
-  expo-dev-menu-interface: 4baf2f8b3b79ce37cf4b900e4b3ba6df3384f0a1
+  expo-dev-client: db44302cdbe0ec55b0ef1849c9a23a76dec6dbac
+  expo-dev-launcher: b512a0a91c4041777e58d1a93084050237fd6d87
+  expo-dev-menu: d34f066794ef41204014801057aaf11fd7d19f6a
+  expo-dev-menu-interface: 00dc42302a72722fdecec3fa048de84a9133bcc4
   ExpoAsset: 6f7a8887cbb9fb39fdb0808e7f6f74ba0e1ae9b6
   ExpoFileSystem: 83da9dbce2371cc72c3a3ef49e0df54a117310f1
   ExpoFont: 12b0217e42ac97029d0f317f0486039a8508cf52
