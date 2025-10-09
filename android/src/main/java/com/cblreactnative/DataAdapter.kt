@@ -123,11 +123,9 @@ object DataAdapter {
     indexProperties?.let { ip ->
       if (indexType == "value") {
         for (countValue in 0 until ip.size()) {
-          val arItems = ip.getArray(countValue)
-          arItems?.let { items ->
+          ip.getArray(countValue)?.let { items ->
             for (countArray in 0 until items.size()) {
-              val item = items.getString(countArray)
-              item?.let { itemValue ->
+              items.getString(countArray)?.let { itemValue ->
                 valueIndexProperties.add(ValueIndexItem.property(itemValue))
               }
             }
@@ -135,11 +133,9 @@ object DataAdapter {
         }
       } else {
         for (countValue in 0 until ip.size()) {
-          val arItems = ip.getArray(countValue)
-          arItems?.let { items ->
+          ip.getArray(countValue)?.let { items ->
             for (countArray in 0 until items.size()) {
-              val item = items.getString(countArray)
-              item?.let { itemValue ->
+              items.getString(countArray)?.let { itemValue ->
                 fullTextIndexProperties.add(FullTextIndexItem.property(itemValue))
               }
             }
