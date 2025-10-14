@@ -1,6 +1,6 @@
 {
   "name": "cbl-reactnative",
-  "version": "0.6.1",
+  "version": "0.6.3",
   "description": "Couchbase Lite Enterprise for React Native",
   "author": "Dev Experience/Ecosystem Team @ Couchbase",
   "license": "Apache-2.0",
@@ -114,17 +114,22 @@
   "release-it": {
     "git": {
       "commitMessage": "chore: release ${version}",
-      "tagName": "v${version}"
+      "tagName": "v${version}",
+      "push": false,
+      "requireCleanWorkingDir": false
     },
     "npm": {
       "publish": true
     },
     "github": {
-      "release": true
+      "release": false
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": "angular"
+        "preset": {
+          "name": "conventionalcommits"
+        },
+        "infile": "CHANGELOG.md"
       }
     }
   },
