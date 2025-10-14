@@ -1,6 +1,6 @@
 {
   "name": "cbl-reactnative",
-  "version": "0.6.1",
+  "version": "0.6.3",
   "description": "Couchbase Lite Enterprise for React Native",
   "author": "Dev Experience/Ecosystem Team @ Couchbase",
   "license": "Apache-2.0",
