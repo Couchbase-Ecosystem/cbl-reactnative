@@ -47,6 +47,10 @@ import {
   ScopeArgs,
   ScopesResult,
   DocumentGetBlobContentArgs,
+  URLEndpointListenerCreateArgs,
+  URLEndpointListenerArgs,
+  URLEndpointListenerTLSIdentityArgs,
+  URLEndpointListenerStatus,
 } from './cblite-js/cblite/core-types';
 
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
@@ -1473,6 +1477,41 @@ export class CblReactNativeEngine implements ICoreEngine {
         }
       );
     });
+  }
+
+  URLEndpointListener_createListener(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerCreateArgs
+  ): Promise<{ listenerId: string }> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_startListener(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerArgs
+  ): Promise<void> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_stopListener(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerArgs
+  ): Promise<void> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_getStatus(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerArgs
+  ): Promise<URLEndpointListenerStatus> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_deleteIdentity(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerTLSIdentityArgs
+  ): Promise<void> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
   }
 
   getUUID(): string {
