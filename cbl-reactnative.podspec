@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/Couchbase-Ecosystem/cbl-reactnative", :tag => "#{s.version}" }
 
   s.swift_version = '5.5'
-  s.dependency 'CouchbaseLite-Swift-Enterprise', '3.2.1'
+  s.dependency 'CouchbaseLite-Swift-Enterprise', '3.3.0'
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
   # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
