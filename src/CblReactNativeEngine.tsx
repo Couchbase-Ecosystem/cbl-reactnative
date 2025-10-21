@@ -84,6 +84,9 @@ export class CblReactNativeEngine implements ICoreEngine {
   private _isReplicatorDocumentChangeEventSetup: boolean = false;
 
   private _collectionChangeListeners: Map<string, ListenerCallback> = new Map();
+  private _collectionDocumentChangeListeners: Map<string, ListenerCallback> =
+    new Map();
+
   private _queryChangeListeners: Map<string, ListenerCallback> = new Map();
 
   private static readonly LINKING_ERROR =
@@ -193,7 +196,7 @@ export class CblReactNativeEngine implements ICoreEngine {
     return new Promise((resolve, reject) => {
       const token = args.changeListenerToken;
 
-      if (this._collectionChangeListeners.has(token)) {
+      if (this._collectionDocumentChangeListeners.has(token)) {
         reject(new Error('Document change listener token already exists'));
         return;
       }
@@ -212,7 +215,7 @@ export class CblReactNativeEngine implements ICoreEngine {
       );
 
       this._emitterSubscriptions.set(token, subscription);
-      this._collectionChangeListeners.set(token, lcb);
+      this._collectionDocumentChangeListeners.set(token, lcb);
 
       this.CblReactNative.collection_AddDocumentChangeListener(
         token,
@@ -225,7 +228,7 @@ export class CblReactNativeEngine implements ICoreEngine {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (error: any) => {
           this._emitterSubscriptions.delete(token);
-          this._collectionChangeListeners.delete(token);
+          this._collectionDocumentChangeListeners.delete(token);
           subscription.remove();
           reject(error);
         }
@@ -574,8 +577,8 @@ export class CblReactNativeEngine implements ICoreEngine {
       }
 
       // Remove the listener from the document listeners map
-      if (this._collectionChangeListeners.has(token)) {
-        this._collectionChangeListeners.delete(token);
+      if (this._collectionDocumentChangeListeners.has(token)) {
+        this._collectionDocumentChangeListeners.delete(token);
       } else {
         reject(new Error(`No document listener found with token: ${token}`));
         return;

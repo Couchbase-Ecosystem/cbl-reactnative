@@ -49,6 +49,21 @@ export function useTestsNavigationSections() {
           title: 'Testing Tests',
           path: '/tests/testing',
         },
+        // {
+        //   id: 11,
+        //   title: 'Custom Bug Testing',
+        //   path: '/tests/custom-bug-fixes',
+        // },
+        {
+          id: 11,
+          title: 'Collection Change Listener',
+          path: '/tests/collection-change-listener',
+        },
+        {
+          id: 12,
+          title: 'Document Change Listener',
+          path: '/tests/document-change-listener',
+        },
       ],
     },
   ];

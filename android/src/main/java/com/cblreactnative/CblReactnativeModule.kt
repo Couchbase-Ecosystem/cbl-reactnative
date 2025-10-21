@@ -33,6 +33,7 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   private val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
   private val replicatorDocumentListeners: MutableMap<String, ListenerToken> = mutableMapOf()
   private val collectionChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  private val collectionDocumentChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
 
   init {
     CouchbaseLite.init(context, true)
@@ -644,6 +645,7 @@ fun collection_RemoveChangeListener(
 ) {
   GlobalScope.launch(Dispatchers.IO) {
     try {
+      // Check for collection change listeners
       if (collectionChangeListeners.containsKey(changeListenerToken)) {
         val listener = collectionChangeListeners[changeListenerToken]
         listener?.remove()
@@ -651,10 +653,23 @@ fun collection_RemoveChangeListener(
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
-      } else {
+        return@launch
+      }
+      
+      // Check for document change listeners
+      if (collectionDocumentChangeListeners.containsKey(changeListenerToken)) {
+        val listener = collectionDocumentChangeListeners[changeListenerToken]
+        listener?.remove()
+        collectionDocumentChangeListeners.remove(changeListenerToken)
         context.runOnUiQueueThread {
-          promise.reject("COLLECTION_ERROR", "No such listener found with token $changeListenerToken")
+          promise.resolve(null)
         }
+        return@launch
+      }
+      
+      // No listener found
+      context.runOnUiQueueThread {
+        promise.reject("COLLECTION_ERROR", "No such listener found with token $changeListenerToken")
       }
     } catch (e: Throwable) {
       context.runOnUiQueueThread {
@@ -700,7 +715,7 @@ fun collection_AddDocumentChangeListener(
         }
       }
       
-      collectionChangeListeners[changeListenerToken] = listener
+      collectionDocumentChangeListeners[changeListenerToken] = listener
       context.runOnUiQueueThread {
         promise.resolve(null)
       }
