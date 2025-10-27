@@ -64,6 +64,16 @@ export function useTestsNavigationSections() {
           title: 'Document Change Listener',
           path: '/tests/document-change-listener',
         },
+        {
+          id: 13,
+          title: 'Live Query',
+          path: '/tests/live-query-listeners',
+        },
+        {
+          id: 14,
+          title: 'Replicator Listeners',
+          path: '/tests/replicator-listeners',
+        },
       ],
     },
   ];
