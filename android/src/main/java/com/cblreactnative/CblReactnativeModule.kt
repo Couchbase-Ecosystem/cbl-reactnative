@@ -336,6 +336,32 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
+  fun collection_GetFullName(
+    collectionName: String,
+    name: String,
+    scopeName: String,
+    promise: Promise
+  ) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        if (!DataValidation.validateCollection(collectionName, scopeName, name, promise)) {
+          return@launch
+        }
+        val fullName = CollectionManager.fullName(collectionName, scopeName, name)
+        val map = Arguments.createMap()
+        map.putString("fullName", fullName)
+        context.runOnUiQueueThread {
+          promise.resolve(map)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("DATABASE_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
   fun collection_GetDefault(
     name: String,
     promise: Promise

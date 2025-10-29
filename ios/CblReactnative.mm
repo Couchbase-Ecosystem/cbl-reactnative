@@ -108,6 +108,14 @@ RCT_EXTERN_METHOD(collection_GetCount:
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(collection_GetFullName: 
+  (NSString *) collectionName
+  fromDatabaseWithName: (NSString *) name
+  fromScopeWithName: (NSString *) scopeName
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
 RCT_EXTERN_METHOD(collection_GetDefault:
   (NSString *)name
   withResolver:(RCTPromiseResolveBlock)resolve

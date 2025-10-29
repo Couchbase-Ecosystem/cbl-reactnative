@@ -57,7 +57,8 @@ class CblReactnative: RCTEventEmitter {
      return false
    }
   
-  // MARK: - Collection Functions
+
+
   @objc(collection_AddChangeListener:fromCollectionWithName:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
   func collection_AddChangeListener(
     changeListenerToken: NSString,
@@ -469,6 +470,49 @@ class CblReactnative: RCTEventEmitter {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
     }
+  }
+
+    // MARK: - Collection Functions
+
+
+  // this function will get full name from database
+  @objc(collection_GetFullName:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
+  func collection_GetFullName(
+    collectionName: NSString,
+    name: NSString,
+    scopeName: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ){
+    logger.debug("::SWIFT DEBUG:: collection_GetFullName: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
+
+    let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+
+    if(isError){
+      logger.error("::SWIFT DEBUG:: collection_GetFullName: error parsing arguments")
+      return
+    }
+
+    backgroundQueue.async {
+      do{
+          self.logger.debug("::SWIFT DEBUG:: collection_GetFullName: getting fullName")
+
+          let fullName = try CollectionManager.shared.fullName(args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName)
+          self.logger.debug("::SWIFT DEBUG:: collection_GetFullName: fullName retrieved - equal to \(fullName)")
+
+          let dict:NSDictionary = ["fullName": fullName]
+
+          resolve(dict)
+
+          self.logger.debug("::SWIFT DEBUG:: collection_GetFullName: returned \(dict)")
+      }
+      catch let error as NSError {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      } catch {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      }
+    }
+
   }
   
   

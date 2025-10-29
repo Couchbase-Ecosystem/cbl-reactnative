@@ -24,8 +24,9 @@ export default function DocumentEditorScreen() {
         document !== null &&
         doc.getId() === documentId
       ) {
+        const fullName = await collection.fullName();
         return [
-          `Document <${documentId}> saved in Collection <${collection.fullName()}> Database <${collection.database.getName()}>`,
+          `Document <${documentId}> saved in Collection <${fullName}> Database <${collection.database.getName()}>`,
         ];
       } else {
         return ['Error: Document could not be saved'];

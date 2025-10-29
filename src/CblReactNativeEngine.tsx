@@ -422,6 +422,31 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
+  async collection_GetFullName(
+    args: CollectionArgs
+  ): Promise<{ fullName: string }> {
+    this.debugLog(
+      `::DEBUG:: collection_GetFullName: ${args.collectionName} ${args.name} ${args.scopeName}`
+    );
+
+    try {
+      const result = await this.CblReactNative.collection_GetFullName(
+        args.collectionName,
+        args.name,
+        args.scopeName
+      );
+
+      this.debugLog(
+        `::DEBUG:: collection_GetFullName completed with result: ${JSON.stringify(result)}`
+      );
+
+      return result;
+    } catch (error: unknown) {
+      this.debugLog(`::DEBUG:: collection_GetFullName Error: ${error}`);
+      throw error; // Re-throw to maintain error propagation
+    }
+  }
+
   collection_GetDefault(args: DatabaseArgs): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetDefault(args.name).then(
