@@ -145,7 +145,11 @@ export class CblReactNativeEngine implements ICoreEngine {
         const callback = this.customLogCallbacksMap.get(data.token);
 
         if (callback) {
-          callback(data.level as LogLevel, data.domain as LogDomain, data.message);
+          callback(
+            data.level as LogLevel,
+            data.domain as LogDomain,
+            data.message
+          );
         }
       }
     );
