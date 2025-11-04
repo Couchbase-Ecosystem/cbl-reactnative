@@ -39,5 +39,26 @@ export function useDatabaseNavigationSections() {
         { id: 11, title: 'Set File', path: '/database/logging/file' },
       ],
     },
+    {
+      title: 'LogSinks API (New)',
+      icon: 'alpha-l-box',
+      data: [
+        {
+          id: 12,
+          title: 'Console LogSink',
+          path: '/logsinks/console',
+        },
+        { 
+          id: 13, 
+          title: 'File LogSink', 
+          path: '/logsinks/file' 
+        },
+        { 
+          id: 14, 
+          title: 'Custom LogSink', 
+          path: '/logsinks/custom' 
+        },
+      ],
+    },
   ];
 }

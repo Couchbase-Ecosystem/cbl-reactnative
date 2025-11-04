@@ -74,6 +74,11 @@ export function useTestsNavigationSections() {
           title: 'Replicator Listeners',
           path: '/tests/replicator-listeners',
         },
+        {
+          id: 15,
+          title: 'Log Sink Console Logs',
+          path: '/tests/console-logging',
+        },
       ],
     },
   ];

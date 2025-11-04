@@ -242,6 +242,27 @@ RCT_EXTERN_METHOD(database_SetLogLevel:(NSString *)domain
     withResolver:(RCTPromiseResolveBlock)resolve
     withRejecter:(RCTPromiseRejectBlock)reject)
 
+// MARK: - LogSinks Functions
+
+RCT_EXTERN_METHOD(logsinks_SetConsole:
+    (NSNumber *)level
+    withDomains:(NSArray *)domains
+    withResolver:(RCTPromiseResolveBlock)resolve
+    withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(logsinks_SetFile:
+    (NSNumber *)level
+    withConfig:(NSDictionary *)config
+    withResolver:(RCTPromiseResolveBlock)resolve
+    withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(logsinks_SetCustom:
+    (NSNumber *)level
+    withDomains:(NSArray *)domains
+    withToken:(NSString *)token
+    withResolver:(RCTPromiseResolveBlock)resolve
+    withRejecter:(RCTPromiseRejectBlock)reject)
+
 // MARK: - SQL++ Query Functions
 
 RCT_EXTERN_METHOD(query_AddChangeListener:

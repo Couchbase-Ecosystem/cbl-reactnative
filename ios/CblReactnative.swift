@@ -40,13 +40,15 @@ class CblReactnative: RCTEventEmitter {
   let kQueryChange = "queryChange"
   let kReplicatorStatusChange = "replicatorStatusChange"
   let kReplicatorDocumentChange = "replicatorDocumentChange"
+  let kCustomLogMessage = "customLogMessage"
   
   override func supportedEvents() -> [String]! {
     return [kCollectionChange,
             kCollectionDocumentChange,
             kQueryChange,
             kReplicatorStatusChange,
-            kReplicatorDocumentChange]
+            kReplicatorDocumentChange,
+            kCustomLogMessage]
     }
   
    @objc override static func moduleName() -> String! {
@@ -1693,7 +1695,130 @@ func replicator_AddDocumentChangeListener(
       }
     }
   }
+
+
+  ////////// LOG SINKS START
+
+  @objc(logsinks_SetConsole:withDomains:withResolver:withRejecter:)
+  func logsinks_SetConsole(
+    level: NSNumber?,
+    domains: [String]?,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ){
+    backgroundQueue.async {
+    do{
+      // convert NSNumber? to Int?
+      let intLevel = level?.intValue
+      try LogSinksManager.shared.setConsoleSink(level: intLevel, domains: domains)
+      resolve(nil)
+    }
+    catch let error as NSError {
+        reject("LOGSINKS_ERROR", error.localizedDescription, error)
+      } catch {
+        reject("LOGSINKS_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+
+  @objc(logsinks_SetFile:withConfig:withResolver:withRejecter:)
+  func logsinks_SetFile(
+    level: NSNumber?,
+    config: NSDictionary?,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ){
+    backgroundQueue.async {
+      do{
+        // Convert NSNumber? to Int?
+        let intLevel = level?.intValue
+        // Convert NSDictionary? to [String: Any]?
+        let configDict = config as? [String: Any]
+
+        try LogSinksManager.shared.setFileSink(
+          level: intLevel,
+          config: configDict,
+        )
+
+        resolve(nil)
+      }
+      catch let error as NSError {
+        reject("LOGSINKS_ERROR", error.localizedDescription, error)
+      } catch {
+        reject("LOGSINKS_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+
+
+  @objc(logsinks_SetCustom:withDomains:withToken:withResolver:withRejecter:)
+  func logsinks_SetCustom(
+    level: NSNumber?,
+    domains: [String]?,
+    token: String?,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    backgroundQueue.async {
+      do {
+        // Convert NSNumber? to Int?
+        let intLevel = level?.intValue
+        
+        // Create callback closure only if we have level and token (means enable, not disable)
+        let callback: ((LogLevel, LogDomain, String) -> Void)? = 
+          (intLevel != nil && token != nil) ? { [weak self] logLevel, logDomain, message in
+            guard let self = self else { return }
+            // Convert Swift types back to JavaScript-friendly types
+            let eventData: [String: Any] = [
+              "token": token!,
+              "level": logLevel.rawValue,
+              "domain": self.logDomainToString(logDomain),
+              "message": message
+            ]
+            
+            // Send event to JavaScript
+            self.sendEvent(withName: self.kCustomLogMessage, body: eventData)
+          } : nil
+        
+        try LogSinksManager.shared.setCustomSink(
+          level: intLevel,
+          domains: domains,
+          callback: callback
+        )
+        resolve(nil)
+      } catch let error as NSError {
+        reject("LOGSINKS_ERROR", error.localizedDescription, error)
+      } catch {
+        reject("LOGSINKS_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+
+//// LOG SINKS HELPER FUNCTIONS
+    private func logDomainToString(_ domain: LogDomain) -> String {
+      switch domain {
+    case .database:
+      return "DATABASE"
+    case .query:
+      return "QUERY"
+    case .replicator:
+      return "REPLICATOR"
+    case .network:
+      return "NETWORK"
+    case .listener:
+      return "LISTENER"
+    default:
+      return "UNKNOWN"
+    }
+    }
+
+  ////////// LOG SINKS END
+
 }
+
 
 extension Notification.Name {
   static let collectionChange = Notification.Name("collectionChange")
