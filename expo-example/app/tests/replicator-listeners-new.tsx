@@ -8,7 +8,8 @@ import {
   ReplicatorConfiguration,
   URLEndpoint,
   BasicAuthenticator,
-  MutableDocument
+  MutableDocument,
+  CollectionConfiguration
 } from 'cbl-reactnative';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
@@ -61,12 +62,18 @@ export default function ReplicatorListenersScreen() {
       }
 
       const endpoint = new URLEndpoint(SYNC_GATEWAY_URL);
-      const replicatorConfig = new ReplicatorConfiguration(endpoint);
+
+      //Create CollectionConfiguration
+      const collectionConfig = new CollectionConfiguration(defaultCollection);
+
+      const listOfCollectionConfig = [collectionConfig]
+
+      // Pass array of configs and endpoint to constructor
+      const replicatorConfig = new ReplicatorConfiguration(listOfCollectionConfig , endpoint);
       
       replicatorConfig.setAuthenticator(new BasicAuthenticator(USERNAME, PASSWORD));
       replicatorConfig.setContinuous(true);
       replicatorConfig.setAcceptOnlySelfSignedCerts(false);  
-      replicatorConfig.addCollection(defaultCollection);
       
       const replicator = await Replicator.create(replicatorConfig);
       setReplicator(replicator);

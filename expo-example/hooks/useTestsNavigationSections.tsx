@@ -45,15 +45,15 @@ export function useTestsNavigationSections() {
           path: '/tests/replication',
         },
         {
+          id: 9.5,
+          title: 'Replicator (NEW)',
+          path: '/tests/replication-new',
+        },
+        {
           id: 10,
           title: 'Testing Tests',
           path: '/tests/testing',
         },
-        // {
-        //   id: 11,
-        //   title: 'Custom Bug Testing',
-        //   path: '/tests/custom-bug-fixes',
-        // },
         {
           id: 11,
           title: 'Collection Change Listener',
@@ -71,8 +71,18 @@ export function useTestsNavigationSections() {
         },
         {
           id: 14,
-          title: 'Replicator Listeners',
-          path: '/tests/replicator-listeners',
+          title: 'Replicator Listeners (NEW API)',
+          path: '/tests/replicator-listeners-new',
+        },
+        {
+          id: 15,
+          title: 'Replicator Listeners (OLD API)',
+          path: '/tests/replicator-listeners-old',
+        },
+        {
+          id: 16,
+          title: 'Custom Bug Testing',
+          path: '/tests/custom-bug-fix',
         },
       ],
     },

@@ -1400,6 +1400,34 @@ func replicator_AddDocumentChangeListener(
       }
     }
   
+  /// **[DUAL API SUPPORT]** Creates a replicator from React Native configuration
+  ///
+  /// **What it does:**
+  /// - Receives replicator configuration from JavaScript layer
+  /// - Automatically detects NEW or OLD API format
+  /// - Creates and registers a new replicator instance
+  /// - Returns unique replicator ID for future operations
+  ///
+  /// **Parameters (from React Native):**
+  /// - `config`: NSDictionary containing:
+  ///   - `collectionConfig`: JSON string (NEW or OLD format)
+  ///   - All other replicator settings (target, type, continuous, etc.)
+  ///
+  /// **NEW API Format:**
+  /// ```json
+  /// "[{\"collection\":{\"name\":\"users\",...},\"config\":{\"channels\":[\"public\"]}}]"
+  /// ```
+  ///
+  /// **OLD API Format:**
+  /// ```json
+  /// "[{\"collections\":[{\"collection\":{\"name\":\"users\",...}}],\"config\":{...}}]"
+  /// ```
+  ///
+  /// **Returns (via resolve):**
+  /// - `NSDictionary`: `["replicatorId": "UUID-STRING"]`
+  ///
+  /// **Errors (via reject):**
+  /// - "REPLICATOR_ERROR": If parsing fails, collection not found, or invalid config
   @objc(replicator_Create:withResolver:withRejecter:)
   func replicator_Create(
     config: NSDictionary,
@@ -1413,16 +1441,13 @@ func replicator_AddDocumentChangeListener(
       }
       backgroundQueue.async {
         do {
-          if let data = collectionConfigJson.data(using: .utf8){
-            let decoder: JSONDecoder = JSONDecoder()
-            let collectionConfig = try decoder.decode([CollectionConfigItem].self, from: data)
-            let replicatorId = try ReplicatorManager.shared.replicator(repConfig, collectionConfiguration:collectionConfig)
-            let dict:NSDictionary = [
-              "replicatorId": replicatorId]
-            resolve(dict)
-          } else {
-            reject("REPLICATOR_ERROR", "couldn't deserialize replicator config, is config proper JSON string formatted?", nil)
-          }
+          // Pass JSON string to ReplicatorManager - it will auto-detect format
+          let replicatorId = try ReplicatorManager.shared.replicator(
+            repConfig,
+            collectionConfigJson: collectionConfigJson
+          )
+          let dict:NSDictionary = ["replicatorId": replicatorId]
+          resolve(dict)
         } catch let error as NSError {
           reject("REPLICATOR_ERROR", error.localizedDescription, nil)
         } catch {
