@@ -87,7 +87,7 @@ export default function CollectionChangeListenerScreen() {
 
   const stopCollectionChangeListenerOldAPI = async () => {
     try{
-      if (collection && token) {
+      if (collection) {
         if (token) {
           // old api
           await collection.removeChangeListener(token);

@@ -93,7 +93,7 @@ export default function DocumentChangeListenerScreen() {
 
   const stopDocumentChangeListenerOldApi = async () => {
     try{
-      if (collection && token) {
+      if (collection) {
         if (token) {
           await collection.removeDocumentChangeListener(token);
           setToken(null);
