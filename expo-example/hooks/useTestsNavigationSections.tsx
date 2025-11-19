@@ -50,7 +50,7 @@ export function useTestsNavigationSections() {
           path: '/tests/listener',
         },
         {
-          id: 10,
+          id: 11,
           title: 'Testing Tests',
           path: '/tests/testing',
         },
@@ -60,22 +60,22 @@ export function useTestsNavigationSections() {
         //   path: '/tests/custom-bug-fixes',
         // },
         {
-          id: 11,
+          id: 12,
           title: 'Collection Change Listener',
           path: '/tests/collection-change-listener',
         },
         {
-          id: 12,
+          id: 13,
           title: 'Document Change Listener',
           path: '/tests/document-change-listener',
         },
         {
-          id: 13,
+          id: 14,
           title: 'Live Query',
           path: '/tests/live-query-listeners',
         },
         {
-          id: 14,
+          id: 15,
           title: 'Replicator Listeners',
           path: '/tests/replicator-listeners',
         },

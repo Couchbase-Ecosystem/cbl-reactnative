@@ -741,11 +741,6 @@ fun listenerToken_Remove(
         // Remove from our unified storage
         allChangeListenerTokenByUuid.remove(changeListenerToken)
         
-        android.util.Log.d(
-          "CblReactnative",
-          "::KOTLIN DEBUG:: listenerToken_Remove: Removed ${listenerRecord.listenerType} listener with token $changeListenerToken"
-        )
-        
         context.runOnUiQueueThread {
           promise.resolve(null)
         }

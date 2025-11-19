@@ -11,7 +11,7 @@ export default function TestsListenerScreen() {
       return [''];
     } catch (e) {
       // @ts-ignore
-      return [error.message];
+      return [e.message];
     }
   }
 
