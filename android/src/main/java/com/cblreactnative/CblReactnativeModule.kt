@@ -22,6 +22,35 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
+/**
+ * Enum representing the type of listener.
+ * 
+ * This allows us to identify what kind of listener a token represents,
+ * useful for debugging and filtering.
+ */
+enum class ChangeListenerType {
+  COLLECTION,
+  COLLECTION_DOCUMENT,
+  QUERY,
+  REPLICATOR,
+  REPLICATOR_DOCUMENT
+}
+
+/**
+ * Metadata for storing listener information in unified dictionary.
+ * 
+ * This data class wraps the native ListenerToken along with its type.
+ * When adding a listener, we store both the token and its type.
+ * When removing a listener, we look up by UUID and get both back.
+ * 
+ * This eliminates the need to pass the type when removing - it's
+ * already stored in the metadata!
+ */
+data class ChangeListenerRecord(
+  val nativeListenerToken: ListenerToken,
+  val listenerType: ChangeListenerType
+)
+
 @OptIn(DelicateCoroutinesApi::class)
 @Suppress("FunctionName")
 class CblReactnativeModule(reactContext: ReactApplicationContext) :
@@ -29,11 +58,19 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
 
   // Property to hold the context
   private val context: ReactApplicationContext = reactContext
-  private val queryChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
-  private val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
-  private val replicatorDocumentListeners: MutableMap<String, ListenerToken> = mutableMapOf()
-  private val collectionChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
-  private val collectionDocumentChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  // private val queryChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  // private val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  // private val replicatorDocumentListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  // private val collectionChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+  // private val collectionDocumentChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+
+     
+    /**
+    * Unified storage for all listener tokens.
+    * Maps UUID token string to ChangeListenerRecord (which contains native token + type)
+    */
+    private val allChangeListenerTokenByUuid: MutableMap<String, ChangeListenerRecord> = mutableMapOf()
+  
 
   init {
     CouchbaseLite.init(context, true)
@@ -652,7 +689,17 @@ fun collection_AddChangeListener(
           sendEvent(context, "collectionChange", resultMap)
         }
       }
-      collectionChangeListeners[changeListenerToken] = listener
+      
+
+      // Earlier we were adding the listener to the collectionChangeListeners dictionary
+      // collectionChangeListeners[changeListenerToken] = listener
+
+      // Store in unified dictionary with type
+      allChangeListenerTokenByUuid[changeListenerToken] = ChangeListenerRecord(
+        nativeListenerToken = listener,
+        listenerType = ChangeListenerType.COLLECTION
+      )
+
       context.runOnUiQueueThread {
         promise.resolve(null)
       }
@@ -669,37 +716,93 @@ fun collection_RemoveChangeListener(
   changeListenerToken: String,
   promise: Promise
 ) {
+  // Delegate to unified listener removal
+  listenerToken_Remove(changeListenerToken, promise)
+  
+  // Old implementation (commented out for reference)
+  // GlobalScope.launch(Dispatchers.IO) {
+  //   try {
+  //     // Check for collection change listeners
+  //     if (collectionChangeListeners.containsKey(changeListenerToken)) {
+  //       val listener = collectionChangeListeners[changeListenerToken]
+  //       listener?.remove()
+  //       collectionChangeListeners.remove(changeListenerToken)
+  //       context.runOnUiQueueThread {
+  //         promise.resolve(null)
+  //       }
+  //       return@launch
+  //     }
+  //     
+  //     // Check for document change listeners
+  //     if (collectionDocumentChangeListeners.containsKey(changeListenerToken)) {
+  //       val listener = collectionDocumentChangeListeners[changeListenerToken]
+  //       listener?.remove()
+  //       collectionDocumentChangeListeners.remove(changeListenerToken)
+  //       context.runOnUiQueueThread {
+  //         promise.resolve(null)
+  //       }
+  //       return@launch
+  //     }
+  //     
+  //     // No listener found
+  //     context.runOnUiQueueThread {
+  //       promise.reject("COLLECTION_ERROR", "No such listener found with token $changeListenerToken")
+  //     }
+  //   } catch (e: Throwable) {
+  //     context.runOnUiQueueThread {
+  //       promise.reject("COLLECTION_ERROR", e.message)
+  //     }
+  //   }
+  // }
+}
+
+/**
+ * Generic method to remove any listener by its UUID token.
+ * 
+ * This is the unified removal method that works for all listener types:
+ * - Collection change listeners
+ * - Collection document change listeners
+ * - Query change listeners
+ * - Replicator status change listeners
+ * - Replicator document change listeners
+ * 
+ * The method looks up the listener by UUID in the unified storage,
+ * retrieves both the native token and its type, and removes it.
+ */
+@ReactMethod
+fun listenerToken_Remove(
+  changeListenerToken: String,
+  promise: Promise
+) {
   GlobalScope.launch(Dispatchers.IO) {
     try {
-      // Check for collection change listeners
-      if (collectionChangeListeners.containsKey(changeListenerToken)) {
-        val listener = collectionChangeListeners[changeListenerToken]
-        listener?.remove()
-        collectionChangeListeners.remove(changeListenerToken)
+      val listenerRecord = allChangeListenerTokenByUuid[changeListenerToken]
+      
+      if (listenerRecord != null) {
+        // Remove the listener using the native token
+        listenerRecord.nativeListenerToken.remove()
+        
+        // Remove from our unified storage
+        allChangeListenerTokenByUuid.remove(changeListenerToken)
+        
+        android.util.Log.d(
+          "CblReactnative",
+          "::KOTLIN DEBUG:: listenerToken_Remove: Removed ${listenerRecord.listenerType} listener with token $changeListenerToken"
+        )
+        
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
-        return@launch
-      }
-      
-      // Check for document change listeners
-      if (collectionDocumentChangeListeners.containsKey(changeListenerToken)) {
-        val listener = collectionDocumentChangeListeners[changeListenerToken]
-        listener?.remove()
-        collectionDocumentChangeListeners.remove(changeListenerToken)
+      } else {
+        val errorMsg = "No listener found for token $changeListenerToken"
+        android.util.Log.e("CblReactnative", "::KOTLIN DEBUG:: listenerToken_Remove: $errorMsg")
         context.runOnUiQueueThread {
-          promise.resolve(null)
+          promise.reject("LISTENER_ERROR", errorMsg)
         }
-        return@launch
-      }
-      
-      // No listener found
-      context.runOnUiQueueThread {
-        promise.reject("COLLECTION_ERROR", "No such listener found with token $changeListenerToken")
       }
     } catch (e: Throwable) {
       context.runOnUiQueueThread {
-        promise.reject("COLLECTION_ERROR", e.message)
+        promise.reject("LISTENER_ERROR", e.message)
       }
     }
   }
@@ -741,7 +844,16 @@ fun collection_AddDocumentChangeListener(
         }
       }
       
-      collectionDocumentChangeListeners[changeListenerToken] = listener
+      // Earlier we were adding the listener to the collectionDocumentChangeListeners dictionary
+      // collectionDocumentChangeListeners[changeListenerToken] = listener
+
+      // Store in unified dictionary with type
+      allChangeListenerTokenByUuid[changeListenerToken] = ChangeListenerRecord(
+        nativeListenerToken = listener,
+        listenerType = ChangeListenerType.COLLECTION_DOCUMENT
+      )
+
+
       context.runOnUiQueueThread {
         promise.resolve(null)
       }
@@ -1161,7 +1273,16 @@ fun collection_AddDocumentChangeListener(
             sendEvent(context, "queryChange", resultMap)
           }
         }
-        queryChangeListeners[changeListenerToken] = listener
+        
+        // Earlier we were adding the listener to the queryChangeListeners dictionary
+        // queryChangeListeners[changeListenerToken] = listener
+
+        // Store in unified dictionary with type
+        allChangeListenerTokenByUuid[changeListenerToken] = ChangeListenerRecord(
+          nativeListenerToken = listener,
+          listenerType = ChangeListenerType.QUERY
+        )
+
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
@@ -1178,26 +1299,30 @@ fun query_RemoveChangeListener(
   changeListenerToken: String,
   promise: Promise
 ) {
-  GlobalScope.launch(Dispatchers.IO) {
-    try {
-      if (queryChangeListeners.containsKey(changeListenerToken)) {
-        val listener = queryChangeListeners[changeListenerToken]
-        listener?.remove()
-        queryChangeListeners.remove(changeListenerToken)
-        context.runOnUiQueueThread {
-          promise.resolve(null)
-        }
-      } else {
-        context.runOnUiQueueThread {
-          promise.reject("QUERY_ERROR", "No query listener found for token $changeListenerToken")
-        }
-      }
-    } catch (e: Throwable) {
-      context.runOnUiQueueThread {
-        promise.reject("QUERY_ERROR", e.message)
-      }
-    }
-  }
+  // Delegate to unified listener removal
+  listenerToken_Remove(changeListenerToken, promise)
+  
+  // Old implementation (commented out for reference)
+  // GlobalScope.launch(Dispatchers.IO) {
+  //   try {
+  //     if (queryChangeListeners.containsKey(changeListenerToken)) {
+  //       val listener = queryChangeListeners[changeListenerToken]
+  //       listener?.remove()
+  //       queryChangeListeners.remove(changeListenerToken)
+  //       context.runOnUiQueueThread {
+  //         promise.resolve(null)
+  //       }
+  //     } else {
+  //       context.runOnUiQueueThread {
+  //         promise.reject("QUERY_ERROR", "No query listener found for token $changeListenerToken")
+  //       }
+  //     }
+  //   } catch (e: Throwable) {
+  //     context.runOnUiQueueThread {
+  //       promise.reject("QUERY_ERROR", e.message)
+  //     }
+  //   }
+  // }
 }
 
   // Replicator Functions
@@ -1222,7 +1347,14 @@ fun replicator_AddChangeListener(
         }
       }
       listener?.let {
-        replicatorChangeListeners[changeListenerToken] = it
+        // Earlier we were adding the listener to the replicatorChangeListeners dictionary
+        // replicatorChangeListeners[changeListenerToken] = it
+        
+        // Store in unified dictionary with type
+        allChangeListenerTokenByUuid[changeListenerToken] = ChangeListenerRecord(
+          nativeListenerToken = it,
+          listenerType = ChangeListenerType.REPLICATOR
+        )
       }
       context.runOnUiQueueThread {
         promise.resolve(null)
@@ -1256,7 +1388,14 @@ fun replicator_AddDocumentChangeListener(
         }
       }
       listener?.let {
-        replicatorDocumentListeners[changeListenerToken] = it
+        // Earlier we were adding the listener to the replicatorDocumentListeners dictionary
+        // replicatorDocumentListeners[changeListenerToken] = it
+        
+        // Store in unified dictionary with type
+        allChangeListenerTokenByUuid[changeListenerToken] = ChangeListenerRecord(
+          nativeListenerToken = it,
+          listenerType = ChangeListenerType.REPLICATOR_DOCUMENT
+        )
       }
       context.runOnUiQueueThread {
         promise.resolve(null)
@@ -1396,44 +1535,49 @@ fun replicator_RemoveChangeListener(
   changeListenerToken: String,
   replicatorId: String,
   promise: Promise) {
-  GlobalScope.launch(Dispatchers.IO) {
-    try {
-      if (!DataValidation.validateReplicatorId(replicatorId, promise)){
-        return@launch
-      }
-
-      // Check for replicator change listeners
-      if (replicatorChangeListeners.containsKey(changeListenerToken)) {
-        val listener = replicatorChangeListeners[changeListenerToken]
-        listener?.remove()
-        replicatorChangeListeners.remove(changeListenerToken)
-        context.runOnUiQueueThread {
-          promise.resolve(null)
-        }
-        return@launch
-      }
-
-      // Check for document change listeners
-      if (replicatorDocumentListeners.containsKey(changeListenerToken)) {
-        val listener = replicatorDocumentListeners[changeListenerToken]
-        listener?.remove()
-        replicatorDocumentListeners.remove(changeListenerToken)
-        context.runOnUiQueueThread {
-          promise.resolve(null)
-        }
-        return@launch
-      }
-
-      // If no listener found
-      context.runOnUiQueueThread {
-        promise.reject("REPLICATOR_ERROR", "No such listener found with token $changeListenerToken")
-      }
-    } catch (e: Throwable) {
-      context.runOnUiQueueThread {
-        promise.reject("REPLICATOR_ERROR", e.message)
-      }
-    }
-  }
+  // Delegate to unified listener removal
+  // Note: replicatorId parameter is not used anymore but must remain in signature for compatibility
+  listenerToken_Remove(changeListenerToken, promise)
+  
+  // Old implementation (commented out for reference)
+  // GlobalScope.launch(Dispatchers.IO) {
+  //   try {
+  //     if (!DataValidation.validateReplicatorId(replicatorId, promise)){
+  //       return@launch
+  //     }
+  //
+  //     // Check for replicator change listeners
+  //     if (replicatorChangeListeners.containsKey(changeListenerToken)) {
+  //       val listener = replicatorChangeListeners[changeListenerToken]
+  //       listener?.remove()
+  //       replicatorChangeListeners.remove(changeListenerToken)
+  //       context.runOnUiQueueThread {
+  //         promise.resolve(null)
+  //       }
+  //       return@launch
+  //     }
+  //
+  //     // Check for document change listeners
+  //     if (replicatorDocumentListeners.containsKey(changeListenerToken)) {
+  //       val listener = replicatorDocumentListeners[changeListenerToken]
+  //       listener?.remove()
+  //       replicatorDocumentListeners.remove(changeListenerToken)
+  //       context.runOnUiQueueThread {
+  //         promise.resolve(null)
+  //       }
+  //       return@launch
+  //     }
+  //
+  //     // If no listener found
+  //     context.runOnUiQueueThread {
+  //       promise.reject("REPLICATOR_ERROR", "No such listener found with token $changeListenerToken")
+  //     }
+  //   } catch (e: Throwable) {
+  //     context.runOnUiQueueThread {
+  //       promise.reject("REPLICATOR_ERROR", e.message)
+  //     }
+  //   }
+  // }
 }
 
   @ReactMethod

@@ -3,6 +3,38 @@ import CouchbaseLiteSwift
 import os
 import React
 
+
+/**
+ * Metadata for storing listener information in unified dictionary.
+ * 
+ * This struct wraps the native ListenerToken along with its type.
+ * When adding a listener, we store both the token and its type.
+ * When removing a listener, we look up by UUID and get both back.
+ * 
+ * This eliminates the need to pass the type when removing - it's
+ * already stored in the metadata!
+ */
+struct ChangeListenerRecord{
+  let nativeListenerToken: ListenerToken
+  let listenerType: ChangeListenerType
+}
+
+
+/**
+ * Enum representing the type of listener.
+ * 
+ * This allows us to identify what kind of listener a token represents,
+ * useful for debugging and filtering.
+ */
+enum ChangeListenerType: String {
+  case collection
+  case collectionDocument
+  case query
+  case replicator
+  case replicatorDocument
+}
+
+
 @objc(
   CblReactnative
 )
@@ -10,14 +42,20 @@ class CblReactnative: RCTEventEmitter {
   
   // MARK: - Member Properties
   private var hasListeners = false
-  var databaseChangeListeners = [String: Any]()
-  
-  var collectionChangeListeners = [String: Any]()
-  var collectionDocumentChangeListeners = [String: Any]()
-  var queryChangeListeners = [String: Any]()
-  
-  var replicatorChangeListeners = [String: Any]()
-  var replicatorDocumentChangeListeners = [String: Any]()
+
+  // // earlier we were using separate dictionaries for each listener type
+  // var databaseChangeListeners = [String: Any]()
+  // var collectionChangeListeners = [String: Any]()
+  // var collectionDocumentChangeListeners = [String: Any]()
+  // var queryChangeListeners = [String: Any]()
+  // var replicatorChangeListeners = [String: Any]()
+  // var replicatorDocumentChangeListeners = [String: Any]()
+
+
+  /**
+ * Unified storage for all listener tokens.
+ */
+  var allChangeListenerTokenByUuid : [String: ChangeListenerRecord] = [:]
   
   var queryCount: Int = 0
   var replicatorCount: Int = 0
@@ -69,9 +107,9 @@ class CblReactnative: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
-    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isUuidTokenError, uuidToken) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
 
-    if isError || isTokenError {
+    if isError || isUuidTokenError {
       return
     }
 
@@ -91,7 +129,7 @@ class CblReactnative: RCTEventEmitter {
         
           // Format the data to match the CollectionChange interface
           let resultData = NSMutableDictionary()
-          resultData.setValue(token, forKey: "token")
+          resultData.setValue(uuidToken, forKey: "token")
           resultData.setValue(change.documentIDs, forKey: "documentIDs")
         
           // Use DataAdapter to convert the Collection to a consistent dictionary format
@@ -100,8 +138,12 @@ class CblReactnative: RCTEventEmitter {
       
           self.sendEvent(withName: self.kCollectionChange, body: resultData)
         }
-    
-        self.collectionChangeListeners[token] = listener
+
+        // // earlier we were adding the listner to the collectionChangeListeners dictionary
+        // self.collectionChangeListeners[uuidToken] = listener
+
+        // Store in unified dictionary with type
+        self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .collection)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -122,10 +164,10 @@ class CblReactnative: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
-    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isUuidTokenError, uuidToken) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
     let (isDocIdError, docId) = DataAdapter.shared.adaptNonEmptyString(value: documentId, propertyName: "documentId", reject: reject)
 
-    if isError || isTokenError || isDocIdError {
+    if isError || isUuidTokenError || isDocIdError {
       return
     }
 
@@ -144,7 +186,7 @@ class CblReactnative: RCTEventEmitter {
           guard let self = self else { return }
       
           let resultData = NSMutableDictionary()
-          resultData.setValue(token, forKey: "token")
+          resultData.setValue(uuidToken, forKey: "token")
           resultData.setValue(change.documentID, forKey: "documentId")
       
           let collectionDict = DataAdapter.shared.adaptCollectionToNSDictionary(collection, databaseName: args.databaseName)
@@ -154,8 +196,12 @@ class CblReactnative: RCTEventEmitter {
       
           self.sendEvent(withName: self.kCollectionDocumentChange, body: resultData)
         }
-    
-        self.collectionDocumentChangeListeners[token] = listener
+
+        // // earlier we were adding the listner to the collectionDocumentChangeListeners dictionary
+        // self.collectionDocumentChangeListeners[uuidToken] = listener
+
+        // Store in unified dictionary with type
+        self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .collectionDocument)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -172,28 +218,61 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    let token = String(changeListenerToken)
+
+    listenerToken_Remove(changeListenerToken: changeListenerToken, resolve: resolve, reject: reject)
+
+    // let uuidToken = String(changeListenerToken)
   
+    // backgroundQueue.async {
+    //   // Check for collection change listeners
+    //   if let listener = self.collectionChangeListeners[uuidToken] as? ListenerToken {
+    //     listener.remove()
+    //     self.collectionChangeListeners.removeValue(forKey: token)
+    //     resolve(nil)
+    //     return
+    //   }
+    
+    //   // Check for document change listeners
+    //   if let listener = self.collectionDocumentChangeListeners[token] as? ListenerToken {
+    //     listener.remove()
+    //     self.collectionDocumentChangeListeners.removeValue(forKey: token)
+    //     resolve(nil)
+    //     return
+    //   }
+    
+    //   // No listener found with this token
+    //   reject("DATABASE_ERROR", "No listener found for token \(token)", nil)
+    // }
+  }
+
+  @objc(listenerToken_Remove:withResolver:withRejecter:)
+  func listenerToken_Remove(
+    changeListenerToken: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+
+    let uuidToken = String(changeListenerToken)
     backgroundQueue.async {
-      // Check for collection change listeners
-      if let listener = self.collectionChangeListeners[token] as? ListenerToken {
-        listener.remove()
-        self.collectionChangeListeners.removeValue(forKey: token)
+      if let changeListenerTokenRecord = self.allChangeListenerTokenByUuid[uuidToken]{
+
+        // Removing the listener using the native token, basically calling token.remove()
+        changeListenerTokenRecord.nativeListenerToken.remove()
+
+        // removing reference of the token from our dictionary
+        self.allChangeListenerTokenByUuid.removeValue(forKey: uuidToken)
+
+        self.logger.debug("::SWIFT DEBUG:: listenerToken_Remove: Removed \(changeListenerTokenRecord.listenerType.rawValue) listener with token \(uuidToken)")
+
         resolve(nil)
-        return
       }
-    
-      // Check for document change listeners
-      if let listener = self.collectionDocumentChangeListeners[token] as? ListenerToken {
-        listener.remove()
-        self.collectionDocumentChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      }
-    
-      // No listener found with this token
-      reject("DATABASE_ERROR", "No listener found for token \(token)", nil)
+      else {
+        let errorMsg = "No listener found for token \(uuidToken)"
+        self.logger.error("::SWIFT DEBUG:: listenerToken_Remove: \(errorMsg)")
+        reject("LISTENER_ERROR", errorMsg, nil)
     }
+    }
+
   }
 
   
@@ -1166,10 +1245,10 @@ class CblReactnative: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
     let (isError, databaseName) = DataAdapter.shared.adaptDatabaseName(name: name, reject: reject)
-    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isUuidTokenError, uuidToken) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
     let (isQueryError, queryString) = DataAdapter.shared.adaptNonEmptyString(value: query, propertyName: "query", reject: reject)
   
-    if isError || isTokenError || isQueryError {
+    if isError || isUuidTokenError || isQueryError {
       return
     }
     
@@ -1191,7 +1270,7 @@ class CblReactnative: RCTEventEmitter {
           guard let self = self else { return }
         
           let resultData = NSMutableDictionary()
-          resultData.setValue(token, forKey: "token")
+          resultData.setValue(uuidToken, forKey: "token")
         
           if let results = change.results {
             // Convert results to JSON format
@@ -1206,8 +1285,12 @@ class CblReactnative: RCTEventEmitter {
         
           self.sendEvent(withName: self.kQueryChange, body: resultData)
         }
-      
-        self.queryChangeListeners[token] = listener
+
+        // // earlier we were adding the listner to the queryChangeListeners dictionary
+        // self.queryChangeListeners[uuidToken] = listener
+
+        // Store in unified dictionary with type
+        self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .query)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -1223,18 +1306,22 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    let token = String(changeListenerToken)
+
+    listenerToken_Remove(changeListenerToken: changeListenerToken, resolve: resolve, reject: reject)
+
+    // // earlier implementation using queryChangeListeners dictionary
+    // let token = String(changeListenerToken)
   
-    backgroundQueue.async {
-      if let listener = self.queryChangeListeners[token] as? ListenerToken {
-        listener.remove()
-        self.queryChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      }
+    // backgroundQueue.async {
+    //   if let listener = self.queryChangeListeners[token] as? ListenerToken {
+    //     listener.remove()
+    //     self.queryChangeListeners.removeValue(forKey: token)
+    //     resolve(nil)
+    //     return
+    //   }
     
-      reject("DATABASE_ERROR", "No query listener found for token \(token)", nil)
-    }
+    //   reject("DATABASE_ERROR", "No query listener found for token \(token)", nil)
+    // }
   }
 
   @objc(query_Execute:
@@ -1327,7 +1414,7 @@ class CblReactnative: RCTEventEmitter {
   {
     var errorMessage = ""
     let replId = String(replicatorId)
-    let token = String(changeListenerToken)
+    let uuidToken = String(changeListenerToken)
     
     backgroundQueue.async {
       guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
@@ -1339,11 +1426,16 @@ class CblReactnative: RCTEventEmitter {
       let listener = replicator.addChangeListener(withQueue: self.backgroundQueue, { change in
         let statusJson = ReplicatorHelper.generateReplicatorStatusJson(change.status)
         let resultData = NSMutableDictionary()
-        resultData.setValue(token, forKey: "token")
+        resultData.setValue(uuidToken, forKey: "token")
         resultData.setValue(statusJson, forKey: "status")
         self.sendEvent(withName: self.kReplicatorStatusChange, body: resultData)
       })
-      self.replicatorChangeListeners[token] = listener
+
+      // // earlier we were adding the listner to the replicatorChangeListeners dictionary
+      // self.replicatorChangeListeners[uuidToken] = listener
+
+      // Store in unified dictionary with type
+      self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .replicator)
       resolve(nil)
     }
   }
@@ -1357,7 +1449,7 @@ func replicator_AddDocumentChangeListener(
 {
   var errorMessage = ""
   let replId = String(replicatorId)
-  let token = String(changeListenerToken)
+  let uuidToken = String(changeListenerToken)
   
   backgroundQueue.async {
     guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
@@ -1369,12 +1461,17 @@ func replicator_AddDocumentChangeListener(
     let listener = replicator.addDocumentReplicationListener(withQueue: self.backgroundQueue, { change in
       let documentJson = ReplicatorHelper.generateReplicationJson(change.documents, isPush: change.isPush)
       let resultData = NSMutableDictionary()
-      resultData.setValue(token, forKey: "token")
+      resultData.setValue(uuidToken, forKey: "token")
       resultData.setValue(documentJson, forKey: "documents")
       self.logger.debug ("::SWIFT DEBUG:: Sending event \(self.kReplicatorDocumentChange), with data: \(resultData)")
       self.sendEvent(withName: self.kReplicatorDocumentChange, body: resultData)
     })
-    self.replicatorDocumentChangeListeners[token] = listener
+
+    // // earlier we were adding the listner to the replicatorDocumentChangeListeners dictionary
+    // self.replicatorDocumentChangeListeners[uuidToken] = listener
+
+    // Store in unified dictionary with type
+    self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .replicatorDocument)
     resolve(nil)
   }
 }
@@ -1522,30 +1619,36 @@ func replicator_AddDocumentChangeListener(
     replicatorId: NSString,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock) -> Void {
-      var errorMessage = ""
-      let replId = String(replicatorId)
-      let token = String(changeListenerToken)
-      guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
-        errorMessage = "No such replicator found for id \(replId)"
-        reject("REPLICATOR_ERROR", errorMessage, nil)
-        return
-      }
-      backgroundQueue.async {
-        if let listener = self.replicatorChangeListeners[token] as? ListenerToken {
-        replicator.removeChangeListener(withToken: listener)
-        self.replicatorChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      } else if let listener = self.replicatorDocumentChangeListeners[token] as? ListenerToken {
-        replicator.removeChangeListener(withToken: listener)
-        self.replicatorDocumentChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      } else {
-        reject("REPLICATOR_ERROR", "No such listener found with token \(token)", nil)
-      }
-        
-      }
+
+      // Delegate to unified listener removal
+      // Note: replicatorId parameter is not used anymore but must remain in signature for @objc compatibility
+      listenerToken_Remove(changeListenerToken: changeListenerToken, resolve: resolve, reject: reject)
+
+      // // earlier implementation using separate dictionaries and replicator lookup
+      // var errorMessage = ""
+      // let replId = String(replicatorId)
+      // let token = String(changeListenerToken)
+      // guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
+      //   errorMessage = "No such replicator found for id \(replId)"
+      //   reject("REPLICATOR_ERROR", errorMessage, nil)
+      //   return
+      // }
+      // backgroundQueue.async {
+      //   if let listener = self.replicatorChangeListeners[token] as? ListenerToken {
+      //   replicator.removeChangeListener(withToken: listener)
+      //   self.replicatorChangeListeners.removeValue(forKey: token)
+      //   resolve(nil)
+      //   return
+      // } else if let listener = self.replicatorDocumentChangeListeners[token] as? ListenerToken {
+      //   replicator.removeChangeListener(withToken: listener)
+      //   self.replicatorDocumentChangeListeners.removeValue(forKey: token)
+      //   resolve(nil)
+      //   return
+      // } else {
+      //   reject("REPLICATOR_ERROR", "No such listener found with token \(token)", nil)
+      // }
+      //   
+      // }
     }
   
   @objc(replicator_ResetCheckpoint:withResolver:withRejecter:)

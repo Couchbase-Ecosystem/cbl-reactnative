@@ -14,7 +14,8 @@ import {
     Collection,
   MutableDocument, 
   Document,
-  ConcurrencyControl 
+  ConcurrencyControl, 
+  ListenerToken
   } from 'cbl-reactnative';import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
 export default function DocumentChangeListenerScreen() {
@@ -35,7 +36,7 @@ export default function DocumentChangeListenerScreen() {
 
   const [listOfDocuments, setListOfDocuments] = useState<string[]>([]);
 
-  const [token, setToken] = useState<string>('');
+  const [token, setToken] = useState<ListenerToken | null>(null);
 
 
  
@@ -73,7 +74,7 @@ export default function DocumentChangeListenerScreen() {
     try{
       if (collection) {
         setListOfLogs(prev => [...prev, `Starting document change listener`]);
-        const token = await collection.addDocumentChangeListener(document?.getId() || '', (change) => {
+        const cblToken = await collection.addDocumentChangeListener(document?.getId() || '', (change) => {
           const dateTime = new Date().toISOString();
           setListOfLogs(prev => [...prev, 
             `${dateTime} - Document changed:`,
@@ -82,7 +83,7 @@ export default function DocumentChangeListenerScreen() {
             `  Database: ${change.database.getName()}`
           ]);
         });
-        setToken(token);
+        setToken(cblToken);
       }
     } catch (error) {
       // @ts-ignore
@@ -90,13 +91,13 @@ export default function DocumentChangeListenerScreen() {
     }
   }
 
-  const stopDocumentChangeListener = async () => {
+  const stopDocumentChangeListenerOldApi = async () => {
     try{
-      if (collection) {
+      if (collection && token) {
         if (token) {
           await collection.removeDocumentChangeListener(token);
-          setToken('');
-          setListOfLogs(prev => [...prev, `Document change listener stopped`]);
+          setToken(null);
+          setListOfLogs(prev => [...prev, `✅ OLD API: Document change listener stopped`]);
         } else {
           setErrorLogs(prev => [...prev, `No token found to stop document change listener`]);
         }
@@ -106,9 +107,21 @@ export default function DocumentChangeListenerScreen() {
       setErrorLogs(prev => [...prev, `Error stopping document change listener: ${error.message}`]);
     }
   }
-  
 
-
+  const stopDocumentChangeListenerNewApi = async () => {
+    try{
+        if (token) {
+          await token.remove();
+          setToken(null);
+          setListOfLogs(prev => [...prev, `✅ NEW API: Document change listener stopped`]);
+        } else {
+          setErrorLogs(prev => [...prev, `No token found to stop document change listener`]);
+        }
+    } catch (error) {
+      // @ts-ignore
+      setErrorLogs(prev => [...prev, `Error stopping document change listener: ${error.message}`]);
+    }
+  }
 
   const createDocument = async () => {
     setListOfLogs(prev => [...prev, 'Creating Document']);  // ✅ Use prev
@@ -158,8 +171,7 @@ export default function DocumentChangeListenerScreen() {
   }
 
 
-
-
+  
   return (
     <SafeAreaView>
         <View style={{ padding: 10 }}>
@@ -169,7 +181,8 @@ export default function DocumentChangeListenerScreen() {
         <Button title="Start Document Change Listener" onPress={() => startDocumentChangeListener()} />
         <Button title="Create Document" onPress={() => createDocument()} />
         <Button title="Update Document" onPress={() => updateDocument()} />
-        <Button title="Stop Document Change Listener" onPress={() => stopDocumentChangeListener()} />
+        <Button title="Stop Listener (OLD API)" onPress={() => stopDocumentChangeListenerOldApi()} />
+        <Button title="Stop Listener (NEW API)" onPress={() => stopDocumentChangeListenerNewApi()} />
         <Button title="CLEAR LOGS" color="red" onPress={() => {setListOfLogs([]); setErrorLogs([])}} />
 
 

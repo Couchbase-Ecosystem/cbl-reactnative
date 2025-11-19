@@ -46,6 +46,11 @@ export function useTestsNavigationSections() {
         },
         {
           id: 10,
+          title: 'Listeners',
+          path: '/tests/listener',
+        },
+        {
+          id: 10,
           title: 'Testing Tests',
           path: '/tests/testing',
         },

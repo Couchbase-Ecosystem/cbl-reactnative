@@ -11,6 +11,7 @@ import {
     BasicAuthenticator,
     SessionAuthenticator,
     ReplicatorType,
+    ListenerToken,
     Collection,
   MutableDocument, 
   Document,
@@ -34,7 +35,7 @@ export default function CollectionChangeListenerScreen() {
 
   const [listOfDocuments, setListOfDocuments] = useState<string[]>([]);
 
-  const [token, setToken] = useState<string>('');
+  const [token, setToken] = useState<ListenerToken | null>(null);
 
 
  
@@ -72,10 +73,10 @@ export default function CollectionChangeListenerScreen() {
     try{
       if (collection) {
         setListOfLogs(prev => [...prev, `Starting collection change listener`]);
-        const token = await collection.addChangeListener((change) => {
+        const cblToken = await collection.addChangeListener((change) => {
           setListOfLogs(prev => [...prev, `Collection changed:`, JSON.stringify(change)]);
         });
-        setToken(token);
+        setToken(cblToken);
 
       }
     } catch (error) {
@@ -84,13 +85,14 @@ export default function CollectionChangeListenerScreen() {
     }
   }
 
-  const stopCollectionChangeListener = async () => {
+  const stopCollectionChangeListenerOldAPI = async () => {
     try{
-      if (collection) {
+      if (collection && token) {
         if (token) {
+          // old api
           await collection.removeChangeListener(token);
-          setToken('');
-          setListOfLogs(prev => [...prev, `Collection change listener stopped`]);
+          setToken(null);
+          setListOfLogs(prev => [...prev, `✅ OLD API: Collection change listener stopped via collection.removeChangeListener()`]);
         } else {
           setErrorLogs(prev => [...prev, `No token found to stop collection change listener`]);
         }
@@ -98,6 +100,21 @@ export default function CollectionChangeListenerScreen() {
     } catch (error) {
       // @ts-ignore
       setErrorLogs(prev => [...prev, `Error stopping collection change listener: ${error.message}`]);
+    }
+  }
+
+  const stopCollectionChangeListenerNewAPI = async () => {
+    try {
+      if(token){
+        await token.remove()
+        setToken(null);
+        setListOfLogs(prev => [...prev, `✅ NEW API: Collection change listener stopped via token.remove()`]);
+      } else {
+        setErrorLogs(prev => [...prev, `No token found to stop collection change listener`]);
+      }
+    }
+    catch(error){
+      setErrorLogs(prev => [...prev, `Error stopping collection change listener (NEW API): ${error}`]);
     }
   }
   
@@ -200,7 +217,8 @@ export default function CollectionChangeListenerScreen() {
         <Button title="Open Database" onPress={() => openDatabase()} />
         <Button title="Create Collection" onPress={() => createCollection()} />
         <Button title="Start Collection Change Listener" onPress={() => startCollectionChangeListener()} />
-        <Button title="Stop Collection Change Listener" onPress={() => stopCollectionChangeListener()} />
+        <Button title="Stop Listener (OLD API)" onPress={() => stopCollectionChangeListenerOldAPI()} />
+        <Button title="Stop Listener (NEW API)" onPress={() => stopCollectionChangeListenerNewAPI()} />
         {/* <Button title="Connect to Sync Gateway" onPress={() => connectToSyncGateway()} /> */}
         <Button title="Create Document" onPress={() => createDocument()} />
         <Button title="CLEAR LOGS" color="red" onPress={() => {setListOfLogs([]); setErrorLogs([])}} />
