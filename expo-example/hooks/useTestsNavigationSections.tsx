@@ -51,36 +51,46 @@ export function useTestsNavigationSections() {
         },
         {
           id: 10,
+          title: 'Listeners',
+          path: '/tests/listener',
+        },
+        {
+          id: 11,
           title: 'Testing Tests',
           path: '/tests/testing',
         },
         {
-          id: 11,
+          id: 12,
           title: 'Collection Change Listener',
           path: '/tests/collection-change-listener',
         },
         {
-          id: 12,
+          id: 13,
           title: 'Document Change Listener',
           path: '/tests/document-change-listener',
         },
         {
-          id: 13,
+          id: 14,
           title: 'Live Query',
           path: '/tests/live-query-listeners',
         },
         {
-          id: 14,
+          id: 15,
           title: 'Replicator Listeners (NEW API)',
           path: '/tests/replicator-listeners-new',
         },
         {
-          id: 15,
+          id: 16,
           title: 'Replicator Listeners (OLD API)',
           path: '/tests/replicator-listeners-old',
         },
         {
-          id: 16,
+          id: 17,
+          title: 'Replicator Listeners',
+          path: '/tests/replicator-listeners',
+        },
+        {
+          id: 18,
           title: 'Custom Bug Testing',
           path: '/tests/custom-bug-fix',
         },

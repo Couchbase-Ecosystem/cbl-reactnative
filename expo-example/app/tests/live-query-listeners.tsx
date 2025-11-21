@@ -6,7 +6,8 @@ import {
   DatabaseConfiguration,
   Collection,
   MutableDocument,
-  Query
+  Query,
+  ListenerToken
 } from 'cbl-reactnative';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
@@ -17,7 +18,7 @@ export default function LiveQueryScreen() {
   const [database, setDatabase] = useState<Database | null>(null);
   const [collection, setCollection] = useState<Collection | null>(null);
   const [query, setQuery] = useState<Query | null>(null);
-  const [token, setToken] = useState<string>('');
+  const [token, setToken] = useState<ListenerToken | null>(null);
   const [listOfDocuments, setListOfDocuments] = useState<string[]>([]);
 
   const openDatabase = async () => {
@@ -82,7 +83,7 @@ export default function LiveQueryScreen() {
 
         setQuery(query);
         setToken(listenerToken);
-        setListOfLogs(prev => [...prev, `Live query started successfully`]);
+        setListOfLogs(prev => [...prev, `Live query started successfully with token: ${listenerToken.getUuidToken()}`]);
       } else {
         setErrorLogs(prev => [...prev, `Database or Collection not initialized`]);
       }
@@ -92,19 +93,35 @@ export default function LiveQueryScreen() {
     }
   }
 
-  const stopLiveQuery = async () => {
+  const stopLiveQueryOldAPI = async () => {
     try {
       if (query && token) {
         await query.removeChangeListener(token);
-        setToken('');
+        setToken(null);
         setQuery(null);
-        setListOfLogs(prev => [...prev, `Live query stopped`]);
+        setListOfLogs(prev => [...prev, `✅ OLD API: Live query stopped via query.removeChangeListener()`]);
       } else {
         setErrorLogs(prev => [...prev, `No active query to stop`]);
       }
     } catch (error) {
       // @ts-ignore
-      setErrorLogs(prev => [...prev, `Error stopping live query: ${error.message}`]);
+      setErrorLogs(prev => [...prev, `Error stopping live query (OLD API): ${error.message}`]);
+    }
+  }
+
+  const stopLiveQueryNewAPI = async () => {
+    try {
+      if (token) {
+        await token.remove();
+        setToken(null);
+        setQuery(null);
+        setListOfLogs(prev => [...prev, `✅ NEW API: Live query stopped via token.remove()`]);
+      } else {
+        setErrorLogs(prev => [...prev, `No active query to stop`]);
+      }
+    } catch (error) {
+      // @ts-ignore
+      setErrorLogs(prev => [...prev, `Error stopping live query (NEW API): ${error.message}`]);
     }
   }
 
@@ -193,30 +210,41 @@ export default function LiveQueryScreen() {
       <ScrollView style={{ padding: 10 }}>
         <View style={{ padding: 10 }}>
           <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-            Live Query Test
+            Live Query Test (Query Change Listener)
           </Text>
           
-          <Text style={{ marginBottom: 10 }}>
+          <Text style={{ marginBottom: 10, fontSize: 12, color: '#666' }}>
+            Tests both OLD and NEW APIs for removing query change listeners
+          </Text>
+          
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>
             Setup Steps:
           </Text>
           <Button title="1. Open Database" onPress={() => openDatabase()} />
           <Button title="2. Create Collection" onPress={() => createCollection()} />
-          <Button title="3. Start Live Query" onPress={() => startLiveQuery()} />
+          <Button title="3. Start Live Query" onPress={() => startLiveQuery()} color="#007AFF" />
           
           <View style={{ height: 20 }} />
           
-          <Text style={{ marginBottom: 10 }}>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>
             Test Actions:
           </Text>
-          <Button title="Create Matching Document" onPress={() => createDocument()} />
-          <Button title="Create Non-Matching Document" onPress={() => createNonMatchingDocument()} />
-          <Button title="Update Last Document" onPress={() => updateDocument()} />
-          <Button title="Delete Last Document" onPress={() => deleteDocument()} />
+          <Button title="Create Matching Document" onPress={() => createDocument()} color="#5856D6" />
+          <Button title="Create Non-Matching Document" onPress={() => createNonMatchingDocument()} color="#AF52DE" />
+          <Button title="Update Last Document" onPress={() => updateDocument()} color="#5AC8FA" />
+          <Button title="Delete Last Document" onPress={() => deleteDocument()} color="#FF3B30" />
           
           <View style={{ height: 20 }} />
           
-          <Button title="Stop Live Query" color="orange" onPress={() => stopLiveQuery()} />
-          <Button title="CLEAR LOGS" color="red" onPress={() => {setListOfLogs([]); setErrorLogs([])}} />
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>
+            Stop Live Query:
+          </Text>
+          <Button title="Stop Live Query (OLD API)" color="#FF9500" onPress={() => stopLiveQueryOldAPI()} />
+          <Button title="Stop Live Query (NEW API - token.remove())" color="#34C759" onPress={() => stopLiveQueryNewAPI()} />
+          
+          <View style={{ height: 20 }} />
+          
+          <Button title="CLEAR LOGS" color="red" onPress={() => {setListOfLogs([]); setErrorLogs([]); setListOfDocuments([])}} />
 
           <View style={{ height: 20 }} />
 
@@ -225,7 +253,7 @@ export default function LiveQueryScreen() {
           </Text>
 
           {listOfDocuments.length > 0 && (
-            <View style={{ marginBottom: 10 }}>
+            <View style={{ marginBottom: 10, padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5 }}>
               {listOfDocuments.map((docId, index) => (
                 <Text key={index} style={{ fontSize: 12 }}>
                   • {docId}
@@ -238,12 +266,16 @@ export default function LiveQueryScreen() {
             Logs
           </Text>
 
-          <View style={{ padding: 10, backgroundColor: '#f5f5f5', borderRadius: 5 }}>
-            {listOfLogs.map((log, index) => (
-              <Text key={index} style={{ fontSize: 12, marginBottom: 5 }}>
-                {log}
-              </Text>
-            ))}
+          <View style={{ padding: 10, backgroundColor: '#f5f5f5', borderRadius: 5, minHeight: 100 }}>
+            {listOfLogs.length === 0 ? (
+              <Text style={{ fontSize: 12, color: '#999' }}>No logs yet...</Text>
+            ) : (
+              listOfLogs.map((log, index) => (
+                <Text key={index} style={{ fontSize: 12, marginBottom: 5 }}>
+                  {log}
+                </Text>
+              ))
+            )}
           </View>
 
           {errorLogs.length > 0 && (
