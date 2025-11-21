@@ -38,8 +38,8 @@ export default async function createReplicatorFromConfig(
   const target = new URLEndpoint(connectionString);
   const cols = await getCollections(collections, scopeName, database);
   // Create CollectionConfiguration for each collection
-  const listOfCollectionConfigrations = cols.map((col) => new CollectionConfiguration(col))
-  const config = new ReplicatorConfiguration(listOfCollectionConfigrations, target);
+  const listOfCollectionConfigurations = cols.map((col) => new CollectionConfiguration(col))
+  const config = new ReplicatorConfiguration(listOfCollectionConfigurations, target);
 
   if (selectedAuthenticationType.toLowerCase() === 'basic') {
     const uname = username || '';

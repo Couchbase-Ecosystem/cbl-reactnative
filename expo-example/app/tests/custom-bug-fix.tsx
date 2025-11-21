@@ -16,7 +16,8 @@ import {
   Document,
   ConcurrencyControl, 
   CollectionConfiguration
-  } from 'cbl-reactnative';import getFileDefaultPath from '@/service/file/getFileDefaultPath';
+  } from 'cbl-reactnative';
+  import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
 export default function CustomBugFixScreen() {
   function reset() {}
@@ -69,17 +70,15 @@ export default function CustomBugFixScreen() {
     }
     const defaultCollection = await database.defaultCollection();
 
-    const syncGatewayUrl = "wss://nasm0fvdr-jnehnb.apps.cloud.couchbase.com:4984/testendpoint"
+    const syncGatewayUrl = process.env.EXPO_PUBLIC_SYNC_GATEWAY_URL || "wss://localhost:4984/testendpoint"
     const endpoint = new URLEndpoint(syncGatewayUrl);
-    const username = "jayantdhingra"
-    const password = "f9yu5QT4B5jpZep@"
+    const username = process.env.EXPO_PUBLIC_SYNC_USERNAME || "test_user"
+    const password = process.env.EXPO_PUBLIC_SYNC_PASSWORD || "test_pass"
 
     
-      const collectionConfig = new CollectionConfiguration(defaultCollection)
-
-
+    const collectionConfig = new CollectionConfiguration(defaultCollection)
     const listOfCollectionConfig = [collectionConfig] 
-
+    
     const replicatorConfig = new ReplicatorConfiguration(listOfCollectionConfig, endpoint)
     replicatorConfig.setAuthenticator(new BasicAuthenticator(username, password))
     // replicatorConfig.setContinuous(true)

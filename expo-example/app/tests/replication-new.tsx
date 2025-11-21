@@ -10,8 +10,8 @@ export default function TestsReplicatorScreen() {
     try {
       return [''];
     } catch (e) {
-      // @ts-ignore
-      return [error.message];
+      const errorMessage = e instanceof Error ? e.message : String(e);
+      return [errorMessage];
     }
   }
 

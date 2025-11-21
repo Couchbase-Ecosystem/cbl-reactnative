@@ -24,10 +24,10 @@ export default function ReplicatorListenersOldScreen() {
   const [documentToken, setDocumentToken] = useState<string>('');
   const [listOfDocuments, setListOfDocuments] = useState<string[]>([]);
 
-  // Configuration for Sync Gateway
-  const SYNC_GATEWAY_URL = "wss://nasm0fvdr-jnehnb.apps.cloud.couchbase.com:4984/testendpoint";
-  const USERNAME = "jayantdhingra";
-  const PASSWORD = "f9yu5QT4B5jpZep@";
+  // Configuration for Sync Gateway (from environment variables)
+  const SYNC_GATEWAY_URL = process.env.EXPO_PUBLIC_SYNC_GATEWAY_URL || "wss://localhost:4984/testendpoint";
+  const USERNAME = process.env.EXPO_PUBLIC_SYNC_USERNAME || "test_user";
+  const PASSWORD = process.env.EXPO_PUBLIC_SYNC_PASSWORD || "test_pass";
 
   const openDatabase = async () => {
     try {
