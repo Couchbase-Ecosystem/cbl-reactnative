@@ -1490,7 +1490,7 @@ fun replicator_RemoveChangeListener(
         if (!DataValidation.validateReplicatorId(replicatorId, promise)){
           return@launch
         }
-        ReplicatorManager.start(replicatorId)
+        ReplicatorManager.start(replicatorId, false)
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
