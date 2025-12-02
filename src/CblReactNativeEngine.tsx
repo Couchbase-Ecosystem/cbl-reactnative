@@ -129,11 +129,11 @@ export class CblReactNativeEngine implements ICoreEngine {
     if (customEventEmitter) {
       this.debugLog('Using provided custom event emitter');
       this._eventEmitter = customEventEmitter;
-      return;
+    } else {
+      this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
     }
 
-    this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
-
+    // Always add the customLogMessage listener regardless of emitter source
     this._eventEmitter.addListener(
       'customLogMessage',
       (data: {

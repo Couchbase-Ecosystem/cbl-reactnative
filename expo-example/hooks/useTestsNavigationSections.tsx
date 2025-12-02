@@ -76,8 +76,23 @@ export function useTestsNavigationSections() {
         },
         {
           id: 15,
+          title: 'LogSinks API',
+          path: '/tests/logsinks',
+        },
+        {
+          id: 16,
           title: 'Log Sink Console Logs',
           path: '/tests/console-logging',
+        },
+        {
+          id: 17,
+          title: 'File Logging Test',
+          path: '/tests/file-logging',
+        },
+        {
+          id: 18,
+          title: 'Custom Logging Test',
+          path: '/tests/custom-logging',
         },
       ],
     },

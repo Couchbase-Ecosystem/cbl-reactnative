@@ -245,21 +245,21 @@ RCT_EXTERN_METHOD(database_SetLogLevel:(NSString *)domain
 // MARK: - LogSinks Functions
 
 RCT_EXTERN_METHOD(logsinks_SetConsole:
-    (NSNumber *)level
-    withDomains:(NSArray *)domains
+    (nonnull NSNumber *)level
+    withDomains:(nonnull NSArray *)domains
     withResolver:(RCTPromiseResolveBlock)resolve
     withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(logsinks_SetFile:
-    (NSNumber *)level
-    withConfig:(NSDictionary *)config
+    (nonnull NSNumber *)level
+    withConfig:(nonnull NSDictionary *)config
     withResolver:(RCTPromiseResolveBlock)resolve
     withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(logsinks_SetCustom:
-    (NSNumber *)level
-    withDomains:(NSArray *)domains
-    withToken:(NSString *)token
+    (nonnull NSNumber *)level
+    withDomains:(nonnull NSArray *)domains
+    withToken:(nonnull NSString *)token
     withResolver:(RCTPromiseResolveBlock)resolve
     withRejecter:(RCTPromiseRejectBlock)reject)
 

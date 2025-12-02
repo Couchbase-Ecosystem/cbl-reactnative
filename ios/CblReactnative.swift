@@ -32,6 +32,17 @@ class CblReactnative: RCTEventEmitter {
   override init() {
     super.init()
   }
+  
+  // Track whether JavaScript is listening for events
+  // Note: These may not be called reliably by React Native/Expo
+  override func startObserving() {
+    hasListeners = true
+  }
+  
+  override func stopObserving() {
+    hasListeners = false
+  }
+  
   // MARK: - Setup Notifications
   
   // Required override to specify supported events
@@ -1701,16 +1712,19 @@ func replicator_AddDocumentChangeListener(
 
   @objc(logsinks_SetConsole:withDomains:withResolver:withRejecter:)
   func logsinks_SetConsole(
-    level: NSNumber?,
-    domains: [String]?,
+    level: Any?,
+    domains: Any?,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ){
     backgroundQueue.async {
     do{
-      // convert NSNumber? to Int?
-      let intLevel = level?.intValue
-      try LogSinksManager.shared.setConsoleSink(level: intLevel, domains: domains)
+      // convert Any? to Int? - treat -1 as nil (disable signal)
+      let levelNumber = (level as? NSNumber)?.intValue
+      let intLevel = (levelNumber == -1) ? nil : levelNumber
+      // convert Any? to [String]?
+      let domainsArray = domains as? [String]
+      try LogSinksManager.shared.setConsoleSink(level: intLevel, domains: domainsArray)
       resolve(nil)
     }
     catch let error as NSError {
@@ -1724,16 +1738,17 @@ func replicator_AddDocumentChangeListener(
 
   @objc(logsinks_SetFile:withConfig:withResolver:withRejecter:)
   func logsinks_SetFile(
-    level: NSNumber?,
-    config: NSDictionary?,
+    level: Any?,
+    config: Any?,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ){
     backgroundQueue.async {
       do{
-        // Convert NSNumber? to Int?
-        let intLevel = level?.intValue
-        // Convert NSDictionary? to [String: Any]?
+        // Convert Any? to Int? - treat -1 as nil (disable signal)
+        let levelNumber = (level as? NSNumber)?.intValue
+        let intLevel = (levelNumber == -1) ? nil : levelNumber
+        // Convert Any? to [String: Any]?
         let configDict = config as? [String: Any]
 
         try LogSinksManager.shared.setFileSink(
@@ -1755,36 +1770,44 @@ func replicator_AddDocumentChangeListener(
 
   @objc(logsinks_SetCustom:withDomains:withToken:withResolver:withRejecter:)
   func logsinks_SetCustom(
-    level: NSNumber?,
-    domains: [String]?,
-    token: String?,
+    level: Any?,
+    domains: Any?,
+    token: Any?,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
     backgroundQueue.async {
       do {
-        // Convert NSNumber? to Int?
-        let intLevel = level?.intValue
+        // Convert Any? to Int? - treat -1 as nil (disable signal)
+        let levelNumber = (level as? NSNumber)?.intValue
+        let intLevel = (levelNumber == -1) ? nil : levelNumber
+        // Convert Any? to [String]?
+        let domainsArray = domains as? [String]
+        // Convert Any? to String?
+        let tokenString = token as? String
         
         // Create callback closure only if we have level and token (means enable, not disable)
         let callback: ((LogLevel, LogDomain, String) -> Void)? = 
-          (intLevel != nil && token != nil) ? { [weak self] logLevel, logDomain, message in
+          (intLevel != nil && tokenString != nil && !tokenString!.isEmpty) ? { [weak self] logLevel, logDomain, message in
             guard let self = self else { return }
+            
             // Convert Swift types back to JavaScript-friendly types
             let eventData: [String: Any] = [
-              "token": token!,
+              "token": tokenString!,
               "level": logLevel.rawValue,
               "domain": self.logDomainToString(logDomain),
               "message": message
             ]
             
             // Send event to JavaScript
+            // Note: React Native may show warnings about no listeners if events arrive before
+            // JS listener is fully initialized, but these warnings are harmless
             self.sendEvent(withName: self.kCustomLogMessage, body: eventData)
           } : nil
         
         try LogSinksManager.shared.setCustomSink(
           level: intLevel,
-          domains: domains,
+          domains: domainsArray,
           callback: callback
         )
         resolve(nil)
