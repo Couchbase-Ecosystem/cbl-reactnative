@@ -59,6 +59,13 @@ import { Result } from './cblite-js/cblite/src/result';
 import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Scope } from './cblite-js/cblite/src/scope';
 
+import { LogLevel, LogDomain } from './cblite-js/cblite/src/log-sinks-enums';
+import type {
+  LogSinksSetConsoleArgs,
+  LogSinksSetFileArgs,
+  LogSinksSetCustomArgs,
+} from './cblite-js/cblite/src/log-sinks-types';
+
 import uuid from 'react-native-uuid';
 
 export class CblReactNativeEngine implements ICoreEngine {
@@ -89,6 +96,14 @@ export class CblReactNativeEngine implements ICoreEngine {
 
   private _queryChangeListeners: Map<string, ListenerCallback> = new Map();
 
+  // Storage for custom log sink callbacks, users can have multiple custom logs
+  // Key : unique token
+  // value: callback function
+  private customLogCallbacksMap: Map<
+    string,
+    (level: LogLevel, domain: LogDomain, message: string) => void
+  > = new Map();
+
   private static readonly LINKING_ERROR =
     `The package 'cbl-reactnative' doesn't seem to be linked. Make sure: \n\n` +
     Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
@@ -114,10 +129,30 @@ export class CblReactNativeEngine implements ICoreEngine {
     if (customEventEmitter) {
       this.debugLog('Using provided custom event emitter');
       this._eventEmitter = customEventEmitter;
-      return;
+    } else {
+      this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
     }
 
-    this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
+    // Always add the customLogMessage listener regardless of emitter source
+    this._eventEmitter.addListener(
+      'customLogMessage',
+      (data: {
+        token: string;
+        level: LogLevel;
+        domain: LogDomain;
+        message: string;
+      }) => {
+        const callback = this.customLogCallbacksMap.get(data.token);
+
+        if (callback) {
+          callback(
+            data.level as LogLevel,
+            data.domain as LogDomain,
+            data.message
+          );
+        }
+      }
+    );
   }
 
   //private logging function
@@ -1567,5 +1602,37 @@ export class CblReactNativeEngine implements ICoreEngine {
 
   getUUID(): string {
     return uuid.v4().toString();
+  }
+
+  // =============================================================================
+  // LOG SINKS API
+  // =============================================================================
+
+  /**
+   * Sets or disables the console log sink
+   * @param args Arguments containing level and domains, or null to disable
+   */
+  async logsinks_SetConsole(args: LogSinksSetConsoleArgs): Promise<void> {
+    return this.CblReactNative.logsinks_SetConsole(args.level, args.domains);
+  }
+
+  /**
+   * Sets or disables the file log sink
+   * @param args Arguments containing level and config, or null to disable
+   */
+  async logsinks_SetFile(args: LogSinksSetFileArgs): Promise<void> {
+    return this.CblReactNative.logsinks_SetFile(args.level, args.config);
+  }
+
+  /**
+   * Sets or disables the custom log sink
+   * @param args Arguments containing level, domains, and token, or null to disable
+   */
+  async logsinks_SetCustom(args: LogSinksSetCustomArgs): Promise<void> {
+    return this.CblReactNative.logsinks_SetCustom(
+      args.level,
+      args.domains,
+      args.token
+    );
   }
 }
