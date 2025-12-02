@@ -225,6 +225,10 @@ RCT_EXTERN_METHOD(database_PerformMaintenance:
 
 RCT_EXTERN_METHOD(file_GetDefaultPath:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(listenerToken_Remove:(NSString *)changeListenerToken
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+                  
 // MARK: - Logging Functions
 
 RCT_EXTERN_METHOD(database_SetFileLoggingConfig:

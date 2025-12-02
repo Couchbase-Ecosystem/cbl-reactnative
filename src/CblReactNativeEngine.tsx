@@ -663,6 +663,29 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
+  /**
+   * Generic method to remove any listener by its UUID token.
+   * Calls the native listenerToken_Remove bridge method.
+   */
+  listenerToken_Remove(args: { changeListenerToken: string }): Promise<void> {
+    return this.CblReactNative.listenerToken_Remove(
+      args.changeListenerToken
+    ).then(
+      () => {
+        this.debugLog(
+          `::DEBUG:: Successfully removed listener with token ${args.changeListenerToken}`
+        );
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (error: any) => {
+        this.debugLog(
+          `::ERROR:: Failed to remove listener with token ${args.changeListenerToken}: ${error}`
+        );
+        throw error;
+      }
+    );
+  }
+
   collection_Save(
     args: CollectionSaveStringArgs
   ): Promise<CollectionDocumentSaveResult> {
