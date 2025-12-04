@@ -1471,16 +1471,10 @@ func replicator_AddDocumentChangeListener(
       }
       backgroundQueue.async {
         do {
-          if let data = collectionConfigJson.data(using: .utf8){
-            let decoder: JSONDecoder = JSONDecoder()
-            let collectionConfig = try decoder.decode([CollectionConfigItem].self, from: data)
-            let replicatorId = try ReplicatorManager.shared.replicator(repConfig, collectionConfiguration:collectionConfig)
+            let replicatorId = try ReplicatorManager.shared.replicator(repConfig, collectionConfigJson: collectionConfigJson)
             let dict:NSDictionary = [
               "replicatorId": replicatorId]
             resolve(dict)
-          } else {
-            reject("REPLICATOR_ERROR", "couldn't deserialize replicator config, is config proper JSON string formatted?", nil)
-          }
         } catch let error as NSError {
           reject("REPLICATOR_ERROR", error.localizedDescription, nil)
         } catch {
