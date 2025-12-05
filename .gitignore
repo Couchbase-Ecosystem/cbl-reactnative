@@ -80,4 +80,5 @@ lib/
 # Documentation and iOS source
 cbl-reactnative-docs/
 couchbase-lite-ios/
+couchbase-lite-java-common-android-release-*/
 ios-swift-quickstart/

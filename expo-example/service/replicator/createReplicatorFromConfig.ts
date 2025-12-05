@@ -7,6 +7,7 @@ import {
   URLEndpoint,
   Collection,
   ReplicatorType,
+  CollectionConfiguration
 } from 'cbl-reactnative';
 import React from 'react';
 
@@ -33,9 +34,12 @@ export default async function createReplicatorFromConfig(
   cookieName: string | undefined
 ): Promise<string> {
   let replicator: Replicator;
+
   const target = new URLEndpoint(connectionString);
-  const config = new ReplicatorConfiguration(target);
   const cols = await getCollections(collections, scopeName, database);
+  // Create CollectionConfiguration for each collection
+  const listOfCollectionConfigurations = cols.map((col) => new CollectionConfiguration(col))
+  const config = new ReplicatorConfiguration(listOfCollectionConfigurations, target);
 
   if (selectedAuthenticationType.toLowerCase() === 'basic') {
     const uname = username || '';
@@ -47,7 +51,6 @@ export default async function createReplicatorFromConfig(
     config.setAuthenticator(new SessionAuthenticator(session, cookie));
   }
 
-  config.addCollections(cols);
   config.setReplicatorType(getReplicationType(replicatorType));
   config.setHeartbeat(parseInt(heartbeat, 10));
   config.setMaxAttempts(parseInt(maxAttempts, 10));

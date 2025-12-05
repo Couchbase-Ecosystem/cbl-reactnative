@@ -14,8 +14,10 @@ import {
     Collection,
   MutableDocument, 
   Document,
-  ConcurrencyControl 
-  } from 'cbl-reactnative';import getFileDefaultPath from '@/service/file/getFileDefaultPath';
+  ConcurrencyControl, 
+  CollectionConfiguration
+  } from 'cbl-reactnative';
+  import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
 export default function CustomBugFixScreen() {
   function reset() {}
@@ -63,22 +65,26 @@ export default function CustomBugFixScreen() {
   
   const connectToSyncGateway = async () => {
     setListOfLogs(prev => [...prev, 'Connecting to Sync Gateway']);  // ✅ Use prev
-    const defaultCollection = await database?.defaultCollection();
+    if(database === null || database === undefined) {
+      throw Error("Database is undefined")
+    }
+    const defaultCollection = await database.defaultCollection();
 
-    const syncGatewayUrl = "wss://nasm0fvdr-jnehnb.apps.cloud.couchbase.com:4984/testendpoint"
+    const syncGatewayUrl = process.env.EXPO_PUBLIC_SYNC_GATEWAY_URL || "wss://localhost:4984/testendpoint"
     const endpoint = new URLEndpoint(syncGatewayUrl);
-    const username = "jayantdhingra"
-    const password = "f9yu5QT4B5jpZep@"
+    const username = process.env.EXPO_PUBLIC_SYNC_USERNAME || "test_user"
+    const password = process.env.EXPO_PUBLIC_SYNC_PASSWORD || "test_pass"
 
-    const replicatorConfig = new ReplicatorConfiguration(endpoint)
+    
+    const collectionConfig = new CollectionConfiguration(defaultCollection)
+    const listOfCollectionConfig = [collectionConfig] 
+    
+    const replicatorConfig = new ReplicatorConfiguration(listOfCollectionConfig, endpoint)
     replicatorConfig.setAuthenticator(new BasicAuthenticator(username, password))
     // replicatorConfig.setContinuous(true)
     replicatorConfig.setAcceptOnlySelfSignedCerts(false);
 
     
-    if (defaultCollection) {
-      replicatorConfig.addCollection(defaultCollection)
-    }
 
     const replicator = await Replicator.create(replicatorConfig)
 

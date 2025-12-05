@@ -9,30 +9,30 @@ import {
   URLEndpoint,
   BasicAuthenticator,
   MutableDocument,
-  ListenerToken
+  CollectionConfig
 } from 'cbl-reactnative';
 import getFileDefaultPath from '@/service/file/getFileDefaultPath';
 
-export default function ReplicatorListenersScreen() {
+export default function ReplicatorListenersOldScreen() {
   const [listOfLogs, setListOfLogs] = useState<string[]>([]);
   const [errorLogs, setErrorLogs] = useState<string[]>([]);
 
   const [database, setDatabase] = useState<Database | null>(null);
   const [replicator, setReplicator] = useState<Replicator | null>(null);
   
-  const [statusToken, setStatusToken] = useState<ListenerToken | null>(null);
-  const [documentToken, setDocumentToken] = useState<ListenerToken | null>(null);
+  const [statusToken, setStatusToken] = useState<string>('');
+  const [documentToken, setDocumentToken] = useState<string>('');
   const [listOfDocuments, setListOfDocuments] = useState<string[]>([]);
 
-  // Configuration for Sync Gateway
-  const SYNC_GATEWAY_URL = "wss://nasm0fvdr-jnehnb.apps.cloud.couchbase.com:4984/testendpoint";
-  const USERNAME = "jayantdhingra";
-  const PASSWORD = "f9yu5QT4B5jpZep@";
+  // Configuration for Sync Gateway (from environment variables)
+  const SYNC_GATEWAY_URL = process.env.EXPO_PUBLIC_SYNC_GATEWAY_URL || "wss://localhost:4984/testendpoint";
+  const USERNAME = process.env.EXPO_PUBLIC_SYNC_USERNAME || "test_user";
+  const PASSWORD = process.env.EXPO_PUBLIC_SYNC_PASSWORD || "test_pass";
 
   const openDatabase = async () => {
     try {
       setListOfLogs(prev => [...prev, 'Opening Database']);
-      const databaseName = 'replicator_test_db';
+      const databaseName = 'replicator_test_db_old';
       const directory = await getFileDefaultPath();
       const dbConfig = new DatabaseConfiguration();
       const database = new Database(databaseName, dbConfig);
@@ -47,7 +47,7 @@ export default function ReplicatorListenersScreen() {
 
   const createReplicator = async () => {
     try {
-      setListOfLogs(prev => [...prev, 'Creating Replicator with Default Collection']);
+      setListOfLogs(prev => [...prev, 'Creating Replicator with OLD API (Default Collection)']);
       
       if (!database) {
         setErrorLogs(prev => [...prev, 'Database not opened yet']);
@@ -62,16 +62,24 @@ export default function ReplicatorListenersScreen() {
       }
 
       const endpoint = new URLEndpoint(SYNC_GATEWAY_URL);
+
+      // OLD API: Create config with endpoint only
       const replicatorConfig = new ReplicatorConfiguration(endpoint);
+      
+      // OLD API: Create CollectionConfig and add collections
+      const collectionConfig = new CollectionConfig();
+      // No channels set - will replicate all
+      
+      // OLD API: Add collection with config
+      replicatorConfig.addCollection(defaultCollection, collectionConfig);
       
       replicatorConfig.setAuthenticator(new BasicAuthenticator(USERNAME, PASSWORD));
       replicatorConfig.setContinuous(true);
       replicatorConfig.setAcceptOnlySelfSignedCerts(false);  
-      replicatorConfig.addCollection(defaultCollection);
       
       const replicator = await Replicator.create(replicatorConfig);
       setReplicator(replicator);
-      setListOfLogs(prev => [...prev, `Replicator created with ID: ${replicator.getId()}`]);
+      setListOfLogs(prev => [...prev, `Replicator created with OLD API, ID: ${replicator.getId()}`]);
     } catch (error) {
       // @ts-ignore
       setErrorLogs(prev => [...prev, `Error creating replicator: ${error.message}`]);
@@ -110,40 +118,25 @@ export default function ReplicatorListenersScreen() {
       });
 
       setStatusToken(token);
-      setListOfLogs(prev => [...prev, `Status change listener started with token: ${token.getUuidToken()}`]);
+      setListOfLogs(prev => [...prev, `Status change listener started with token: ${token}`]);
     } catch (error) {
       // @ts-ignore
       setErrorLogs(prev => [...prev, `Error starting status listener: ${error.message}`]);
     }
   }
 
-  const stopStatusChangeListenerOldAPI = async () => {
+  const stopStatusChangeListener = async () => {
     try {
       if (replicator && statusToken) {
         await replicator.removeChangeListener(statusToken);
-        setStatusToken(null);
-        setListOfLogs(prev => [...prev, '✅ OLD API: Status change listener stopped via replicator.removeChangeListener()']);
+        setStatusToken('');
+        setListOfLogs(prev => [...prev, 'Status change listener stopped']);
       } else {
         setErrorLogs(prev => [...prev, 'No active status listener to stop']);
       }
     } catch (error) {
       // @ts-ignore
-      setErrorLogs(prev => [...prev, `Error stopping status listener (OLD API): ${error.message}`]);
-    }
-  }
-
-  const stopStatusChangeListenerNewAPI = async () => {
-    try {
-      if (statusToken) {
-        await statusToken.remove();
-        setStatusToken(null);
-        setListOfLogs(prev => [...prev, '✅ NEW API: Status change listener stopped via token.remove()']);
-      } else {
-        setErrorLogs(prev => [...prev, 'No active status listener to stop']);
-      }
-    } catch (error) {
-      // @ts-ignore
-      setErrorLogs(prev => [...prev, `Error stopping status listener (NEW API): ${error.message}`]);
+      setErrorLogs(prev => [...prev, `Error stopping status listener: ${error.message}`]);
     }
   }
 
@@ -170,40 +163,25 @@ export default function ReplicatorListenersScreen() {
       });
 
       setDocumentToken(token);
-      setListOfLogs(prev => [...prev, `Document change listener started with token: ${token.getUuidToken()}`]);
+      setListOfLogs(prev => [...prev, `Document change listener started with token: ${token}`]);
     } catch (error) {
       // @ts-ignore
       setErrorLogs(prev => [...prev, `Error starting document listener: ${error.message}`]);
     }
   }
 
-  const stopDocumentChangeListenerOldAPI = async () => {
+  const stopDocumentChangeListener = async () => {
     try {
       if (replicator && documentToken) {
         await replicator.removeChangeListener(documentToken);
-        setDocumentToken(null);
-        setListOfLogs(prev => [...prev, '✅ OLD API: Document change listener stopped via replicator.removeChangeListener()']);
+        setDocumentToken('');
+        setListOfLogs(prev => [...prev, 'Document change listener stopped']);
       } else {
         setErrorLogs(prev => [...prev, 'No active document listener to stop']);
       }
     } catch (error) {
       // @ts-ignore
-      setErrorLogs(prev => [...prev, `Error stopping document listener (OLD API): ${error.message}`]);
-    }
-  }
-
-  const stopDocumentChangeListenerNewAPI = async () => {
-    try {
-      if (documentToken) {
-        await documentToken.remove();
-        setDocumentToken(null);
-        setListOfLogs(prev => [...prev, '✅ NEW API: Document change listener stopped via token.remove()']);
-      } else {
-        setErrorLogs(prev => [...prev, 'No active document listener to stop']);
-      }
-    } catch (error) {
-      // @ts-ignore
-      setErrorLogs(prev => [...prev, `Error stopping document listener (NEW API): ${error.message}`]);
+      setErrorLogs(prev => [...prev, `Error stopping document listener: ${error.message}`]);
     }
   }
 
@@ -248,9 +226,9 @@ export default function ReplicatorListenersScreen() {
       }
 
       const doc = new MutableDocument();
-      doc.setString('type', 'test-replication');
+      doc.setString('type', 'test-replication-old-api');
       doc.setString('name', `Test Doc ${Date.now()}`);
-      doc.setString('description', 'This document should replicate to server');
+      doc.setString('description', 'This document should replicate to server (OLD API)');
       doc.setNumber('value', Math.floor(Math.random() * 1000));
       doc.setDate('createdAt', new Date());
 
@@ -295,59 +273,43 @@ export default function ReplicatorListenersScreen() {
     <SafeAreaView>
       <ScrollView style={{ padding: 10 }}>
         <View style={{ padding: 10 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-            Replicator Listeners Test
+         
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 5, color: '#FF6B6B' }}>
+            Replicator Listeners Test - OLD API
           </Text>
-          
-          <Text style={{ marginBottom: 10, fontSize: 12, color: '#666' }}>
-            Tests both OLD and NEW APIs for removing replicator change listeners
+          <Text style={{ fontSize: 12, marginBottom: 10, fontStyle: 'italic', color: '#666' }}>
+            Using deprecated CollectionConfig and ReplicatorConfiguration(endpoint) constructor
           </Text>
           
           <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Setup Steps:</Text>
           <Button title="1. Open Database" onPress={() => openDatabase()} />
-          <Button title="2. Create Replicator (uses default collection)" onPress={() => createReplicator()} />
+          <Button title="2. Create Replicator (OLD API - uses default collection)" onPress={() => createReplicator()} />
           
           <View style={{ height: 20 }} />
           
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Status Change Listener:</Text>
+          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Listener Controls:</Text>
           <Button 
-            title="Start Status Listener" 
+            title="Start Status Change Listener" 
             color="#4CAF50"
             onPress={() => startStatusChangeListener()} 
             disabled={!!statusToken}
           />
           <Button 
-            title="Stop Status Listener (OLD API)" 
-            color="#FF9500"
-            onPress={() => stopStatusChangeListenerOldAPI()} 
+            title="Stop Status Change Listener" 
+            color="#f44336"
+            onPress={() => stopStatusChangeListener()} 
             disabled={!statusToken}
           />
           <Button 
-            title="Stop Status Listener (NEW API - token.remove())" 
-            color="#34C759"
-            onPress={() => stopStatusChangeListenerNewAPI()} 
-            disabled={!statusToken}
-          />
-          
-          <View style={{ height: 20 }} />
-          
-          <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Document Change Listener:</Text>
-          <Button 
-            title="Start Document Listener" 
+            title="Start Document Change Listener" 
             color="#2196F3"
             onPress={() => startDocumentChangeListener()} 
             disabled={!!documentToken}
           />
           <Button 
-            title="Stop Document Listener (OLD API)" 
-            color="#FF9500"
-            onPress={() => stopDocumentChangeListenerOldAPI()} 
-            disabled={!documentToken}
-          />
-          <Button 
-            title="Stop Document Listener (NEW API - token.remove())" 
-            color="#34C759"
-            onPress={() => stopDocumentChangeListenerNewAPI()} 
+            title="Stop Document Change Listener" 
+            color="#FF9800"
+            onPress={() => stopDocumentChangeListener()} 
             disabled={!documentToken}
           />
           
@@ -361,14 +323,14 @@ export default function ReplicatorListenersScreen() {
           <View style={{ height: 20 }} />
           
           <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>Test Actions:</Text>
-          <Button title="Create Document (triggers replication)" onPress={() => createDocument()} color="#5856D6" />
+          <Button title="Create Document" onPress={() => createDocument()} />
           
           <View style={{ height: 20 }} />
           
           <Button 
             title="CLEAR LOGS" 
             color="red" 
-            onPress={() => {setListOfLogs([]); setErrorLogs([]); setListOfDocuments([])}} 
+            onPress={() => {setListOfLogs([]); setErrorLogs([])}} 
           />
 
           <View style={{ height: 20 }} />
@@ -376,23 +338,15 @@ export default function ReplicatorListenersScreen() {
           <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
             Active Listeners:
           </Text>
-          <View style={{ padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5, marginBottom: 10 }}>
-            <Text style={{ marginBottom: 5 }}>
-              Status Listener: {statusToken ? '✅ Active' : '❌ Inactive'}
-              {statusToken && <Text style={{ fontSize: 10, color: '#666' }}> ({statusToken.getUuidToken().substring(0, 8)}...)</Text>}
-            </Text>
-            <Text>
-              Document Listener: {documentToken ? '✅ Active' : '❌ Inactive'}
-              {documentToken && <Text style={{ fontSize: 10, color: '#666' }}> ({documentToken.getUuidToken().substring(0, 8)}...)</Text>}
-            </Text>
-          </View>
+          <Text>Status Listener: {statusToken ? '✅ Active' : '❌ Inactive'}</Text>
+          <Text>Document Listener: {documentToken ? '✅ Active' : '❌ Inactive'}</Text>
 
-          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>
             Documents Created: {listOfDocuments.length}
           </Text>
 
           {listOfDocuments.length > 0 && (
-            <View style={{ marginBottom: 10, padding: 10, backgroundColor: '#f0f0f0', borderRadius: 5 }}>
+            <View style={{ marginBottom: 10 }}>
               {listOfDocuments.map((docId, index) => (
                 <Text key={index} style={{ fontSize: 12 }}>
                   • {docId}
@@ -405,16 +359,12 @@ export default function ReplicatorListenersScreen() {
             Logs
           </Text>
 
-          <View style={{ padding: 10, backgroundColor: '#f5f5f5', borderRadius: 5, minHeight: 100 }}>
-            {listOfLogs.length === 0 ? (
-              <Text style={{ fontSize: 12, color: '#999' }}>No logs yet...</Text>
-            ) : (
-              listOfLogs.map((log, index) => (
-                <Text key={index} style={{ fontSize: 12, marginBottom: 5 }}>
-                  {log}
-                </Text>
-              ))
-            )}
+          <View style={{ padding: 10, backgroundColor: '#f5f5f5', borderRadius: 5 }}>
+            {listOfLogs.map((log, index) => (
+              <Text key={index} style={{ fontSize: 12, marginBottom: 5 }}>
+                {log}
+              </Text>
+            ))}
           </View>
 
           {errorLogs.length > 0 && (
@@ -436,3 +386,4 @@ export default function ReplicatorListenersScreen() {
     </SafeAreaView>
   );
 }
+
