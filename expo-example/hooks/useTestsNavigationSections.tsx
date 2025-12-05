@@ -22,6 +22,10 @@ export function useTestsNavigationSections() {
         { id: 17, title: 'Replicator Listeners (OLD API)', path: '/tests/replicator-listeners-old' },
         { id: 18, title: 'Replicator Listeners', path: '/tests/replicator-listeners' },
         { id: 19, title: 'Custom Bug Testing', path: '/tests/custom-bug-fix' },
+        { id: 20, title: 'LogSinks API', path: '/tests/logsinks' },
+        { id: 21, title: 'Log Sink Console Logs', path: '/tests/console-logging' },
+        { id: 22, title: 'File Logging Test', path: '/tests/file-logging' },
+        { id: 23, title: 'Custom Logging Test', path: '/tests/custom-logging' },
       ],
     },
   ];

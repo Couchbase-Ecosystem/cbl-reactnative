@@ -4,6 +4,7 @@ import cbl.js.kotiln.DatabaseManager
 import cbl.js.kotiln.CollectionManager
 import cbl.js.kotiln.FileSystemHelper
 import cbl.js.kotiln.LoggingManager
+import cbl.js.kotiln.LogSinksManager
 import cbl.js.kotiln.ReplicatorManager
 import cbl.js.kotiln.ReplicatorHelper
 import com.couchbase.lite.*
@@ -59,12 +60,14 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
   // Property to hold the context
   private val context: ReactApplicationContext = reactContext
      
-    /**
-    * Unified storage for all listener tokens.
-    * Maps UUID token string to ChangeListenerRecord (which contains native token + type)
-    */
-    private val allChangeListenerTokenByUuid: MutableMap<String, ChangeListenerRecord> = mutableMapOf()
+  /**
+   * Unified storage for all listener tokens.
+   * Maps UUID token string to ChangeListenerRecord (which contains native token + type)
+   */
+  private val allChangeListenerTokenByUuid: MutableMap<String, ChangeListenerRecord> = mutableMapOf()
   
+  // Track whether JavaScript is listening for events
+  private var listenerCount = 0
 
   init {
     CouchbaseLite.init(context, true)
@@ -74,6 +77,18 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
+  // Required for NativeEventEmitter - these methods are called by React Native
+  // when JS adds/removes listeners, but may not be reliable with Expo
+  @ReactMethod
+  fun addListener(eventName: String) {
+    listenerCount++
+  }
+
+  @ReactMethod
+  fun removeListeners(count: Int) {
+    listenerCount -= count
+    if (listenerCount < 0) listenerCount = 0
+  }
 
   private fun sendEvent(
     reactContext: ReactContext,
@@ -1608,6 +1623,110 @@ fun replicator_RemoveChangeListener(
       } catch (e: Throwable) {
         context.runOnUiQueueThread {
           promise.reject("SCOPE_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+   // ============================================================
+  // LOG SINKS FUNCTIONS
+  // ============================================================
+
+  @ReactMethod
+  fun logsinks_SetConsole(
+    level: Double?,
+    domains: ReadableArray?,
+    promise: Promise
+  ) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        // Convert Double? to Int?
+        val intLevel = level?.toInt()
+
+        // Convert ReadableArray? to List<String>?
+        val domainList = domains?.toArrayList()?.filterIsInstance<String>()
+
+        LogSinksManager.setConsoleSink(intLevel, domainList)
+
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("LOGSINKS_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun logsinks_SetFile(
+    level: Double?,
+    config: ReadableMap?,
+    promise: Promise
+  ) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        // Convert Double? to Int?
+        val intLevel = level?.toInt()
+
+        // Convert ReadableMap? to Map<String, Any>?
+        val configMap = config?.toHashMap()?.mapValues { it.value as Any }
+
+        LogSinksManager.setFileSink(intLevel, configMap)
+
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("LOGSINKS_ERROR", e.message)
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun logsinks_SetCustom(
+    level: Double?,
+    domains: ReadableArray?,
+    token: String?,
+    promise: Promise
+  ) {
+    GlobalScope.launch(Dispatchers.IO) {
+      try {
+        // Convert Double? to Int?
+        val intLevel = level?.toInt()
+
+        // Convert ReadableArray? to List<String>?
+        val domainList = domains?.toArrayList()?.filterIsInstance<String>()
+
+        // Create callback only if enabling (not disabling)
+        val callback: ((LogLevel, LogDomain, String) -> Unit)? =
+          if (intLevel != null && token != null) {
+            { logLevel, logDomain, message ->
+              val eventData = Arguments.createMap()
+              eventData.putString("token", token)
+              eventData.putInt("level", logLevel.ordinal)
+              eventData.putString("domain", LogSinksManager.logDomainToString(logDomain))
+              eventData.putString("message", message)
+
+              // Note: React Native may show warnings about no listeners if events arrive before
+              // JS listener is fully initialized, but these warnings are harmless
+              context.runOnUiQueueThread {
+                sendEvent(context, "customLogMessage", eventData)
+              }
+            }
+          } else null
+
+        LogSinksManager.setCustomSink(intLevel, domainList, callback)
+
+        context.runOnUiQueueThread {
+          promise.resolve(null)
+        }
+      } catch (e: Throwable) {
+        context.runOnUiQueueThread {
+          promise.reject("LOGSINKS_ERROR", e.message)
         }
       }
     }
