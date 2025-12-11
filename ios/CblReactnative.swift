@@ -52,8 +52,23 @@ class CblReactnative: RCTEventEmitter {
   var queryCount: Int = 0
   var replicatorCount: Int = 0
   var allResultsChunkSize: Int = 256
-  //create logger
-  let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "cblite")
+
+  // Helper methods for logging with availability checks
+  private func logDebug(_ message: String) {
+    if #available(iOS 14.0, *) {
+      Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.cblite", category: "cblite").debug("\(message)")
+    } else {
+      print("[DEBUG] \(message)")
+    }
+  }
+  
+  private func logError(_ message: String) {
+    if #available(iOS 14.0, *) {
+      Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.cblite", category: "cblite").error("\(message)")
+    } else {
+      print("[ERROR] \(message)")
+    }
+  }
 
   // Create a serial DispatchQueue for background tasks
   let backgroundQueue = DispatchQueue(label: "com.cblite.reactnative.backgroundQueue")
@@ -241,13 +256,13 @@ class CblReactnative: RCTEventEmitter {
         // removing reference of the token from our dictionary
         self.allChangeListenerTokenByUuid.removeValue(forKey: uuidToken)
 
-        self.logger.debug("::SWIFT DEBUG:: listenerToken_Remove: Removed \(changeListenerTokenRecord.listenerType.rawValue) listener with token \(uuidToken)")
+        self.logDebug("::SWIFT DEBUG:: listenerToken_Remove: Removed \(changeListenerTokenRecord.listenerType.rawValue) listener with token \(uuidToken)")
 
         resolve(nil)
       }
       else {
         let errorMsg = "No listener found for token \(uuidToken)"
-        self.logger.error("::SWIFT DEBUG:: listenerToken_Remove: \(errorMsg)")
+        self.logError("::SWIFT DEBUG:: listenerToken_Remove: \(errorMsg)")
         reject("LISTENER_ERROR", errorMsg, nil)
     }
     }
@@ -507,21 +522,21 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    logger.debug("::SWIFT DEBUG:: collection_GetCount: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
+    logDebug("::SWIFT DEBUG:: collection_GetCount: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
     if isError {
-      logger.error("::SWIFT DEBUG:: collection_GetCount: error parsing aurgments")
+      logError("::SWIFT DEBUG:: collection_GetCount: error parsing aurgments")
       return
     }
     backgroundQueue.async {
       do {
-        self.logger.debug("::SWIFT DEBUG:: collection_GetCount: getting count")
+        self.logDebug("::SWIFT DEBUG:: collection_GetCount: getting count")
         let count = try CollectionManager.shared.documentsCount(
           args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName)
-        self.logger.debug("::SWIFT DEBUG:: collection_GetCount: count retreived - equal to \(count)")
+        self.logDebug("::SWIFT DEBUG:: collection_GetCount: count retreived - equal to \(count)")
         let dict:NSDictionary = ["count": count]
         resolve(dict)
-        self.logger.debug("::SWIFT DEBUG:: collection_GetCount: returned \(dict)")
+        self.logDebug("::SWIFT DEBUG:: collection_GetCount: returned \(dict)")
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       } catch {
@@ -542,27 +557,27 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ){
-    logger.debug("::SWIFT DEBUG:: collection_GetFullName: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
+    logDebug("::SWIFT DEBUG:: collection_GetFullName: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
 
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
 
     if(isError){
-      logger.error("::SWIFT DEBUG:: collection_GetFullName: error parsing arguments")
+      logError("::SWIFT DEBUG:: collection_GetFullName: error parsing arguments")
       return
     }
 
     backgroundQueue.async {
       do{
-          self.logger.debug("::SWIFT DEBUG:: collection_GetFullName: getting fullName")
+          self.logDebug("::SWIFT DEBUG:: collection_GetFullName: getting fullName")
 
           let fullName = try CollectionManager.shared.fullName(args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName)
-          self.logger.debug("::SWIFT DEBUG:: collection_GetFullName: fullName retrieved - equal to \(fullName)")
+          self.logDebug("::SWIFT DEBUG:: collection_GetFullName: fullName retrieved - equal to \(fullName)")
 
           let dict:NSDictionary = ["fullName": fullName]
 
           resolve(dict)
 
-          self.logger.debug("::SWIFT DEBUG:: collection_GetFullName: returned \(dict)")
+          self.logDebug("::SWIFT DEBUG:: collection_GetFullName: returned \(dict)")
       }
       catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -751,24 +766,24 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    logger.debug("::SWIFT DEBUG:: collection_Save: called for documentId \(docId) in database \(name) with scopeName \(scopeName) with collectionName \(collectionName) with document: \(document) with blobs: \(blobs) with concurrencyControlValue: \(concurrencyControlValue)")
+    logDebug("::SWIFT DEBUG:: collection_Save: called for documentId \(docId) in database \(name) with scopeName \(scopeName) with collectionName \(collectionName) with document: \(document) with blobs: \(blobs) with concurrencyControlValue: \(concurrencyControlValue)")
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
     let (isDocumentError, documentArgs) = DataAdapter.shared.adaptDocumentArgs(docId: docId, concurrencyControlValue: concurrencyControlValue, reject: reject)
     if isError || isDocumentError {
-      logger.error ("::SWIFT DEBUG:: collection_Save: Error parsing database and document args")
+      logError("::SWIFT DEBUG:: collection_Save: Error parsing database and document args")
       return
     }
     let (isDocumentBlobError, documentBlobArgs) = DataAdapter.shared.adaptDocumentBlobStrings(document: document, blobs: blobs, reject: reject)
     if (isDocumentBlobError) {
-      logger.error ("::SWIFT DEBUG:: collection_Save: Error in parsing blobs args")
+      logError("::SWIFT DEBUG:: collection_Save: Error in parsing blobs args")
       return
     }
     backgroundQueue.async {
       do {
-        self.logger.debug("::SWIFT DEBUG:: collection_save: Getting blobs from json string")
+        self.logDebug("::SWIFT DEBUG:: collection_save: Getting blobs from json string")
         
         let blobs = try CollectionManager.shared.blobsFromJsonString(documentBlobArgs.blobs)
-        self.logger.debug ("::SWIFT DEBUG:: collection_save: got blobs \(blobs), calling saveDocument")
+        self.logDebug("::SWIFT DEBUG:: collection_save: got blobs \(blobs), calling saveDocument")
         
         let result = try CollectionManager.shared.saveDocument(
           documentArgs.documentId,
@@ -778,21 +793,21 @@ class CblReactnative: RCTEventEmitter {
           collectionName: args.collectionName,
           scopeName: args.scopeName,
           databaseName: args.databaseName)
-        self.logger.debug ("::SWIFT DEBUG:: collection_save: got result, creating dict")
+        self.logDebug("::SWIFT DEBUG:: collection_save: got result, creating dict")
         
         let dict:NSDictionary = [
           "_id": result.id,
           "_revId": result.revId ?? "",
           "_sequence": result.sequence,
           "concurrencyControlResult": result.concurrencyControl as Any]
-        self.logger.debug("::SWIFT DEBUG:: collection_save: dict created \(dict) - resolving with dict")
+        self.logDebug("::SWIFT DEBUG:: collection_save: dict created \(dict) - resolving with dict")
         resolve(dict)
-        self.logger.debug("::SWIFT DEBUG:: collection_save: resolve completed")
+        self.logDebug("::SWIFT DEBUG:: collection_save: resolve completed")
       } catch let error as NSError {
-        self.logger.error("::SWIFT DEBUG:: collection_save: Error \(error)")
+        self.logError("::SWIFT DEBUG:: collection_save: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       } catch {
-        self.logger.error("::SWIFT DEBUG:: collection_save: Error \(error)")
+        self.logError("::SWIFT DEBUG:: collection_save: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
     }
@@ -1130,21 +1145,21 @@ class CblReactnative: RCTEventEmitter {
     let intMaintenanceType: Int = maintenanceType.intValue
     let strDatabaseName: String = String(databaseName)
     let mType = DataAdapter.shared.adaptMaintenanceTypeFromInt(intValue: intMaintenanceType)
-    logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance: called with arguments maintenanceType: \(intMaintenanceType) for databaseName: \(strDatabaseName)")
+    logDebug("::SWIFT DEBUG:: database_PerformMaintenance: called with arguments maintenanceType: \(intMaintenanceType) for databaseName: \(strDatabaseName)")
     backgroundQueue.async {
       do {
-        self.logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance:  calling performane maintainance")
+        self.logDebug("::SWIFT DEBUG:: database_PerformMaintenance:  calling performane maintainance")
         try DatabaseManager.shared.performMaintenance(strDatabaseName, maintenanceType: mType)
-        self.logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance: done, resolving")
+        self.logDebug("::SWIFT DEBUG:: database_PerformMaintenance: done, resolving")
         resolve(nil)
-        self.logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance: resolve completed")
+        self.logDebug("::SWIFT DEBUG:: database_PerformMaintenance: resolve completed")
 
       } catch let error as NSError {
-        self.logger.error ("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
+        self.logError("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
       catch {
-        self.logger.error ("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
+        self.logError("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
     }
@@ -1426,7 +1441,7 @@ func replicator_AddDocumentChangeListener(
       let resultData = NSMutableDictionary()
       resultData.setValue(uuidToken, forKey: "token")
       resultData.setValue(documentJson, forKey: "documents")
-      self.logger.debug ("::SWIFT DEBUG:: Sending event \(self.kReplicatorDocumentChange), with data: \(resultData)")
+      self.logDebug("::SWIFT DEBUG:: Sending event \(self.kReplicatorDocumentChange), with data: \(resultData)")
       self.sendEvent(withName: self.kReplicatorDocumentChange, body: resultData)
     })
 

@@ -1,6 +1,6 @@
 package com.cblreactnative
 
-import cbl.js.kotiln.DatabaseManager
+import cbl.js.kotlin.DatabaseManager
 import com.couchbase.lite.MaintenanceType
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap

@@ -1,12 +1,12 @@
 package com.cblreactnative
 
-import cbl.js.kotiln.DatabaseManager
-import cbl.js.kotiln.CollectionManager
-import cbl.js.kotiln.FileSystemHelper
-import cbl.js.kotiln.LoggingManager
-import cbl.js.kotiln.LogSinksManager
-import cbl.js.kotiln.ReplicatorManager
-import cbl.js.kotiln.ReplicatorHelper
+import cbl.js.kotlin.DatabaseManager
+import cbl.js.kotlin.CollectionManager
+import cbl.js.kotlin.FileSystemHelper
+import cbl.js.kotlin.LoggingManager
+import cbl.js.kotlin.LogSinksManager
+import cbl.js.kotlin.ReplicatorManager
+import cbl.js.kotlin.ReplicatorHelper
 import com.couchbase.lite.*
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -16,6 +16,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReadableMap
+import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
