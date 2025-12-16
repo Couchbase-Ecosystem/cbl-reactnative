@@ -27,20 +27,20 @@ export function useDatabaseNavigationSections() {
         },
       ],
     },
+    // {
+    //   title: 'Logging API',
+    //   icon: 'cellphone-text',
+    //   data: [
+    //     {
+    //       id: 10,
+    //       title: 'Set Console',
+    //       path: '/database/logging/console',
+    //     },
+    //     { id: 11, title: 'Set File', path: '/database/logging/file' },
+    //   ],
+    // },
     {
-      title: 'Logging API',
-      icon: 'cellphone-text',
-      data: [
-        {
-          id: 10,
-          title: 'Set Console',
-          path: '/database/logging/console',
-        },
-        { id: 11, title: 'Set File', path: '/database/logging/file' },
-      ],
-    },
-    {
-      title: 'LogSinks API (New)',
+      title: 'LogSinks API',
       icon: 'alpha-l-box',
       data: [
         {
