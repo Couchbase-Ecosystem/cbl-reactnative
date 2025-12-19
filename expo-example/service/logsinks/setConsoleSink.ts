@@ -28,6 +28,7 @@ function getLogDomainFromString(value: string): LogDomain {
     case 'REPLICATOR': return LogDomain.REPLICATOR;
     case 'NETWORK': return LogDomain.NETWORK;
     case 'LISTENER': return LogDomain.LISTENER;
+    case 'ALL': return LogDomain.ALL;
     default:
       throw new Error(`Unknown LogDomain: ${value}`);
   }
