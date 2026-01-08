@@ -28,7 +28,7 @@
 
 # Keep our React Native module
 -keep class com.cblreactnative.** { *; }
--keep class cbl.js.kotiln.** { *; }
+-keep class cbl.js.kotlin.** { *; }
 
 # Keep J2V8 (JavaScript engine used for filters)
 -keep class com.eclipsesource.v8.** { *; }

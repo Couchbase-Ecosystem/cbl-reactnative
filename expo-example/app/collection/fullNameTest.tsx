@@ -29,9 +29,9 @@ export default function CollectionFullNameTestScreen() {
         results.push(`   Got: "${fullName}"`);
       }
       
-      // Test 3: Test error handling with a fake collection
+      // Test 3: Verify fullName succeeds with valid collection
       results.push('');
-      results.push('=== TEST 3: Error Handling ===');
+      results.push('=== TEST 3: Validate Success Case ===');
       results.push('Testing with valid collection (should succeed)');
       try {
         const testFullName = await collection.fullName();

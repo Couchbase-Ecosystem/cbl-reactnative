@@ -762,7 +762,7 @@ fun listenerToken_Remove(
         }
       } else {
         val errorMsg = "No listener found for token $changeListenerToken"
-        android.util.Log.e("CblReactnative", "::KOTLIN DEBUG:: listenerToken_Remove: $errorMsg")
+        android.util.Log.w("CblReactnative", "::KOTLIN DEBUG:: listenerToken_Remove: $errorMsg")
         context.runOnUiQueueThread {
           promise.reject("LISTENER_ERROR", errorMsg)
         }
@@ -1672,7 +1672,7 @@ fun replicator_RemoveChangeListener(
         val intLevel = level?.toInt()
 
         // Convert ReadableMap? to Map<String, Any>?
-        val configMap = config?.toHashMap()?.mapValues { it.value as Any }
+        val configMap = config?.toHashMap()?.filterValues { it != null } as? Map<String, Any>
 
         LogSinksManager.setFileSink(intLevel, configMap)
 
