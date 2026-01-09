@@ -870,12 +870,9 @@ class CblReactnative: RCTEventEmitter {
     let encryptionKey = String(newKey)
     backgroundQueue.async {
       do {
-        let errorMessageEncryptionKey = DataAdapter.shared.checkStringValue(value: encryptionKey, propertyName: "Encryption Key")
-        if !errorMessageEncryptionKey.isEmpty {
-          reject("DATABASE_ERROR", errorMessageEncryptionKey, nil)
-        }
-        
-        try DatabaseManager.shared.changeEncryptionKey(databaseName, newKey: encryptionKey)
+        // Allow empty encryption key - it's used to remove encryption
+        let keyToUse = encryptionKey.isEmpty ? nil : encryptionKey
+        try DatabaseManager.shared.changeEncryptionKey(databaseName, newKey: keyToUse)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)

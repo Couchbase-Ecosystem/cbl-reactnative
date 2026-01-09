@@ -841,7 +841,9 @@ fun collection_AddDocumentChangeListener(
         return@launch
       }
       try {
-        DatabaseManager.changeEncryptionKey(name, newKey)
+        // Allow empty encryption key - it's used to remove encryption
+        val keyToUse = if (newKey.isEmpty()) null else newKey
+        DatabaseManager.changeEncryptionKey(name, keyToUse)
         context.runOnUiQueueThread {
           promise.resolve(null)
         }
