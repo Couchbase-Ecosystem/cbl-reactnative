@@ -118,44 +118,7 @@ export default function CollectionChangeListenerScreen() {
     }
   }
   
-  // const connectToSyncGateway = async () => {
-  //   setListOfLogs(prev => [...prev, 'Connecting to Sync Gateway']);  // ✅ Use prev
-  //   const defaultCollection = await database?.defaultCollection();
-
-  //   const syncGatewayUrl = "wss://nasm0fvdr-jnehnb.apps.cloud.couchbase.com:4984/testendpoint"
-  //   const endpoint = new URLEndpoint(syncGatewayUrl);
-  //   const username = "jayantdhingra"
-  //   const password = "f9yu5QT4B5jpZep@"
-
-  //   const replicatorConfig = new ReplicatorConfiguration(endpoint)
-  //   replicatorConfig.setAuthenticator(new BasicAuthenticator(username, password))
-  //   // replicatorConfig.setContinuous(true)
-  //   replicatorConfig.setAcceptOnlySelfSignedCerts(false);
-
-    
-  //   if (defaultCollection) {
-  //     replicatorConfig.addCollection(defaultCollection)
-  //   }
-
-  //   const replicator = await Replicator.create(replicatorConfig)
-
-  //   replicator.addChangeListener((change) => {
-  //       const status = change.status;
-
-  //     setListOfLogs(prev => [...prev, `Replicator changed:, ${status}`]);  
-
-  //     if (status.getError()) {
-  //       setErrorLogs(prev => [...prev, `Replication error: ${status.getError()}`]);
-  //     }
-
-  //   })
-
-  //   await replicator.start(false)
-  //   setReplicator(replicator);
-
-  //   setListOfLogs(prev => [...prev, `Replicator created`]);  // ✅ Use prev
-  // }
-
+ 
 
   const createDocument = async () => {
     setListOfLogs(prev => [...prev, 'Creating Document']);  // ✅ Use prev
