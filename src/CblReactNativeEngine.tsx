@@ -47,6 +47,10 @@ import {
   ScopeArgs,
   ScopesResult,
   DocumentGetBlobContentArgs,
+  URLEndpointListenerCreateArgs,
+  URLEndpointListenerArgs,
+  URLEndpointListenerTLSIdentityArgs,
+  URLEndpointListenerStatus,
 } from './cblite-js/cblite/core-types';
 
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
@@ -54,6 +58,13 @@ import { Collection } from './cblite-js/cblite/src/collection';
 import { Result } from './cblite-js/cblite/src/result';
 import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
 import { Scope } from './cblite-js/cblite/src/scope';
+
+import { LogLevel, LogDomain } from './cblite-js/cblite/src/log-sinks-enums';
+import type {
+  LogSinksSetConsoleArgs,
+  LogSinksSetFileArgs,
+  LogSinksSetCustomArgs,
+} from './cblite-js/cblite/src/log-sinks-types';
 
 import uuid from 'react-native-uuid';
 
@@ -80,7 +91,18 @@ export class CblReactNativeEngine implements ICoreEngine {
   private _isReplicatorDocumentChangeEventSetup: boolean = false;
 
   private _collectionChangeListeners: Map<string, ListenerCallback> = new Map();
+  private _collectionDocumentChangeListeners: Map<string, ListenerCallback> =
+    new Map();
+
   private _queryChangeListeners: Map<string, ListenerCallback> = new Map();
+
+  // Storage for custom log sink callbacks, users can have multiple custom logs
+  // Key : unique token
+  // value: callback function
+  private customLogCallbacksMap: Map<
+    string,
+    (level: LogLevel, domain: LogDomain, message: string) => void
+  > = new Map();
 
   private static readonly LINKING_ERROR =
     `The package 'cbl-reactnative' doesn't seem to be linked. Make sure: \n\n` +
@@ -107,10 +129,30 @@ export class CblReactNativeEngine implements ICoreEngine {
     if (customEventEmitter) {
       this.debugLog('Using provided custom event emitter');
       this._eventEmitter = customEventEmitter;
-      return;
+    } else {
+      this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
     }
 
-    this._eventEmitter = new NativeEventEmitter(this.CblReactNative);
+    // Always add the customLogMessage listener regardless of emitter source
+    this._eventEmitter.addListener(
+      'customLogMessage',
+      (data: {
+        token: string;
+        level: LogLevel;
+        domain: LogDomain;
+        message: string;
+      }) => {
+        const callback = this.customLogCallbacksMap.get(data.token);
+
+        if (callback) {
+          callback(
+            data.level as LogLevel,
+            data.domain as LogDomain,
+            data.message
+          );
+        }
+      }
+    );
   }
 
   //private logging function
@@ -189,7 +231,7 @@ export class CblReactNativeEngine implements ICoreEngine {
     return new Promise((resolve, reject) => {
       const token = args.changeListenerToken;
 
-      if (this._collectionChangeListeners.has(token)) {
+      if (this._collectionDocumentChangeListeners.has(token)) {
         reject(new Error('Document change listener token already exists'));
         return;
       }
@@ -208,7 +250,7 @@ export class CblReactNativeEngine implements ICoreEngine {
       );
 
       this._emitterSubscriptions.set(token, subscription);
-      this._collectionChangeListeners.set(token, lcb);
+      this._collectionDocumentChangeListeners.set(token, lcb);
 
       this.CblReactNative.collection_AddDocumentChangeListener(
         token,
@@ -221,7 +263,7 @@ export class CblReactNativeEngine implements ICoreEngine {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (error: any) => {
           this._emitterSubscriptions.delete(token);
-          this._collectionChangeListeners.delete(token);
+          this._collectionDocumentChangeListeners.delete(token);
           subscription.remove();
           reject(error);
         }
@@ -415,6 +457,31 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
+  async collection_GetFullName(
+    args: CollectionArgs
+  ): Promise<{ fullName: string }> {
+    this.debugLog(
+      `::DEBUG:: collection_GetFullName: ${args.collectionName} ${args.name} ${args.scopeName}`
+    );
+
+    try {
+      const result = await this.CblReactNative.collection_GetFullName(
+        args.collectionName,
+        args.name,
+        args.scopeName
+      );
+
+      this.debugLog(
+        `::DEBUG:: collection_GetFullName completed with result: ${JSON.stringify(result)}`
+      );
+
+      return result;
+    } catch (error: unknown) {
+      this.debugLog(`::DEBUG:: collection_GetFullName Error: ${error}`);
+      throw error; // Re-throw to maintain error propagation
+    }
+  }
+
   collection_GetDefault(args: DatabaseArgs): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetDefault(args.name).then(
@@ -570,8 +637,8 @@ export class CblReactNativeEngine implements ICoreEngine {
       }
 
       // Remove the listener from the document listeners map
-      if (this._collectionChangeListeners.has(token)) {
-        this._collectionChangeListeners.delete(token);
+      if (this._collectionDocumentChangeListeners.has(token)) {
+        this._collectionDocumentChangeListeners.delete(token);
       } else {
         reject(new Error(`No document listener found with token: ${token}`));
         return;
@@ -594,6 +661,29 @@ export class CblReactNativeEngine implements ICoreEngine {
         }
       );
     });
+  }
+
+  /**
+   * Generic method to remove any listener by its UUID token.
+   * Calls the native listenerToken_Remove bridge method.
+   */
+  listenerToken_Remove(args: { changeListenerToken: string }): Promise<void> {
+    return this.CblReactNative.listenerToken_Remove(
+      args.changeListenerToken
+    ).then(
+      () => {
+        this.debugLog(
+          `::DEBUG:: Successfully removed listener with token ${args.changeListenerToken}`
+        );
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (error: any) => {
+        this.debugLog(
+          `::ERROR:: Failed to remove listener with token ${args.changeListenerToken}: ${error}`
+        );
+        throw error;
+      }
+    );
   }
 
   collection_Save(
@@ -1475,7 +1565,74 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
+  URLEndpointListener_createListener(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerCreateArgs
+  ): Promise<{ listenerId: string }> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_startListener(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerArgs
+  ): Promise<void> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_stopListener(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerArgs
+  ): Promise<void> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_getStatus(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerArgs
+  ): Promise<URLEndpointListenerStatus> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
+  URLEndpointListener_deleteIdentity(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: URLEndpointListenerTLSIdentityArgs
+  ): Promise<void> {
+    return Promise.reject(new Error('URLEndpointListener not implemented yet'));
+  }
+
   getUUID(): string {
     return uuid.v4().toString();
+  }
+
+  // =============================================================================
+  // LOG SINKS API
+  // =============================================================================
+
+  /**
+   * Sets or disables the console log sink
+   * @param args Arguments containing level and domains, or null to disable
+   */
+  async logsinks_SetConsole(args: LogSinksSetConsoleArgs): Promise<void> {
+    return this.CblReactNative.logsinks_SetConsole(args.level, args.domains);
+  }
+
+  /**
+   * Sets or disables the file log sink
+   * @param args Arguments containing level and config, or null to disable
+   */
+  async logsinks_SetFile(args: LogSinksSetFileArgs): Promise<void> {
+    return this.CblReactNative.logsinks_SetFile(args.level, args.config);
+  }
+
+  /**
+   * Sets or disables the custom log sink
+   * @param args Arguments containing level, domains, and token, or null to disable
+   */
+  async logsinks_SetCustom(args: LogSinksSetCustomArgs): Promise<void> {
+    return this.CblReactNative.logsinks_SetCustom(
+      args.level,
+      args.domains,
+      args.token
+    );
   }
 }

@@ -12,8 +12,9 @@ export default function DeleteDocumentScreen() {
   ): Promise<string[]> {
     try {
       await deleteDocument(collection, documentId);
+      const fullName = await collection.fullName();
       return [
-        `Document <${documentId}> deleted successfully from Collection <${collection.fullName()}> - Database <${collection.database.getName()}>`,
+        `Document <${documentId}> deleted successfully from Collection <${fullName}> - Database <${collection.database.getName()}>`,
       ];
     } catch (error) {
       // @ts-ignore

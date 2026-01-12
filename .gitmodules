@@ -1,12 +1,19 @@
 [submodule "src/cblite-js"]
 	path = src/cblite-js
 	url = git@github.com:Couchbase-Ecosystem/cblite-js.git
+	branch = RN-v1
+
 [submodule "ios/cbl-js-swift"]
 	path = ios/cbl-js-swift
 	url = git@github.com:Couchbase-Ecosystem/cbl-js-swift.git
+	branch = RN-v1
+
 [submodule "android/src/main/java/com/cblreactnative/cbl-js-kotlin"]
 	path = android/src/main/java/com/cblreactnative/cbl-js-kotlin
 	url = git@github.com:Couchbase-Ecosystem/cbl-js-kotlin.git
+	branch = RN-v1
+
 [submodule "expo-example/cblite-js-tests"]
 	path = expo-example/cblite-js-tests
 	url = git@github.com:Couchbase-Ecosystem/cblite-js-tests.git
+	branch = RN-v1

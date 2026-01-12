@@ -9,8 +9,9 @@ export default function CollectionGetDefaultScreen() {
   async function update(database: Database) {
     try {
       const collection = await defaultCollection(database);
+      const fullName = await collection.fullName();
       return [
-        `Found Collection: <${collection.fullName()}> in Database: <${collection.database.getName()}>`,
+        `Found Collection: <${fullName}> in Database: <${collection.database.getName()}>`,
       ];
     } catch (error) {
       // @ts-ignore

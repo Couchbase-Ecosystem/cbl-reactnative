@@ -6,8 +6,9 @@ export default function CollectionGetScreen() {
   function reset() {}
 
   async function update(collection: Collection): Promise<string[]> {
+    const fullName = await collection.fullName();
     return [
-      `Collection: <${collection.fullName()}> was retrieved from database <${collection.database.getName()}>`,
+      `Collection: <${fullName}> was retrieved from database <${collection.database.getName()}>`,
     ];
   }
 

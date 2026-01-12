@@ -27,8 +27,9 @@ export default function DocumentSetBlobScreen() {
         mutDoc !== null &&
         mutDoc.getId() === documentId
       ) {
+        const fullName = await collection.fullName();
         return [
-          `Blob with key <${key}> set on Document <${documentId}> in Collection <${collection.fullName()}> Database <${collection.database.getName()}>`,
+          `Blob with key <${key}> set on Document <${documentId}> in Collection <${fullName}> Database <${collection.database.getName()}>`,
         ];
       } else {
         return ['Error: Blob could not be set'];

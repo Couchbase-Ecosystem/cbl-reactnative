@@ -108,6 +108,14 @@ RCT_EXTERN_METHOD(collection_GetCount:
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(collection_GetFullName: 
+  (NSString *) collectionName
+  fromDatabaseWithName: (NSString *) name
+  fromScopeWithName: (NSString *) scopeName
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject
+)
+
 RCT_EXTERN_METHOD(collection_GetDefault:
   (NSString *)name
   withResolver:(RCTPromiseResolveBlock)resolve
@@ -217,6 +225,10 @@ RCT_EXTERN_METHOD(database_PerformMaintenance:
 
 RCT_EXTERN_METHOD(file_GetDefaultPath:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(listenerToken_Remove:(NSString *)changeListenerToken
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+                  
 // MARK: - Logging Functions
 
 RCT_EXTERN_METHOD(database_SetFileLoggingConfig:
@@ -231,6 +243,27 @@ RCT_EXTERN_METHOD(database_SetFileLoggingConfig:
 
 RCT_EXTERN_METHOD(database_SetLogLevel:(NSString *)domain
     withLogLevel:(nonnull NSNumber *)logLevel
+    withResolver:(RCTPromiseResolveBlock)resolve
+    withRejecter:(RCTPromiseRejectBlock)reject)
+
+// MARK: - LogSinks Functions
+
+RCT_EXTERN_METHOD(logsinks_SetConsole:
+    (nonnull NSNumber *)level
+    withDomains:(nonnull NSArray *)domains
+    withResolver:(RCTPromiseResolveBlock)resolve
+    withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(logsinks_SetFile:
+    (nonnull NSNumber *)level
+    withConfig:(nonnull NSDictionary *)config
+    withResolver:(RCTPromiseResolveBlock)resolve
+    withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(logsinks_SetCustom:
+    (nonnull NSNumber *)level
+    withDomains:(nonnull NSArray *)domains
+    withToken:(nonnull NSString *)token
     withResolver:(RCTPromiseResolveBlock)resolve
     withRejecter:(RCTPromiseRejectBlock)reject)
 

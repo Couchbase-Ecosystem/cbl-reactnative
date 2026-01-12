@@ -27,16 +27,37 @@ export function useDatabaseNavigationSections() {
         },
       ],
     },
+    // {
+    //   title: 'Logging API',
+    //   icon: 'cellphone-text',
+    //   data: [
+    //     {
+    //       id: 10,
+    //       title: 'Set Console',
+    //       path: '/database/logging/console',
+    //     },
+    //     { id: 11, title: 'Set File', path: '/database/logging/file' },
+    //   ],
+    // },
     {
-      title: 'Logging API',
-      icon: 'cellphone-text',
+      title: 'LogSinks API',
+      icon: 'alpha-l-box',
       data: [
         {
-          id: 10,
-          title: 'Set Console',
-          path: '/database/logging/console',
+          id: 12,
+          title: 'Console LogSink',
+          path: '/logsinks/console',
         },
-        { id: 11, title: 'Set File', path: '/database/logging/file' },
+        { 
+          id: 13, 
+          title: 'File LogSink', 
+          path: '/logsinks/file' 
+        },
+        { 
+          id: 14, 
+          title: 'Custom LogSink', 
+          path: '/logsinks/custom' 
+        },
       ],
     },
   ];

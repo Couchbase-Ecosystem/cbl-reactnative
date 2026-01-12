@@ -9,8 +9,9 @@ export default function CollectionDeleteScreen() {
   async function update(collection: Collection) {
     try {
       await deleteCollection(collection);
+      const fullName = await collection.fullName();
       return [
-        `Deleted Collection: <${collection.fullName()} in Database: <${collection.database.getName()}>`,
+        `Deleted Collection: <${fullName}> in Database: <${collection.database.getName()}>`,
       ];
     } catch (error) {
       // @ts-ignore

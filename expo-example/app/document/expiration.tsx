@@ -21,8 +21,9 @@ export default function GetDocumentExpirationScreen() {
   ): Promise<string[]> {
     try {
       await setExpirationDate(collection, documentId, expiration);
+      const fullName = await collection.fullName();
       return [
-        `Successfully set expiration to <${expiration}> for Document with ID: <${documentId}> in Collection <${collection.fullName()}> in Database <${collection.database.getName()}>`,
+        `Successfully set expiration to <${expiration}> for Document with ID: <${documentId}> in Collection <${fullName}> in Database <${collection.database.getName()}>`,
       ];
     } catch (error) {
       // @ts-ignore

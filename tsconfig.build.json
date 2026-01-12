@@ -1,4 +1,10 @@
 {
   "extends": "./tsconfig",
-  "exclude": ["example", "expo-example"]
+  "exclude": [
+    "example",
+    "expo-example",
+    "couchbase-lite-ios",
+    "cbl-reactnative-docs",
+    "ios-swift-quickstart"
+  ]
 }

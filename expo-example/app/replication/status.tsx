@@ -35,14 +35,28 @@ export default function ReplicatorStatusScreen() {
             ...prev,
             `::Information: Replicator <${replicatorId}> Starting Status Change listener...`,
           ]);
-          const date = new Date().toISOString();
           const changeToken = await replicator.addChangeListener((change) => {
-            const newMessage = [
-              `${date}::Status:: Replicator <${replicator.getId()}> status changed: ${change.status}`,
-            ];
-            setInformationMessages((prev) => [...prev, ...newMessage]);
+            const date = new Date().toISOString();
+            const status = change.status;
+            
+            // Extract details from status object
+            const activityLevel = status.getActivityLevel();
+            const progress = status.getProgress();
+            const error = status.getError();
+
+            let logMessage = `${date}::Status:: Replicator <${replicator.getId()}> ${activityLevel}`;
+            
+            if (progress) {
+              logMessage += ` | Progress: ${progress.getCompleted()}/${progress.getTotal()}`;
+            }
+            
+            if (error) {
+              logMessage += ` | Error: ${error}`;
+            }
+
+            setInformationMessages((prev) => [...prev, logMessage]);
           });
-          setStatusToken((prev) => {
+          setStatusToken((prev: any) => {
             return {
               ...prev,
               [replicatorId]: changeToken,

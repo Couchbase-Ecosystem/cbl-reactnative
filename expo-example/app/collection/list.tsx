@@ -20,11 +20,12 @@ export default function CollectionListScreen() {
       const results: string[] = [];
       const collections = await listCollections(database, scopeName);
       if (collections.length > 0) {
-        collections.forEach((collection) => {
+        for (const collection of collections) {
+          const fullName = await collection.fullName();
           results.push(
-            `Found Collection: <${collection.fullName()}> in Database ${database.getName()}`
+            `Found Collection: <${fullName}> in Database ${database.getName()}`
           );
-        });
+        }
       } else {
         results.push(
           'Error: No collections found.  Collections should have at least 1 collection defined in a given scope.'

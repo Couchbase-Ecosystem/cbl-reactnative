@@ -3,6 +3,38 @@ import CouchbaseLiteSwift
 import os
 import React
 
+
+/**
+ * Metadata for storing listener information in unified dictionary.
+ * 
+ * This struct wraps the native ListenerToken along with its type.
+ * When adding a listener, we store both the token and its type.
+ * When removing a listener, we look up by UUID and get both back.
+ * 
+ * This eliminates the need to pass the type when removing - it's
+ * already stored in the metadata!
+ */
+struct ChangeListenerRecord{
+  let nativeListenerToken: ListenerToken
+  let listenerType: ChangeListenerType
+}
+
+
+/**
+ * Enum representing the type of listener.
+ * 
+ * This allows us to identify what kind of listener a token represents,
+ * useful for debugging and filtering.
+ */
+enum ChangeListenerType: String {
+  case collection
+  case collectionDocument
+  case query
+  case replicator
+  case replicatorDocument
+}
+
+
 @objc(
   CblReactnative
 )
@@ -10,20 +42,33 @@ class CblReactnative: RCTEventEmitter {
   
   // MARK: - Member Properties
   private var hasListeners = false
-  var databaseChangeListeners = [String: Any]()
-  
-  var collectionChangeListeners = [String: Any]()
-  var collectionDocumentChangeListeners = [String: Any]()
-  var queryChangeListeners = [String: Any]()
-  
-  var replicatorChangeListeners = [String: Any]()
-  var replicatorDocumentChangeListeners = [String: Any]()
+
+
+  /**
+ * Unified storage for all listener tokens.
+ */
+  var allChangeListenerTokenByUuid : [String: ChangeListenerRecord] = [:]
   
   var queryCount: Int = 0
   var replicatorCount: Int = 0
   var allResultsChunkSize: Int = 256
-  //create logger
-  let logger = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "cblite")
+
+  // Helper methods for logging with availability checks
+  private func logDebug(_ message: String) {
+    if #available(iOS 14.0, *) {
+      Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.cblite", category: "cblite").debug("\(message)")
+    } else {
+      print("[DEBUG] \(message)")
+    }
+  }
+  
+  private func logError(_ message: String) {
+    if #available(iOS 14.0, *) {
+      Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.cblite", category: "cblite").error("\(message)")
+    } else {
+      print("[ERROR] \(message)")
+    }
+  }
 
   // Create a serial DispatchQueue for background tasks
   let backgroundQueue = DispatchQueue(label: "com.cblite.reactnative.backgroundQueue")
@@ -32,6 +77,17 @@ class CblReactnative: RCTEventEmitter {
   override init() {
     super.init()
   }
+  
+  // Track whether JavaScript is listening for events
+  // Note: These may not be called reliably by React Native/Expo
+  override func startObserving() {
+    hasListeners = true
+  }
+  
+  override func stopObserving() {
+    hasListeners = false
+  }
+  
   // MARK: - Setup Notifications
   
   // Required override to specify supported events
@@ -40,13 +96,15 @@ class CblReactnative: RCTEventEmitter {
   let kQueryChange = "queryChange"
   let kReplicatorStatusChange = "replicatorStatusChange"
   let kReplicatorDocumentChange = "replicatorDocumentChange"
+  let kCustomLogMessage = "customLogMessage"
   
   override func supportedEvents() -> [String]! {
     return [kCollectionChange,
             kCollectionDocumentChange,
             kQueryChange,
             kReplicatorStatusChange,
-            kReplicatorDocumentChange]
+            kReplicatorDocumentChange,
+            kCustomLogMessage]
     }
   
    @objc override static func moduleName() -> String! {
@@ -57,7 +115,8 @@ class CblReactnative: RCTEventEmitter {
      return false
    }
   
-  // MARK: - Collection Functions
+
+
   @objc(collection_AddChangeListener:fromCollectionWithName:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
   func collection_AddChangeListener(
     changeListenerToken: NSString,
@@ -68,9 +127,9 @@ class CblReactnative: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
-    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isUuidTokenError, uuidToken) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
 
-    if isError || isTokenError {
+    if isError || isUuidTokenError {
       return
     }
 
@@ -90,7 +149,7 @@ class CblReactnative: RCTEventEmitter {
         
           // Format the data to match the CollectionChange interface
           let resultData = NSMutableDictionary()
-          resultData.setValue(token, forKey: "token")
+          resultData.setValue(uuidToken, forKey: "token")
           resultData.setValue(change.documentIDs, forKey: "documentIDs")
         
           // Use DataAdapter to convert the Collection to a consistent dictionary format
@@ -99,8 +158,10 @@ class CblReactnative: RCTEventEmitter {
       
           self.sendEvent(withName: self.kCollectionChange, body: resultData)
         }
-    
-        self.collectionChangeListeners[token] = listener
+
+
+        // Store in unified dictionary with type
+        self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .collection)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -121,10 +182,10 @@ class CblReactnative: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
-    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isUuidTokenError, uuidToken) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
     let (isDocIdError, docId) = DataAdapter.shared.adaptNonEmptyString(value: documentId, propertyName: "documentId", reject: reject)
 
-    if isError || isTokenError || isDocIdError {
+    if isError || isUuidTokenError || isDocIdError {
       return
     }
 
@@ -143,7 +204,7 @@ class CblReactnative: RCTEventEmitter {
           guard let self = self else { return }
       
           let resultData = NSMutableDictionary()
-          resultData.setValue(token, forKey: "token")
+          resultData.setValue(uuidToken, forKey: "token")
           resultData.setValue(change.documentID, forKey: "documentId")
       
           let collectionDict = DataAdapter.shared.adaptCollectionToNSDictionary(collection, databaseName: args.databaseName)
@@ -153,8 +214,10 @@ class CblReactnative: RCTEventEmitter {
       
           self.sendEvent(withName: self.kCollectionDocumentChange, body: resultData)
         }
-    
-        self.collectionDocumentChangeListeners[token] = listener
+
+
+        // Store in unified dictionary with type
+        self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .collectionDocument)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -171,28 +234,39 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    let token = String(changeListenerToken)
-  
+
+    listenerToken_Remove(changeListenerToken: changeListenerToken, resolve: resolve, reject: reject)
+
+  }
+
+  @objc(listenerToken_Remove:withResolver:withRejecter:)
+  func listenerToken_Remove(
+    changeListenerToken: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+
+    let uuidToken = String(changeListenerToken)
     backgroundQueue.async {
-      // Check for collection change listeners
-      if let listener = self.collectionChangeListeners[token] as? ListenerToken {
-        listener.remove()
-        self.collectionChangeListeners.removeValue(forKey: token)
+      if let changeListenerTokenRecord = self.allChangeListenerTokenByUuid[uuidToken]{
+
+        // Removing the listener using the native token, basically calling token.remove()
+        changeListenerTokenRecord.nativeListenerToken.remove()
+
+        // removing reference of the token from our dictionary
+        self.allChangeListenerTokenByUuid.removeValue(forKey: uuidToken)
+
+        self.logDebug("::SWIFT DEBUG:: listenerToken_Remove: Removed \(changeListenerTokenRecord.listenerType.rawValue) listener with token \(uuidToken)")
+
         resolve(nil)
-        return
       }
-    
-      // Check for document change listeners
-      if let listener = self.collectionDocumentChangeListeners[token] as? ListenerToken {
-        listener.remove()
-        self.collectionDocumentChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      }
-    
-      // No listener found with this token
-      reject("DATABASE_ERROR", "No listener found for token \(token)", nil)
+      else {
+        let errorMsg = "No listener found for token \(uuidToken)"
+        self.logError("::SWIFT DEBUG:: listenerToken_Remove: \(errorMsg)")
+        reject("LISTENER_ERROR", errorMsg, nil)
     }
+    }
+
   }
 
   
@@ -448,27 +522,70 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    logger.debug("::SWIFT DEBUG:: collection_GetCount: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
+    logDebug("::SWIFT DEBUG:: collection_GetCount: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
     if isError {
-      logger.error("::SWIFT DEBUG:: collection_GetCount: error parsing aurgments")
+      logError("::SWIFT DEBUG:: collection_GetCount: error parsing aurgments")
       return
     }
     backgroundQueue.async {
       do {
-        self.logger.debug("::SWIFT DEBUG:: collection_GetCount: getting count")
+        self.logDebug("::SWIFT DEBUG:: collection_GetCount: getting count")
         let count = try CollectionManager.shared.documentsCount(
           args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName)
-        self.logger.debug("::SWIFT DEBUG:: collection_GetCount: count retreived - equal to \(count)")
+        self.logDebug("::SWIFT DEBUG:: collection_GetCount: count retreived - equal to \(count)")
         let dict:NSDictionary = ["count": count]
         resolve(dict)
-        self.logger.debug("::SWIFT DEBUG:: collection_GetCount: returned \(dict)")
+        self.logDebug("::SWIFT DEBUG:: collection_GetCount: returned \(dict)")
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       } catch {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
     }
+  }
+
+    // MARK: - Collection Functions
+
+
+  // this function will get full name from database
+  @objc(collection_GetFullName:fromDatabaseWithName:fromScopeWithName:withResolver:withRejecter:)
+  func collection_GetFullName(
+    collectionName: NSString,
+    name: NSString,
+    scopeName: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ){
+    logDebug("::SWIFT DEBUG:: collection_GetFullName: called for collection \(collectionName) in database \(name) with scopeName \(scopeName)")
+
+    let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
+
+    if(isError){
+      logError("::SWIFT DEBUG:: collection_GetFullName: error parsing arguments")
+      return
+    }
+
+    backgroundQueue.async {
+      do{
+          self.logDebug("::SWIFT DEBUG:: collection_GetFullName: getting fullName")
+
+          let fullName = try CollectionManager.shared.fullName(args.collectionName, scopeName: args.scopeName, databaseName: args.databaseName)
+          self.logDebug("::SWIFT DEBUG:: collection_GetFullName: fullName retrieved - equal to \(fullName)")
+
+          let dict:NSDictionary = ["fullName": fullName]
+
+          resolve(dict)
+
+          self.logDebug("::SWIFT DEBUG:: collection_GetFullName: returned \(dict)")
+      }
+      catch let error as NSError {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      } catch {
+        reject("DATABASE_ERROR", error.localizedDescription, nil)
+      }
+    }
+
   }
   
   
@@ -649,24 +766,24 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    logger.debug("::SWIFT DEBUG:: collection_Save: called for documentId \(docId) in database \(name) with scopeName \(scopeName) with collectionName \(collectionName) with document: \(document) with blobs: \(blobs) with concurrencyControlValue: \(concurrencyControlValue)")
+    logDebug("::SWIFT DEBUG:: collection_Save: called for documentId \(docId) in database \(name) with scopeName \(scopeName) with collectionName \(collectionName) with document: \(document) with blobs: \(blobs) with concurrencyControlValue: \(concurrencyControlValue)")
     let (isError, args) = DataAdapter.shared.adaptCollectionArgs(name: name, collectionName: collectionName, scopeName: scopeName, reject: reject)
     let (isDocumentError, documentArgs) = DataAdapter.shared.adaptDocumentArgs(docId: docId, concurrencyControlValue: concurrencyControlValue, reject: reject)
     if isError || isDocumentError {
-      logger.error ("::SWIFT DEBUG:: collection_Save: Error parsing database and document args")
+      logError("::SWIFT DEBUG:: collection_Save: Error parsing database and document args")
       return
     }
     let (isDocumentBlobError, documentBlobArgs) = DataAdapter.shared.adaptDocumentBlobStrings(document: document, blobs: blobs, reject: reject)
     if (isDocumentBlobError) {
-      logger.error ("::SWIFT DEBUG:: collection_Save: Error in parsing blobs args")
+      logError("::SWIFT DEBUG:: collection_Save: Error in parsing blobs args")
       return
     }
     backgroundQueue.async {
       do {
-        self.logger.debug("::SWIFT DEBUG:: collection_save: Getting blobs from json string")
+        self.logDebug("::SWIFT DEBUG:: collection_save: Getting blobs from json string")
         
         let blobs = try CollectionManager.shared.blobsFromJsonString(documentBlobArgs.blobs)
-        self.logger.debug ("::SWIFT DEBUG:: collection_save: got blobs \(blobs), calling saveDocument")
+        self.logDebug("::SWIFT DEBUG:: collection_save: got blobs \(blobs), calling saveDocument")
         
         let result = try CollectionManager.shared.saveDocument(
           documentArgs.documentId,
@@ -676,21 +793,21 @@ class CblReactnative: RCTEventEmitter {
           collectionName: args.collectionName,
           scopeName: args.scopeName,
           databaseName: args.databaseName)
-        self.logger.debug ("::SWIFT DEBUG:: collection_save: got result, creating dict")
+        self.logDebug("::SWIFT DEBUG:: collection_save: got result, creating dict")
         
         let dict:NSDictionary = [
           "_id": result.id,
           "_revId": result.revId ?? "",
           "_sequence": result.sequence,
           "concurrencyControlResult": result.concurrencyControl as Any]
-        self.logger.debug("::SWIFT DEBUG:: collection_save: dict created \(dict) - resolving with dict")
+        self.logDebug("::SWIFT DEBUG:: collection_save: dict created \(dict) - resolving with dict")
         resolve(dict)
-        self.logger.debug("::SWIFT DEBUG:: collection_save: resolve completed")
+        self.logDebug("::SWIFT DEBUG:: collection_save: resolve completed")
       } catch let error as NSError {
-        self.logger.error("::SWIFT DEBUG:: collection_save: Error \(error)")
+        self.logError("::SWIFT DEBUG:: collection_save: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       } catch {
-        self.logger.error("::SWIFT DEBUG:: collection_save: Error \(error)")
+        self.logError("::SWIFT DEBUG:: collection_save: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
     }
@@ -753,12 +870,9 @@ class CblReactnative: RCTEventEmitter {
     let encryptionKey = String(newKey)
     backgroundQueue.async {
       do {
-        let errorMessageEncryptionKey = DataAdapter.shared.checkStringValue(value: encryptionKey, propertyName: "Encryption Key")
-        if !errorMessageEncryptionKey.isEmpty {
-          reject("DATABASE_ERROR", errorMessageEncryptionKey, nil)
-        }
-        
-        try DatabaseManager.shared.changeEncryptionKey(databaseName, newKey: encryptionKey)
+        // Allow empty encryption key - it's used to remove encryption
+        let keyToUse = encryptionKey.isEmpty ? nil : encryptionKey
+        try DatabaseManager.shared.changeEncryptionKey(databaseName, newKey: keyToUse)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -1028,21 +1142,21 @@ class CblReactnative: RCTEventEmitter {
     let intMaintenanceType: Int = maintenanceType.intValue
     let strDatabaseName: String = String(databaseName)
     let mType = DataAdapter.shared.adaptMaintenanceTypeFromInt(intValue: intMaintenanceType)
-    logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance: called with arguments maintenanceType: \(intMaintenanceType) for databaseName: \(strDatabaseName)")
+    logDebug("::SWIFT DEBUG:: database_PerformMaintenance: called with arguments maintenanceType: \(intMaintenanceType) for databaseName: \(strDatabaseName)")
     backgroundQueue.async {
       do {
-        self.logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance:  calling performane maintainance")
+        self.logDebug("::SWIFT DEBUG:: database_PerformMaintenance:  calling performane maintainance")
         try DatabaseManager.shared.performMaintenance(strDatabaseName, maintenanceType: mType)
-        self.logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance: done, resolving")
+        self.logDebug("::SWIFT DEBUG:: database_PerformMaintenance: done, resolving")
         resolve(nil)
-        self.logger.debug ("::SWIFT DEBUG:: database_PerformMaintenance: resolve completed")
+        self.logDebug("::SWIFT DEBUG:: database_PerformMaintenance: resolve completed")
 
       } catch let error as NSError {
-        self.logger.error ("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
+        self.logError("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
       catch {
-        self.logger.error ("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
+        self.logError("::SWIFT DEBUG:: database_PerformMaintenance: Error \(error)")
         reject("DATABASE_ERROR", error.localizedDescription, nil)
       }
     }
@@ -1122,10 +1236,10 @@ class CblReactnative: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
     let (isError, databaseName) = DataAdapter.shared.adaptDatabaseName(name: name, reject: reject)
-    let (isTokenError, token) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
+    let (isUuidTokenError, uuidToken) = DataAdapter.shared.adaptNonEmptyString(value: changeListenerToken, propertyName: "changeListenerToken", reject: reject)
     let (isQueryError, queryString) = DataAdapter.shared.adaptNonEmptyString(value: query, propertyName: "query", reject: reject)
   
-    if isError || isTokenError || isQueryError {
+    if isError || isUuidTokenError || isQueryError {
       return
     }
     
@@ -1147,7 +1261,7 @@ class CblReactnative: RCTEventEmitter {
           guard let self = self else { return }
         
           let resultData = NSMutableDictionary()
-          resultData.setValue(token, forKey: "token")
+          resultData.setValue(uuidToken, forKey: "token")
         
           if let results = change.results {
             // Convert results to JSON format
@@ -1162,8 +1276,10 @@ class CblReactnative: RCTEventEmitter {
         
           self.sendEvent(withName: self.kQueryChange, body: resultData)
         }
-      
-        self.queryChangeListeners[token] = listener
+
+
+        // Store in unified dictionary with type
+        self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .query)
         resolve(nil)
       } catch let error as NSError {
         reject("DATABASE_ERROR", error.localizedDescription, nil)
@@ -1179,18 +1295,10 @@ class CblReactnative: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) -> Void {
-    let token = String(changeListenerToken)
-  
-    backgroundQueue.async {
-      if let listener = self.queryChangeListeners[token] as? ListenerToken {
-        listener.remove()
-        self.queryChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      }
+
+    listenerToken_Remove(changeListenerToken: changeListenerToken, resolve: resolve, reject: reject)
+
     
-      reject("DATABASE_ERROR", "No query listener found for token \(token)", nil)
-    }
   }
 
   @objc(query_Execute:
@@ -1283,7 +1391,7 @@ class CblReactnative: RCTEventEmitter {
   {
     var errorMessage = ""
     let replId = String(replicatorId)
-    let token = String(changeListenerToken)
+    let uuidToken = String(changeListenerToken)
     
     backgroundQueue.async {
       guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
@@ -1295,11 +1403,14 @@ class CblReactnative: RCTEventEmitter {
       let listener = replicator.addChangeListener(withQueue: self.backgroundQueue, { change in
         let statusJson = ReplicatorHelper.generateReplicatorStatusJson(change.status)
         let resultData = NSMutableDictionary()
-        resultData.setValue(token, forKey: "token")
+        resultData.setValue(uuidToken, forKey: "token")
         resultData.setValue(statusJson, forKey: "status")
         self.sendEvent(withName: self.kReplicatorStatusChange, body: resultData)
       })
-      self.replicatorChangeListeners[token] = listener
+
+
+      // Store in unified dictionary with type
+      self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .replicator)
       resolve(nil)
     }
   }
@@ -1313,7 +1424,7 @@ func replicator_AddDocumentChangeListener(
 {
   var errorMessage = ""
   let replId = String(replicatorId)
-  let token = String(changeListenerToken)
+  let uuidToken = String(changeListenerToken)
   
   backgroundQueue.async {
     guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
@@ -1325,12 +1436,15 @@ func replicator_AddDocumentChangeListener(
     let listener = replicator.addDocumentReplicationListener(withQueue: self.backgroundQueue, { change in
       let documentJson = ReplicatorHelper.generateReplicationJson(change.documents, isPush: change.isPush)
       let resultData = NSMutableDictionary()
-      resultData.setValue(token, forKey: "token")
+      resultData.setValue(uuidToken, forKey: "token")
       resultData.setValue(documentJson, forKey: "documents")
-      self.logger.debug ("::SWIFT DEBUG:: Sending event \(self.kReplicatorDocumentChange), with data: \(resultData)")
+      self.logDebug("::SWIFT DEBUG:: Sending event \(self.kReplicatorDocumentChange), with data: \(resultData)")
       self.sendEvent(withName: self.kReplicatorDocumentChange, body: resultData)
     })
-    self.replicatorDocumentChangeListeners[token] = listener
+
+
+    // Store in unified dictionary with type
+    self.allChangeListenerTokenByUuid[uuidToken] = ChangeListenerRecord(nativeListenerToken: listener, listenerType: .replicatorDocument)
     resolve(nil)
   }
 }
@@ -1356,6 +1470,34 @@ func replicator_AddDocumentChangeListener(
       }
     }
   
+  /// **[DUAL API SUPPORT]** Creates a replicator from React Native configuration
+  ///
+  /// **What it does:**
+  /// - Receives replicator configuration from JavaScript layer
+  /// - Automatically detects NEW or OLD API format
+  /// - Creates and registers a new replicator instance
+  /// - Returns unique replicator ID for future operations
+  ///
+  /// **Parameters (from React Native):**
+  /// - `config`: NSDictionary containing:
+  ///   - `collectionConfig`: JSON string (NEW or OLD format)
+  ///   - All other replicator settings (target, type, continuous, etc.)
+  ///
+  /// **NEW API Format:**
+  /// ```json
+  /// "[{\"collection\":{\"name\":\"users\",...},\"config\":{\"channels\":[\"public\"]}}]"
+  /// ```
+  ///
+  /// **OLD API Format:**
+  /// ```json
+  /// "[{\"collections\":[{\"collection\":{\"name\":\"users\",...}}],\"config\":{...}}]"
+  /// ```
+  ///
+  /// **Returns (via resolve):**
+  /// - `NSDictionary`: `["replicatorId": "UUID-STRING"]`
+  ///
+  /// **Errors (via reject):**
+  /// - "REPLICATOR_ERROR": If parsing fails, collection not found, or invalid config
   @objc(replicator_Create:withResolver:withRejecter:)
   func replicator_Create(
     config: NSDictionary,
@@ -1369,16 +1511,13 @@ func replicator_AddDocumentChangeListener(
       }
       backgroundQueue.async {
         do {
-          if let data = collectionConfigJson.data(using: .utf8){
-            let decoder: JSONDecoder = JSONDecoder()
-            let collectionConfig = try decoder.decode([CollectionConfigItem].self, from: data)
-            let replicatorId = try ReplicatorManager.shared.replicator(repConfig, collectionConfiguration:collectionConfig)
-            let dict:NSDictionary = [
-              "replicatorId": replicatorId]
-            resolve(dict)
-          } else {
-            reject("REPLICATOR_ERROR", "couldn't deserialize replicator config, is config proper JSON string formatted?", nil)
-          }
+          // Pass JSON string to ReplicatorManager - it will auto-detect format
+          let replicatorId = try ReplicatorManager.shared.replicator(
+            repConfig,
+            collectionConfigJson: collectionConfigJson
+          )
+          let dict:NSDictionary = ["replicatorId": replicatorId]
+          resolve(dict)
         } catch let error as NSError {
           reject("REPLICATOR_ERROR", error.localizedDescription, nil)
         } catch {
@@ -1478,31 +1617,11 @@ func replicator_AddDocumentChangeListener(
     replicatorId: NSString,
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock) -> Void {
-      var errorMessage = ""
-      let replId = String(replicatorId)
-      let token = String(changeListenerToken)
-      guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replId) else {
-        errorMessage = "No such replicator found for id \(replId)"
-        reject("REPLICATOR_ERROR", errorMessage, nil)
-        return
-      }
-      backgroundQueue.async {
-        if let listener = self.replicatorChangeListeners[token] as? ListenerToken {
-        replicator.removeChangeListener(withToken: listener)
-        self.replicatorChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      } else if let listener = self.replicatorDocumentChangeListeners[token] as? ListenerToken {
-        replicator.removeChangeListener(withToken: listener)
-        self.replicatorDocumentChangeListeners.removeValue(forKey: token)
-        resolve(nil)
-        return
-      } else {
-        reject("REPLICATOR_ERROR", "No such listener found with token \(token)", nil)
-      }
-        
-      }
-    }
+
+      // Delegate to unified listener removal
+      // Note: replicatorId parameter is not used anymore but must remain in signature for @objc compatibility
+      listenerToken_Remove(changeListenerToken: changeListenerToken, resolve: resolve, reject: reject)
+ }
   
   @objc(replicator_ResetCheckpoint:withResolver:withRejecter:)
   func replicator_ResetCheckpoint(
@@ -1649,7 +1768,142 @@ func replicator_AddDocumentChangeListener(
       }
     }
   }
+
+
+  ////////// LOG SINKS START
+
+  @objc(logsinks_SetConsole:withDomains:withResolver:withRejecter:)
+  func logsinks_SetConsole(
+    level: Any?,
+    domains: Any?,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ){
+    backgroundQueue.async {
+    do{
+      // convert Any? to Int? - treat -1 as nil (disable signal)
+      let levelNumber = (level as? NSNumber)?.intValue
+      let intLevel = (levelNumber == -1) ? nil : levelNumber
+      // convert Any? to [String]?
+      let domainsArray = domains as? [String]
+      try LogSinksManager.shared.setConsoleSink(level: intLevel, domains: domainsArray)
+      resolve(nil)
+    }
+    catch let error as NSError {
+        reject("LOGSINKS_ERROR", error.localizedDescription, error)
+      } catch {
+        reject("LOGSINKS_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+
+  @objc(logsinks_SetFile:withConfig:withResolver:withRejecter:)
+  func logsinks_SetFile(
+    level: Any?,
+    config: Any?,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ){
+    backgroundQueue.async {
+      do{
+        // Convert Any? to Int? - treat -1 as nil (disable signal)
+        let levelNumber = (level as? NSNumber)?.intValue
+        let intLevel = (levelNumber == -1) ? nil : levelNumber
+        // Convert Any? to [String: Any]?
+        let configDict = config as? [String: Any]
+
+        try LogSinksManager.shared.setFileSink(
+          level: intLevel,
+          config: configDict,
+        )
+
+        resolve(nil)
+      }
+      catch let error as NSError {
+        reject("LOGSINKS_ERROR", error.localizedDescription, error)
+      } catch {
+        reject("LOGSINKS_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+
+
+  @objc(logsinks_SetCustom:withDomains:withToken:withResolver:withRejecter:)
+  func logsinks_SetCustom(
+    level: Any?,
+    domains: Any?,
+    token: Any?,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    backgroundQueue.async {
+      do {
+        // Convert Any? to Int? - treat -1 as nil (disable signal)
+        let levelNumber = (level as? NSNumber)?.intValue
+        let intLevel = (levelNumber == -1) ? nil : levelNumber
+        // Convert Any? to [String]?
+        let domainsArray = domains as? [String]
+        // Convert Any? to String?
+        let tokenString = token as? String
+        
+        // Create callback closure only if we have level and token (means enable, not disable)
+        let callback: ((LogLevel, LogDomain, String) -> Void)? = 
+          (intLevel != nil && tokenString != nil && !tokenString!.isEmpty) ? { [weak self] logLevel, logDomain, message in
+            guard let self = self else { return }
+            
+            // Convert Swift types back to JavaScript-friendly types
+            let eventData: [String: Any] = [
+              "token": tokenString!,
+              "level": logLevel.rawValue,
+              "domain": self.logDomainToString(logDomain),
+              "message": message
+            ]
+            
+            // Send event to JavaScript
+            // Note: React Native may show warnings about no listeners if events arrive before
+            // JS listener is fully initialized, but these warnings are harmless
+            self.sendEvent(withName: self.kCustomLogMessage, body: eventData)
+          } : nil
+        
+        try LogSinksManager.shared.setCustomSink(
+          level: intLevel,
+          domains: domainsArray,
+          callback: callback
+        )
+        resolve(nil)
+      } catch let error as NSError {
+        reject("LOGSINKS_ERROR", error.localizedDescription, error)
+      } catch {
+        reject("LOGSINKS_ERROR", error.localizedDescription, nil)
+      }
+    }
+  }
+
+
+//// LOG SINKS HELPER FUNCTIONS
+    private func logDomainToString(_ domain: LogDomain) -> String {
+      switch domain {
+    case .database:
+      return "DATABASE"
+    case .query:
+      return "QUERY"
+    case .replicator:
+      return "REPLICATOR"
+    case .network:
+      return "NETWORK"
+    case .listener:
+      return "LISTENER"
+    default:
+      return "UNKNOWN"
+    }
+    }
+
+  ////////// LOG SINKS END
+
 }
+
 
 extension Notification.Name {
   static let collectionChange = Notification.Name("collectionChange")
