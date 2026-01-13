@@ -70,7 +70,7 @@ Fork and clone this repo.  You will need to also clone all the submodules for th
 ```sh
 git clone --recurse-submodules git@github.com:Couchbase-Ecosystem/cbl-reactnative.git
 cd cbl-reactnative
-git submodule update --init --recursive
+git submodule update --remote --recursive
 ```
 
 Install the required packages
