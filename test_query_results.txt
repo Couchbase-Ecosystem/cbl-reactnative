@@ -1,0 +1,378 @@
+==================================================
+=== Suite: suite_q_100b ===
+Started: 2026-02-16T19:10:59.924Z
+Completed: 2026-02-16T19:12:12.909Z
+Status: complete
+==================================================
+
+--- query lifecycle | 100B x 100 | 5 iterations ---
+  Warmup:
+    Swift: 2ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 0ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 0ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+
+--- query lifecycle | 100B x 1K | 5 iterations ---
+  Warmup:
+    Swift: 3ms (1000 rows)
+    C:     2ms (1000 rows)
+  Iter 1 [Swift first]:
+    Swift: 3ms (1000 rows)
+    C:     3ms (1000 rows)
+  Iter 2 [C first]:
+    C:     2ms (1000 rows)
+    Swift: 2ms (1000 rows)
+  Iter 3 [Swift first]:
+    Swift: 2ms (1000 rows)
+    C:     2ms (1000 rows)
+  Iter 4 [C first]:
+    C:     2ms (1000 rows)
+    Swift: 3ms (1000 rows)
+  Iter 5 [Swift first]:
+    Swift: 2ms (1000 rows)
+    C:     2ms (1000 rows)
+
+--- query lifecycle | 100B x 10K | 5 iterations ---
+  Warmup:
+    Swift: 16ms (10000 rows)
+    C:     12ms (10000 rows)
+  Iter 1 [Swift first]:
+    Swift: 16ms (10000 rows)
+    C:     12ms (10000 rows)
+  Iter 2 [C first]:
+    C:     12ms (10000 rows)
+    Swift: 16ms (10000 rows)
+  Iter 3 [Swift first]:
+    Swift: 17ms (10000 rows)
+    C:     13ms (10000 rows)
+  Iter 4 [C first]:
+    C:     13ms (10000 rows)
+    Swift: 16ms (10000 rows)
+  Iter 5 [Swift first]:
+    Swift: 16ms (10000 rows)
+    C:     12ms (10000 rows)
+
+--- query lifecycle | 100B x 100K | 5 iterations ---
+  Warmup:
+    Swift: 173ms (100000 rows)
+    C:     126ms (100000 rows)
+  Iter 1 [Swift first]:
+    Swift: 170ms (100000 rows)
+    C:     130ms (100000 rows)
+  Iter 2 [C first]:
+    C:     128ms (100000 rows)
+    Swift: 164ms (100000 rows)
+  Iter 3 [Swift first]:
+    Swift: 163ms (100000 rows)
+    C:     129ms (100000 rows)
+  Iter 4 [C first]:
+    C:     128ms (100000 rows)
+    Swift: 162ms (100000 rows)
+  Iter 5 [Swift first]:
+    Swift: 163ms (100000 rows)
+    C:     126ms (100000 rows)
+
+==================================================
+=== Suite: suite_q_1kb ===
+Started: 2026-02-16T19:12:12.940Z
+Completed: 2026-02-16T19:14:23.109Z
+Status: complete
+==================================================
+
+--- query lifecycle | 1KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+
+--- query lifecycle | 1KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: 6ms (1000 rows)
+    C:     6ms (1000 rows)
+  Iter 1 [Swift first]:
+    Swift: 6ms (1000 rows)
+    C:     6ms (1000 rows)
+  Iter 2 [C first]:
+    C:     5ms (1000 rows)
+    Swift: 5ms (1000 rows)
+  Iter 3 [Swift first]:
+    Swift: 5ms (1000 rows)
+    C:     6ms (1000 rows)
+  Iter 4 [C first]:
+    C:     6ms (1000 rows)
+    Swift: 5ms (1000 rows)
+  Iter 5 [Swift first]:
+    Swift: 6ms (1000 rows)
+    C:     6ms (1000 rows)
+
+--- query lifecycle | 1KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: 60ms (10000 rows)
+    C:     58ms (10000 rows)
+  Iter 1 [Swift first]:
+    Swift: 57ms (10000 rows)
+    C:     55ms (10000 rows)
+  Iter 2 [C first]:
+    C:     53ms (10000 rows)
+    Swift: 59ms (10000 rows)
+  Iter 3 [Swift first]:
+    Swift: 57ms (10000 rows)
+    C:     53ms (10000 rows)
+  Iter 4 [C first]:
+    C:     52ms (10000 rows)
+    Swift: 56ms (10000 rows)
+  Iter 5 [Swift first]:
+    Swift: 55ms (10000 rows)
+    C:     56ms (10000 rows)
+
+--- query lifecycle | 1KB x 100K | 5 iterations ---
+  Warmup:
+    Swift: 536ms (100000 rows)
+    C:     549ms (100000 rows)
+  Iter 1 [Swift first]:
+    Swift: 550ms (100000 rows)
+    C:     526ms (100000 rows)
+  Iter 2 [C first]:
+    C:     562ms (100000 rows)
+    Swift: 562ms (100000 rows)
+  Iter 3 [Swift first]:
+    Swift: 577ms (100000 rows)
+    C:     525ms (100000 rows)
+  Iter 4 [C first]:
+    C:     578ms (100000 rows)
+    Swift: 555ms (100000 rows)
+  Iter 5 [Swift first]:
+    Swift: 562ms (100000 rows)
+    C:     515ms (100000 rows)
+
+==================================================
+=== Suite: suite_q_10kb ===
+Started: 2026-02-17T04:59:03.586Z
+Completed: 2026-02-17T05:09:20.488Z
+Status: complete
+==================================================
+
+--- query lifecycle | 10KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 11ms (100 rows)
+    C:     11ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 13ms (100 rows)
+    C:     12ms (100 rows)
+  Iter 2 [C first]:
+    C:     13ms (100 rows)
+    Swift: 12ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 13ms (100 rows)
+    C:     13ms (100 rows)
+  Iter 4 [C first]:
+    C:     13ms (100 rows)
+    Swift: 11ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 12ms (100 rows)
+    C:     13ms (100 rows)
+
+--- query lifecycle | 10KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: 119ms (1000 rows)
+    C:     131ms (1000 rows)
+  Iter 1 [Swift first]:
+    Swift: 131ms (1000 rows)
+    C:     119ms (1000 rows)
+  Iter 2 [C first]:
+    C:     121ms (1000 rows)
+    Swift: 119ms (1000 rows)
+  Iter 3 [Swift first]:
+    Swift: 117ms (1000 rows)
+    C:     116ms (1000 rows)
+  Iter 4 [C first]:
+    C:     117ms (1000 rows)
+    Swift: 122ms (1000 rows)
+  Iter 5 [Swift first]:
+    Swift: 115ms (1000 rows)
+    C:     115ms (1000 rows)
+
+--- query lifecycle | 10KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: 1131ms (10000 rows)
+    C:     1133ms (10000 rows)
+  Iter 1 [Swift first]:
+    Swift: 1137ms (10000 rows)
+    C:     1148ms (10000 rows)
+  Iter 2 [C first]:
+    C:     1152ms (10000 rows)
+    Swift: 1122ms (10000 rows)
+  Iter 3 [Swift first]:
+    Swift: 1160ms (10000 rows)
+    C:     1127ms (10000 rows)
+  Iter 4 [C first]:
+    C:     1145ms (10000 rows)
+    Swift: 1154ms (10000 rows)
+  Iter 5 [Swift first]:
+    Swift: 1150ms (10000 rows)
+    C:     1160ms (10000 rows)
+
+--- query lifecycle | 10KB x 100K | 3 iterations ---
+  Warmup:
+    Swift: 13821ms (100000 rows)
+    C:     13414ms (100000 rows)
+  Iter 1 [Swift first]:
+    Swift: 13757ms (100000 rows)
+    C:     13948ms (100000 rows)
+  Iter 2 [C first]:
+    C:     13782ms (100000 rows)
+    Swift: 13921ms (100000 rows)
+  Iter 3 [Swift first]:
+    Swift: 13935ms (100000 rows)
+    C:     14002ms (100000 rows)
+
+==================================================
+=== Suite: suite_q_100kb ===
+Started: 2026-02-17T05:10:08.583Z
+Completed: 2026-02-17T05:19:55.986Z
+Status: complete
+==================================================
+
+--- query lifecycle | 100KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 118ms (100 rows)
+    C:     120ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 118ms (100 rows)
+    C:     121ms (100 rows)
+  Iter 2 [C first]:
+    C:     122ms (100 rows)
+    Swift: 119ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 118ms (100 rows)
+    C:     121ms (100 rows)
+  Iter 4 [C first]:
+    C:     119ms (100 rows)
+    Swift: 123ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 117ms (100 rows)
+    C:     121ms (100 rows)
+
+--- query lifecycle | 100KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: 1160ms (1000 rows)
+    C:     1164ms (1000 rows)
+  Iter 1 [Swift first]:
+    Swift: 1162ms (1000 rows)
+    C:     1173ms (1000 rows)
+  Iter 2 [C first]:
+    C:     1159ms (1000 rows)
+    Swift: 1166ms (1000 rows)
+  Iter 3 [Swift first]:
+    Swift: 1163ms (1000 rows)
+    C:     1172ms (1000 rows)
+  Iter 4 [C first]:
+    C:     1184ms (1000 rows)
+    Swift: 1164ms (1000 rows)
+  Iter 5 [Swift first]:
+    Swift: 1159ms (1000 rows)
+    C:     1160ms (1000 rows)
+
+--- query lifecycle | 100KB x 10K | 3 iterations ---
+  Warmup:
+    Swift: 12257ms (10000 rows)
+    C:     12321ms (10000 rows)
+  Iter 1 [Swift first]:
+    Swift: 12247ms (10000 rows)
+    C:     12042ms (10000 rows)
+  Iter 2 [C first]:
+    C:     12134ms (10000 rows)
+    Swift: 12163ms (10000 rows)
+  Iter 3 [Swift first]:
+    Swift: 12258ms (10000 rows)
+    C:     12202ms (10000 rows)
+
+==================================================
+=== Suite: suite_q_1mb ===
+Started: 2026-02-17T05:23:13.681Z
+Completed: 2026-02-17T05:32:45.161Z
+Status: complete
+==================================================
+
+--- query lifecycle | 1MB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 1183ms (100 rows)
+    C:     1159ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1143ms (100 rows)
+    C:     1228ms (100 rows)
+  Iter 2 [C first]:
+    C:     1153ms (100 rows)
+    Swift: 1167ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1175ms (100 rows)
+    C:     1158ms (100 rows)
+  Iter 4 [C first]:
+    C:     1224ms (100 rows)
+    Swift: 1178ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1158ms (100 rows)
+    C:     1157ms (100 rows)
+
+--- query lifecycle | 1MB x 1K | 3 iterations ---
+  Warmup:
+    Swift: 11969ms (1000 rows)
+    C:     11733ms (1000 rows)
+  Iter 1 [Swift first]:
+    Swift: 11865ms (1000 rows)
+    C:     11891ms (1000 rows)
+  Iter 2 [C first]:
+    C:     11842ms (1000 rows)
+    Swift: 11884ms (1000 rows)
+  Iter 3 [Swift first]:
+    Swift: 11994ms (1000 rows)
+    C:     11786ms (1000 rows)
+
+==================================================
+=== SUMMARY (median comparison) ===
+==================================================
+
+suite_q_100b x 100 | query | query: Swift 1ms vs C 1ms -> TIE
+suite_q_100b x 1K | query | query: Swift 2ms vs C 2ms -> C wins by 27.7%
+suite_q_100b x 10K | query | query: Swift 16ms vs C 12ms -> C wins by 22.6%
+suite_q_100b x 100K | query | query: Swift 163ms vs C 128ms -> C wins by 21.4%
+suite_q_1kb x 100 | query | query: Swift 1ms vs C 1ms -> TIE
+suite_q_1kb x 1K | query | query: Swift 5ms vs C 6ms -> TIE
+suite_q_1kb x 10K | query | query: Swift 57ms vs C 53ms -> C wins by 6.2%
+suite_q_1kb x 100K | query | query: Swift 562ms vs C 526ms -> C wins by 6.3%
+suite_q_10kb x 100 | query | query: Swift 12ms vs C 13ms -> SWIFT wins by 6.7%
+suite_q_10kb x 1K | query | query: Swift 119ms vs C 117ms -> C wins by 1.7%
+suite_q_10kb x 10K | query | query: Swift 1150ms vs C 1148ms -> C wins by 0.2%
+suite_q_10kb x 100K | query | query: Swift 13921ms vs C 13948ms -> SWIFT wins by 0.2%
+suite_q_100kb x 100 | query | query: Swift 118ms vs C 121ms -> SWIFT wins by 2.5%
+suite_q_100kb x 1K | query | query: Swift 1163ms vs C 1172ms -> SWIFT wins by 0.8%
+suite_q_100kb x 10K | query | query: Swift 12247ms vs C 12134ms -> C wins by 0.9%
+suite_q_1mb x 100 | query | query: Swift 1167ms vs C 1158ms -> C wins by 0.8%
+suite_q_1mb x 1K | query | query: Swift 11884ms vs C 11842ms -> C wins by 0.4%

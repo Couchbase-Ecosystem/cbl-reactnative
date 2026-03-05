@@ -1,0 +1,123 @@
+========================================
+BENCHMARK SUMMARY: SWIFT VS C (PUSH)
+========================================
+
+----------------------------------------
+ 100 BYTE - PUSH
+----------------------------------------
+
+=== 100 DOCS ===
+⏱ Swift push: 529ms — 100 docs
+⏱ C push: 545ms — 100 docs
+⏱ C push: 536ms — 100 docs
+⏱ Swift push: 543ms — 100 docs
+
+=== 1000 DOCS ===
+⏱ Swift push: 531ms — 1000 docs
+⏱ C push: 533ms — 1000 docs
+⏱ C push: 532ms — 1000 docs
+⏱ Swift push: 528ms — 1000 docs
+
+=== 10,000 DOCS ===
+⏱ Swift push: 2597ms — 10000 docs
+⏱ C push: 2574ms — 10000 docs
+⏱ C push: 2594ms — 10000 docs
+⏱ Swift push: 2580ms — 10000 docs
+
+=== 100,000 DOCS ===
+⏱ Swift push: 22064ms — 100000 docs
+⏱ C push: 20576ms — 100000 docs
+⏱ C push: 21043ms — 100000 docs
+⏱ Swift push: 22059ms — 100000 docs
+
+
+----------------------------------------
+1 KB - PUSH
+----------------------------------------
+
+=== 100 DOCS ===
+⏱ Swift push: 542ms — 100 docs
+⏱ C push: 533ms — 100 docs
+⏱ C push: 534ms — 100 docs
+⏱ Swift push: 544ms — 100 docs
+
+=== 1000 DOCS ===
+⏱ Swift push: 530ms — 1000 docs
+⏱ C push: 544ms — 1000 docs
+⏱ C push: 531ms — 1000 docs
+⏱ Swift push: 547ms — 1000 docs
+
+=== 10,000 DOCS ===
+⏱ Swift push: 2584ms — 10000 docs
+⏱ C push: 3110ms — 10000 docs
+⏱ C push: 3079ms — 10000 docs
+⏱ Swift push: 3109ms — 10000 docs
+
+=== 100,000 DOCS ===
+⏱ Swift push: 25677ms — 100000 docs
+⏱ C push: 18026ms — 100000 docs
+⏱ C push: 17977ms — 100000 docs
+⏱ Swift push: 19503ms — 100000 docs
+
+
+----------------------------------------
+10 KB - PUSH
+----------------------------------------
+
+=== 100 DOCS ===
+⏱ Swift push: 532ms — 100 docs
+⏱ C push: 546ms — 100 docs
+⏱ C push: 544ms — 100 docs
+⏱ Swift push: 537ms — 100 docs
+
+=== 1000 DOCS ===
+⏱ Swift push: 554ms — 1000 docs
+⏱ C push: 532ms — 1000 docs
+⏱ C push: 549ms — 1000 docs
+⏱ Swift push: 545ms — 1000 docs
+
+=== 10,000 DOCS ===
+⏱ Swift push: 4638ms — 10000 docs
+⏱ C push: 4658ms — 10000 docs
+⏱ C push: 4612ms — 10000 docs
+⏱ Swift push: 4627ms — 10000 docs
+
+=== 100,000 DOCS ===
+⏱ Swift push: 31892ms — 100000 docs
+⏱ C push: 34270ms — 100000 docs
+⏱ C push: 33438ms — 100000 docs
+⏱ Swift push: 36559ms — 100000 docs
+
+
+----------------------------------------
+100 KB - PUSH
+----------------------------------------
+
+=== 100 DOCS ===
+⏱ Swift push: 545ms — 100 docs
+⏱ C push: 541ms — 100 docs
+⏱ C push: 533ms — 100 docs
+⏱ Swift push: 551ms — 100 docs
+
+=== 1000 DOCS ===
+⏱ Swift push: 2068ms — 1000 docs
+⏱ C push: 1591ms — 1000 docs
+⏱ C push: 1580ms — 1000 docs
+⏱ Swift push: 2103ms — 1000 docs
+
+=== 10,000 DOCS ===
+⏱ Swift push: 14545ms — 10000 docs
+⏱ C push: 14713ms — 10000 docs
+⏱ C push: 15630ms — 10000 docs
+⏱ Swift push: 13666ms — 10000 docs
+
+
+----------------------------------------
+1 MB - PUSH
+----------------------------------------
+
+=== 100 DOCS ===
+⏱ Swift push: 1578ms — 100 docs
+⏱ C push: 1580ms — 100 docs
+⏱ C push: 1570ms — 100 docs
+⏱ Swift push: 1562ms — 100 docs

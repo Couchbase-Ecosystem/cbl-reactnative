@@ -598,4 +598,41 @@ object DataAdapter {
         }
         return list
     }
+
+    /**
+     * Converts a set of scopes to a JSON string representation.
+     *
+     * @param scopes The set of Scope objects to be converted.
+     * @param databaseName The name of the database.
+     * @return A JSON string representation of the scopes.
+     */
+    fun scopesToJsonString(scopes: Set<Scope>, databaseName: String): String {
+        val jsonArray = JSONArray()
+        scopes.forEach { scope ->
+            val scopeObj = JSONObject()
+            scopeObj.put("name", scope.name)
+            scopeObj.put("databaseName", databaseName)
+            jsonArray.put(scopeObj)
+        }
+        return jsonArray.toString()
+    }
+
+    /**
+     * Converts a set of collections to a JSON string representation.
+     *
+     * @param collections The set of Collection objects to be converted.
+     * @param databaseName The name of the database.
+     * @return A JSON string representation of the collections.
+     */
+    fun collectionsToJsonString(collections: Set<CBLCollection>, databaseName: String): String {
+        val jsonArray = JSONArray()
+        collections.forEach { collection ->
+            val collectionObj = JSONObject()
+            collectionObj.put("name", collection.name)
+            collectionObj.put("scopeName", collection.scope.name)
+            collectionObj.put("databaseName", databaseName)
+            jsonArray.put(collectionObj)
+        }
+        return jsonArray.toString()
+    }
 }

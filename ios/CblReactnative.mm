@@ -172,6 +172,21 @@ RCT_EXTERN_METHOD(collection_SetDocumentExpiration:
   withResolver:(RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(collection_Echo:
+  (NSString *) data
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(collection_PerformanceCheckLegacy:
+  (nonnull NSNumber *) iterations
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(collection_BatchEchoLegacy:
+  (nonnull NSNumber *) count
+  withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
 // MARK: - Database Functions
 
 RCT_EXTERN_METHOD(database_ChangeEncryptionKey:
@@ -378,6 +393,12 @@ RCT_EXTERN_METHOD(scope_GetScope:
 
 RCT_EXTERN_METHOD(scope_GetScopes:(NSString *)name
   withResolver:(RCTPromiseResolveBlock)resolve
+  withRejecter:(RCTPromiseRejectBlock)reject)
+
+// MARK: - Debug Functions
+
+RCT_EXTERN_METHOD(debug_GetMemoryUsage:
+  (RCTPromiseResolveBlock)resolve
   withRejecter:(RCTPromiseRejectBlock)reject)
 
 + (BOOL)requiresMainQueueSetup

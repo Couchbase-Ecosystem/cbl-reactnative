@@ -1,0 +1,431 @@
+==================================================
+=== Suite: repl_100b ===
+Started: 2026-02-17T11:30:27.858Z
+Completed: 2026-02-17T12:36:03.092Z
+Status: complete
+==================================================
+
+--- replication lifecycle | 100B x 100 | 3 iterations ---
+  Warmup:
+    Swift: push-cr:4120ms (total:4120ms)
+    C:     push-cr:3081ms (total:3081ms)
+  Iter 1 [Swift first]:
+    Swift: push-cr:2578ms (total:2578ms)
+    C:     push-cr:3080ms (total:3080ms)
+  Iter 2 [C first]:
+    C:     push-cr:3076ms (total:3076ms)
+    Swift: push-cr:3072ms (total:3072ms)
+  Iter 3 [Swift first]:
+    Swift: push-cr:3087ms (total:3087ms)
+    C:     push-cr:3073ms (total:3073ms)
+
+--- replication lifecycle | 100B x 100 | 3 iterations ---
+  Warmup:
+    Swift: push-up:3084ms (total:3084ms)
+    C:     push-up:3088ms (total:3088ms)
+  Iter 1 [Swift first]:
+    Swift: push-up:3085ms (total:3085ms)
+    C:     push-up:3086ms (total:3086ms)
+  Iter 2 [C first]:
+    C:     push-up:3068ms (total:3068ms)
+    Swift: push-up:3069ms (total:3069ms)
+  Iter 3 [Swift first]:
+    Swift: push-up:3070ms (total:3070ms)
+    C:     push-up:3586ms (total:3586ms)
+
+--- replication lifecycle | 100B x 100 | 3 iterations ---
+  Warmup:
+    Swift: push-del:2575ms (total:2575ms)
+    C:     push-del:3089ms (total:3089ms)
+  Iter 1 [Swift first]:
+    Swift: push-del:2574ms (total:2574ms)
+    C:     push-del:2574ms (total:2574ms)
+  Iter 2 [C first]:
+    C:     push-del:3092ms (total:3092ms)
+    Swift: push-del:2556ms (total:2556ms)
+  Iter 3 [Swift first]:
+    Swift: push-del:2559ms (total:2559ms)
+    C:     push-del:3081ms (total:3081ms)
+
+--- replication lifecycle | 100B x 100 | 3 iterations ---
+  Warmup:
+    Swift: pull-cr:2572ms (total:2572ms)
+    C:     pull-cr:3085ms (total:3085ms)
+  Iter 1 [Swift first]:
+    Swift: pull-cr:2566ms (total:2566ms)
+    C:     pull-cr:2565ms (total:2565ms)
+  Iter 2 [C first]:
+    C:     pull-cr:3068ms (total:3068ms)
+    Swift: pull-cr:2540ms (total:2540ms)
+  Iter 3 [Swift first]:
+    Swift: pull-cr:2583ms (total:2583ms)
+    C:     pull-cr:2569ms (total:2569ms)
+
+--- replication lifecycle | 100B x 100 | 3 iterations ---
+  Warmup:
+    Swift: pull-up:2561ms (total:2561ms)
+    C:     pull-up:2579ms (total:2579ms)
+  Iter 1 [Swift first]:
+    Swift: pull-up:2560ms (total:2560ms)
+    C:     pull-up:3097ms (total:3097ms)
+  Iter 2 [C first]:
+    C:     pull-up:3078ms (total:3078ms)
+    Swift: pull-up:2570ms (total:2570ms)
+  Iter 3 [Swift first]:
+    Swift: pull-up:2567ms (total:2567ms)
+    C:     pull-up:2567ms (total:2567ms)
+
+--- replication lifecycle | 100B x 100 | 3 iterations ---
+  Warmup:
+    Swift: pull-del:2552ms (total:2552ms)
+    C:     pull-del:3100ms (total:3100ms)
+  Iter 1 [Swift first]:
+    Swift: pull-del:2570ms (total:2570ms)
+    C:     pull-del:2579ms (total:2579ms)
+  Iter 2 [C first]:
+    C:     pull-del:3079ms (total:3079ms)
+    Swift: pull-del:3068ms (total:3068ms)
+  Iter 3 [Swift first]:
+    Swift: pull-del:2581ms (total:2581ms)
+    C:     pull-del:2581ms (total:2581ms)
+
+--- replication lifecycle | 100B x 100 | 3 iterations ---
+  Warmup:
+    Swift: bidir:3605ms (total:3605ms)
+    C:     bidir:3602ms (total:3602ms)
+  Iter 1 [Swift first]:
+    Swift: bidir:3075ms (total:3075ms)
+    C:     bidir:4086ms (total:4086ms)
+  Iter 2 [C first]:
+    C:     bidir:3560ms (total:3560ms)
+    Swift: bidir:3067ms (total:3067ms)
+  Iter 3 [Swift first]:
+    Swift: bidir:3090ms (total:3090ms)
+    C:     bidir:3606ms (total:3606ms)
+
+--- replication lifecycle | 100B x 1K | 3 iterations ---
+  Warmup:
+    Swift: push-cr:4091ms (total:4091ms)
+    C:     push-cr:3586ms (total:3586ms)
+  Iter 1 [Swift first]:
+    Swift: push-cr:3088ms (total:3088ms)
+    C:     push-cr:3605ms (total:3605ms)
+  Iter 2 [C first]:
+    C:     push-cr:3590ms (total:3590ms)
+    Swift: push-cr:3597ms (total:3597ms)
+  Iter 3 [Swift first]:
+    Swift: push-cr:3585ms (total:3585ms)
+    C:     push-cr:3616ms (total:3616ms)
+
+--- replication lifecycle | 100B x 1K | 3 iterations ---
+  Warmup:
+    Swift: push-up:3570ms (total:3570ms)
+    C:     push-up:3597ms (total:3597ms)
+  Iter 1 [Swift first]:
+    Swift: push-up:3575ms (total:3575ms)
+    C:     push-up:3578ms (total:3578ms)
+  Iter 2 [C first]:
+    C:     push-up:3592ms (total:3592ms)
+    Swift: push-up:3572ms (total:3572ms)
+  Iter 3 [Swift first]:
+    Swift: push-up:3607ms (total:3607ms)
+    C:     push-up:3574ms (total:3574ms)
+
+--- replication lifecycle | 100B x 1K | 3 iterations ---
+  Warmup:
+    Swift: push-del:2557ms (total:2557ms)
+    C:     push-del:3081ms (total:3081ms)
+  Iter 1 [Swift first]:
+    Swift: push-del:2558ms (total:2558ms)
+    C:     push-del:3088ms (total:3088ms)
+  Iter 2 [C first]:
+    C:     push-del:3574ms (total:3574ms)
+    Swift: push-del:2575ms (total:2575ms)
+  Iter 3 [Swift first]:
+    Swift: push-del:2571ms (total:2571ms)
+    C:     push-del:3075ms (total:3075ms)
+
+--- replication lifecycle | 100B x 1K | 3 iterations ---
+  Warmup:
+    Swift: pull-cr:2540ms (total:2540ms)
+    C:     pull-cr:3070ms (total:3070ms)
+  Iter 1 [Swift first]:
+    Swift: pull-cr:2541ms (total:2541ms)
+    C:     pull-cr:2570ms (total:2570ms)
+  Iter 2 [C first]:
+    C:     pull-cr:3072ms (total:3072ms)
+    Swift: pull-cr:2566ms (total:2566ms)
+  Iter 3 [Swift first]:
+    Swift: pull-cr:2570ms (total:2570ms)
+    C:     pull-cr:2569ms (total:2569ms)
+
+--- replication lifecycle | 100B x 1K | 3 iterations ---
+  Warmup:
+    Swift: pull-up:2580ms (total:2580ms)
+    C:     pull-up:3090ms (total:3090ms)
+  Iter 1 [Swift first]:
+    Swift: pull-up:2578ms (total:2578ms)
+    C:     pull-up:2572ms (total:2572ms)
+  Iter 2 [C first]:
+    C:     pull-up:2564ms (total:2564ms)
+    Swift: pull-up:2561ms (total:2561ms)
+  Iter 3 [Swift first]:
+    Swift: pull-up:2558ms (total:2558ms)
+    C:     pull-up:3040ms (total:3040ms)
+
+--- replication lifecycle | 100B x 1K | 3 iterations ---
+  Warmup:
+    Swift: pull-del:2557ms (total:2557ms)
+    C:     pull-del:2574ms (total:2574ms)
+  Iter 1 [Swift first]:
+    Swift: pull-del:2571ms (total:2571ms)
+    C:     pull-del:3576ms (total:3576ms)
+  Iter 2 [C first]:
+    C:     pull-del:3067ms (total:3067ms)
+    Swift: pull-del:2539ms (total:2539ms)
+  Iter 3 [Swift first]:
+    Swift: pull-del:2591ms (total:2591ms)
+    C:     pull-del:2577ms (total:2577ms)
+
+--- replication lifecycle | 100B x 1K | 3 iterations ---
+  Warmup:
+    Swift: bidir:3554ms (total:3554ms)
+    C:     bidir:3597ms (total:3597ms)
+  Iter 1 [Swift first]:
+    Swift: bidir:3096ms (total:3096ms)
+    C:     bidir:3613ms (total:3613ms)
+  Iter 2 [C first]:
+    C:     bidir:3594ms (total:3594ms)
+    Swift: bidir:3080ms (total:3080ms)
+  Iter 3 [Swift first]:
+    Swift: bidir:3076ms (total:3076ms)
+    C:     bidir:3613ms (total:3613ms)
+
+--- replication lifecycle | 100B x 10K | 3 iterations ---
+  Warmup:
+    Swift: push-cr:9746ms (total:9746ms)
+    C:     push-cr:7732ms (total:7732ms)
+  Iter 1 [Swift first]:
+    Swift: push-cr:6688ms (total:6688ms)
+    C:     push-cr:7701ms (total:7701ms)
+  Iter 2 [C first]:
+    C:     push-cr:7716ms (total:7716ms)
+    Swift: push-cr:6685ms (total:6685ms)
+  Iter 3 [Swift first]:
+    Swift: push-cr:7733ms (total:7733ms)
+    C:     push-cr:7705ms (total:7705ms)
+
+--- replication lifecycle | 100B x 10K | 3 iterations ---
+  Warmup:
+    Swift: push-up:8243ms (total:8243ms)
+    C:     push-up:7722ms (total:7722ms)
+  Iter 1 [Swift first]:
+    Swift: push-up:7722ms (total:7722ms)
+    C:     push-up:7705ms (total:7705ms)
+  Iter 2 [C first]:
+    C:     push-up:7676ms (total:7676ms)
+    Swift: push-up:7728ms (total:7728ms)
+  Iter 3 [Swift first]:
+    Swift: push-up:7187ms (total:7187ms)
+    C:     push-up:8246ms (total:8246ms)
+
+--- replication lifecycle | 100B x 10K | 3 iterations ---
+  Warmup:
+    Swift: push-del:2546ms (total:2546ms)
+    C:     push-del:3058ms (total:3058ms)
+  Iter 1 [Swift first]:
+    Swift: push-del:2577ms (total:2577ms)
+    C:     push-del:2577ms (total:2577ms)
+  Iter 2 [C first]:
+    C:     push-del:3073ms (total:3073ms)
+    Swift: push-del:2574ms (total:2574ms)
+  Iter 3 [Swift first]:
+    Swift: push-del:2574ms (total:2574ms)
+    C:     push-del:3090ms (total:3090ms)
+
+--- replication lifecycle | 100B x 10K | 3 iterations ---
+  Warmup:
+    Swift: pull-cr:2580ms (total:2580ms)
+    C:     pull-cr:3099ms (total:3099ms)
+  Iter 1 [Swift first]:
+    Swift: pull-cr:2563ms (total:2563ms)
+    C:     pull-cr:3089ms (total:3089ms)
+  Iter 2 [C first]:
+    C:     pull-cr:3070ms (total:3070ms)
+    Swift: pull-cr:2584ms (total:2584ms)
+  Iter 3 [Swift first]:
+    Swift: pull-cr:2584ms (total:2584ms)
+    C:     pull-cr:3085ms (total:3085ms)
+
+--- replication lifecycle | 100B x 10K | 3 iterations ---
+  Warmup:
+    Swift: pull-up:2576ms (total:2576ms)
+    C:     pull-up:2573ms (total:2573ms)
+  Iter 1 [Swift first]:
+    Swift: pull-up:2572ms (total:2572ms)
+    C:     pull-up:3077ms (total:3077ms)
+  Iter 2 [C first]:
+    C:     pull-up:2574ms (total:2574ms)
+    Swift: pull-up:2569ms (total:2569ms)
+  Iter 3 [Swift first]:
+    Swift: pull-up:2571ms (total:2571ms)
+    C:     pull-up:2577ms (total:2577ms)
+
+--- replication lifecycle | 100B x 10K | 3 iterations ---
+  Warmup:
+    Swift: pull-del:2558ms (total:2558ms)
+    C:     pull-del:3074ms (total:3074ms)
+  Iter 1 [Swift first]:
+    Swift: pull-del:2574ms (total:2574ms)
+    C:     pull-del:2573ms (total:2573ms)
+  Iter 2 [C first]:
+    C:     pull-del:3100ms (total:3100ms)
+    Swift: pull-del:2576ms (total:2576ms)
+  Iter 3 [Swift first]:
+    Swift: pull-del:2556ms (total:2556ms)
+    C:     pull-del:3089ms (total:3089ms)
+
+--- replication lifecycle | 100B x 10K | 3 iterations ---
+  Warmup:
+    Swift: bidir:6684ms (total:6684ms)
+    C:     bidir:5138ms (total:5138ms)
+  Iter 1 [Swift first]:
+    Swift: bidir:5130ms (total:5130ms)
+    C:     bidir:5665ms (total:5665ms)
+  Iter 2 [C first]:
+    C:     bidir:5153ms (total:5153ms)
+    Swift: bidir:5130ms (total:5130ms)
+  Iter 3 [Swift first]:
+    Swift: bidir:5162ms (total:5162ms)
+    C:     bidir:5119ms (total:5119ms)
+
+--- replication lifecycle | 100B x 100K | 3 iterations ---
+  Warmup:
+    Swift: push-cr:66255ms (total:66255ms)
+    C:     push-cr:47298ms (total:47298ms)
+  Iter 1 [Swift first]:
+    Swift: push-cr:39158ms (total:39158ms)
+    C:     push-cr:48865ms (total:48865ms)
+  Iter 2 [C first]:
+    C:     push-cr:46340ms (total:46340ms)
+    Swift: push-cr:45696ms (total:45696ms)
+  Iter 3 [Swift first]:
+    Swift: push-cr:64995ms (total:64995ms)
+    C:     push-cr:48493ms (total:48493ms)
+
+--- replication lifecycle | 100B x 100K | 3 iterations ---
+  Warmup:
+    Swift: push-up:42805ms (total:42805ms)
+    C:     push-up:46869ms (total:46869ms)
+  Iter 1 [Swift first]:
+    Swift: push-up:43126ms (total:43126ms)
+    C:     push-up:47719ms (total:47719ms)
+  Iter 2 [C first]:
+    C:     push-up:46926ms (total:46926ms)
+    Swift: push-up:45354ms (total:45354ms)
+  Iter 3 [Swift first]:
+    Swift: push-up:41279ms (total:41279ms)
+    C:     push-up:47986ms (total:47986ms)
+
+--- replication lifecycle | 100B x 100K | 3 iterations ---
+  Warmup:
+    Swift: push-del:3592ms (total:3592ms)
+    C:     push-del:3090ms (total:3090ms)
+  Iter 1 [Swift first]:
+    Swift: push-del:2572ms (total:2572ms)
+    C:     push-del:3095ms (total:3095ms)
+  Iter 2 [C first]:
+    C:     push-del:3076ms (total:3076ms)
+    Swift: push-del:2541ms (total:2541ms)
+  Iter 3 [Swift first]:
+    Swift: push-del:2576ms (total:2576ms)
+    C:     push-del:3089ms (total:3089ms)
+
+--- replication lifecycle | 100B x 100K | 3 iterations ---
+  Warmup:
+    Swift: pull-cr:2571ms (total:2571ms)
+    C:     pull-cr:3072ms (total:3072ms)
+  Iter 1 [Swift first]:
+    Swift: pull-cr:2555ms (total:2555ms)
+    C:     pull-cr:3067ms (total:3067ms)
+  Iter 2 [C first]:
+    C:     pull-cr:3088ms (total:3088ms)
+    Swift: pull-cr:2561ms (total:2561ms)
+  Iter 3 [Swift first]:
+    Swift: pull-cr:2567ms (total:2567ms)
+    C:     pull-cr:3067ms (total:3067ms)
+
+--- replication lifecycle | 100B x 100K | 3 iterations ---
+  Warmup:
+    Swift: pull-up:2557ms (total:2557ms)
+    C:     pull-up:3086ms (total:3086ms)
+  Iter 1 [Swift first]:
+    Swift: pull-up:2571ms (total:2571ms)
+    C:     pull-up:3091ms (total:3091ms)
+  Iter 2 [C first]:
+    C:     pull-up:3072ms (total:3072ms)
+    Swift: pull-up:2550ms (total:2550ms)
+  Iter 3 [Swift first]:
+    Swift: pull-up:2576ms (total:2576ms)
+    C:     pull-up:3100ms (total:3100ms)
+
+--- replication lifecycle | 100B x 100K | 3 iterations ---
+  Warmup:
+    Swift: pull-del:3576ms (total:3576ms)
+    C:     pull-del:3083ms (total:3083ms)
+  Iter 1 [Swift first]:
+    Swift: pull-del:2554ms (total:2554ms)
+    C:     pull-del:3073ms (total:3073ms)
+  Iter 2 [C first]:
+    C:     pull-del:3073ms (total:3073ms)
+    Swift: pull-del:2578ms (total:2578ms)
+  Iter 3 [Swift first]:
+    Swift: pull-del:2569ms (total:2569ms)
+    C:     pull-del:3082ms (total:3082ms)
+
+--- replication lifecycle | 100B x 100K | 3 iterations ---
+  Warmup:
+    Swift: bidir:35927ms (total:35927ms)
+    C:     bidir:25128ms (total:25128ms)
+  Iter 1 [Swift first]:
+    Swift: bidir:22146ms (total:22146ms)
+    C:     bidir:26272ms (total:26272ms)
+  Iter 2 [C first]:
+    C:     bidir:25704ms (total:25704ms)
+    Swift: bidir:23679ms (total:23679ms)
+  Iter 3 [Swift first]:
+    Swift: bidir:21112ms (total:21112ms)
+    C:     bidir:25715ms (total:25715ms)
+
+==================================================
+=== SUMMARY (median comparison) ===
+==================================================
+
+repl_100b x 100 | replication | push_create: Swift 3072ms vs C 3076ms -> SWIFT wins by 0.1%
+repl_100b x 100 | replication | push_update: Swift 3070ms vs C 3086ms -> SWIFT wins by 0.5%
+repl_100b x 100 | replication | push_delete: Swift 2559ms vs C 3081ms -> SWIFT wins by 17%
+repl_100b x 100 | replication | pull_create: Swift 2566ms vs C 2569ms -> SWIFT wins by 0.1%
+repl_100b x 100 | replication | pull_update: Swift 2567ms vs C 3078ms -> SWIFT wins by 16.6%
+repl_100b x 100 | replication | pull_delete: Swift 2581ms vs C 2581ms -> TIE
+repl_100b x 100 | replication | bidirectional: Swift 3075ms vs C 3606ms -> SWIFT wins by 14.7%
+repl_100b x 1K | replication | push_create: Swift 3585ms vs C 3605ms -> SWIFT wins by 0.6%
+repl_100b x 1K | replication | push_update: Swift 3575ms vs C 3578ms -> SWIFT wins by 0.1%
+repl_100b x 1K | replication | push_delete: Swift 2571ms vs C 3088ms -> SWIFT wins by 16.7%
+repl_100b x 1K | replication | pull_create: Swift 2566ms vs C 2570ms -> SWIFT wins by 0.2%
+repl_100b x 1K | replication | pull_update: Swift 2561ms vs C 2572ms -> SWIFT wins by 0.5%
+repl_100b x 1K | replication | pull_delete: Swift 2571ms vs C 3067ms -> SWIFT wins by 16.2%
+repl_100b x 1K | replication | bidirectional: Swift 3080ms vs C 3613ms -> SWIFT wins by 14.7%
+repl_100b x 10K | replication | push_create: Swift 6688ms vs C 7705ms -> SWIFT wins by 13.2%
+repl_100b x 10K | replication | push_update: Swift 7722ms vs C 7705ms -> C wins by 0.2%
+repl_100b x 10K | replication | push_delete: Swift 2574ms vs C 3073ms -> SWIFT wins by 16.2%
+repl_100b x 10K | replication | pull_create: Swift 2584ms vs C 3085ms -> SWIFT wins by 16.3%
+repl_100b x 10K | replication | pull_update: Swift 2571ms vs C 2577ms -> SWIFT wins by 0.2%
+repl_100b x 10K | replication | pull_delete: Swift 2574ms vs C 3089ms -> SWIFT wins by 16.7%
+repl_100b x 10K | replication | bidirectional: Swift 5130ms vs C 5153ms -> SWIFT wins by 0.4%
+repl_100b x 100K | replication | push_create: Swift 45696ms vs C 48493ms -> SWIFT wins by 5.8%
+repl_100b x 100K | replication | push_update: Swift 43126ms vs C 47719ms -> SWIFT wins by 9.6%
+repl_100b x 100K | replication | push_delete: Swift 2572ms vs C 3089ms -> SWIFT wins by 16.7%
+repl_100b x 100K | replication | pull_create: Swift 2561ms vs C 3067ms -> SWIFT wins by 16.5%
+repl_100b x 100K | replication | pull_update: Swift 2571ms vs C 3091ms -> SWIFT wins by 16.8%
+repl_100b x 100K | replication | pull_delete: Swift 2569ms vs C 3073ms -> SWIFT wins by 16.4%
+repl_100b x 100K | replication | bidirectional: Swift 22146ms vs C 25715ms -> SWIFT wins by 13.9%

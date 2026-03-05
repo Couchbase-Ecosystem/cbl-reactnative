@@ -54,6 +54,7 @@ import {
 } from './cblite-js/cblite/core-types';
 
 import { EngineLocator } from './cblite-js/cblite/src/engine-locator';
+import { USE_TURBO_MODULES } from './feature-flags';
 import { Collection } from './cblite-js/cblite/src/collection';
 import { Result } from './cblite-js/cblite/src/result';
 import { ReplicatorStatus } from './cblite-js/cblite/src/replicator-status';
@@ -67,6 +68,40 @@ import type {
 } from './cblite-js/cblite/src/log-sinks-types';
 
 import uuid from 'react-native-uuid';
+
+// Conditional import for Database Turbo Module
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let DatabaseTurbo: any = null;
+
+if (USE_TURBO_MODULES) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    DatabaseTurbo = require('./specs/NativeCblDatabase').default;
+    console.log('[CBL Engine] ✅ Database Turbo Module loaded');
+  } catch (error) {
+    console.warn(
+      '[CBL Engine] ⚠️ Database Turbo Module not available, using legacy:',
+      error
+    );
+  }
+}
+
+// Conditional import for Collection Turbo Module
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let CollectionTurbo: any = null;
+
+if (USE_TURBO_MODULES) {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    CollectionTurbo = require('./specs/NativeCblCollection').default;
+    console.log('[CBL Engine] ✅ Collection Turbo Module loaded');
+  } catch (error) {
+    console.warn(
+      '[CBL Engine] ⚠️ Collection Turbo Module not available, using legacy:',
+      error
+    );
+  }
+}
 
 export class CblReactNativeEngine implements ICoreEngine {
   _defaultCollectionName = '_default';
@@ -271,7 +306,37 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  collection_CreateCollection(args: CollectionArgs): Promise<Collection> {
+  async collection_CreateCollection(args: CollectionArgs): Promise<Collection> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && CollectionTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: collection_CreateCollection');
+
+      try {
+        const result = await CollectionTurbo.collection_CreateCollection(
+          args.collectionName,
+          args.name,
+          args.scopeName
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo collection_CreateCollection completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error(
+          '[CBL] ❌ Turbo collection_CreateCollection failed:',
+          error
+        );
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: collection_CreateCollection');
+
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_CreateCollection(
         args.collectionName,
@@ -279,6 +344,10 @@ export class CblReactNativeEngine implements ICoreEngine {
         args.scopeName
       ).then(
         (result: Collection) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy collection_CreateCollection completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
           resolve(result);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -397,7 +466,34 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  collection_GetCollection(args: CollectionArgs): Promise<Collection> {
+  async collection_GetCollection(args: CollectionArgs): Promise<Collection> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && CollectionTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: collection_GetCollection');
+
+      try {
+        const result = await CollectionTurbo.collection_GetCollection(
+          args.collectionName,
+          args.name,
+          args.scopeName
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo collection_GetCollection completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo collection_GetCollection failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: collection_GetCollection');
+
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetCollection(
         args.collectionName,
@@ -405,6 +501,10 @@ export class CblReactNativeEngine implements ICoreEngine {
         args.scopeName
       ).then(
         (result: Collection) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy collection_GetCollection completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
           resolve(result);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -415,13 +515,46 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  collection_GetCollections(args: ScopeArgs): Promise<CollectionsResult> {
+  async collection_GetCollections(args: ScopeArgs): Promise<CollectionsResult> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && CollectionTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: collection_GetCollections');
+
+      try {
+        const result = await CollectionTurbo.collection_GetCollections(
+          args.name,
+          args.scopeName
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo collection_GetCollections completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error(
+          '[CBL] ❌ Turbo collection_GetCollections failed:',
+          error
+        );
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: collection_GetCollections');
+
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetCollections(
         args.name,
         args.scopeName
       ).then(
         (result: CollectionsResult) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy collection_GetCollections completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
           resolve(result);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -432,10 +565,37 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  collection_GetCount(args: CollectionArgs): Promise<{ count: number }> {
+  async collection_GetCount(args: CollectionArgs): Promise<{ count: number }> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && CollectionTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: collection_GetCount');
+
+      try {
+        const result = await CollectionTurbo.collection_GetCount(
+          args.collectionName,
+          args.name,
+          args.scopeName
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo collection_GetCount completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo collection_GetCount failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: collection_GetCount');
     this.debugLog(
       `::DEBUG:: collection_GetCount: ${args.collectionName} ${args.name} ${args.scopeName}`
     );
+
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetCount(
         args.collectionName,
@@ -443,6 +603,11 @@ export class CblReactNativeEngine implements ICoreEngine {
         args.scopeName
       ).then(
         (result: { count: number }) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy collection_GetCount completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
+
           this.debugLog(
             `::DEBUG:: collection_GetCount completed with result: ${JSON.stringify(result)}`
           );
@@ -496,9 +661,36 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  collection_GetDocument(
+  async collection_GetDocument(
     args: CollectionGetDocumentArgs
   ): Promise<DocumentResult> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && CollectionTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: collection_GetDocument');
+
+      try {
+        const result = await CollectionTurbo.collection_GetDocument(
+          args.docId,
+          args.name,
+          args.scopeName,
+          args.collectionName
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo collection_GetDocument completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo collection_GetDocument failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: collection_GetDocument');
     this.debugLog(
       `::DEBUG:: collection_GetDocument: ${args.docId} ${args.name} ${args.scopeName} ${args.collectionName}`
     );
@@ -511,6 +703,11 @@ export class CblReactNativeEngine implements ICoreEngine {
         args.collectionName
       ).then(
         (dr: DocumentResult) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy collection_GetDocument completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
+
           this.debugLog(
             `::DEBUG:: collection_GetDocument completed with result: ${JSON.stringify(dr)}`
           );
@@ -546,7 +743,36 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  collection_GetIndexes(args: CollectionArgs): Promise<{ indexes: string[] }> {
+  async collection_GetIndexes(
+    args: CollectionArgs
+  ): Promise<{ indexes: string[] }> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && CollectionTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: collection_GetIndexes');
+
+      try {
+        const result = await CollectionTurbo.collection_GetIndexes(
+          args.collectionName,
+          args.scopeName,
+          args.name
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo collection_GetIndexes completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo collection_GetIndexes failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: collection_GetIndexes');
+
     return new Promise((resolve, reject) => {
       this.CblReactNative.collection_GetIndexes(
         args.collectionName,
@@ -554,6 +780,10 @@ export class CblReactNativeEngine implements ICoreEngine {
         args.name
       ).then(
         (items: { indexes: string[] }) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy collection_GetIndexes completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
           resolve(items);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -686,7 +916,7 @@ export class CblReactNativeEngine implements ICoreEngine {
     );
   }
 
-  collection_Save(
+  async collection_Save(
     args: CollectionSaveStringArgs
   ): Promise<CollectionDocumentSaveResult> {
     //deal with react native passing nulls
@@ -694,6 +924,37 @@ export class CblReactNativeEngine implements ICoreEngine {
       args.concurrencyControl !== null
         ? (args.concurrencyControl as number)
         : -9999;
+
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && CollectionTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: collection_Save');
+
+      try {
+        const result = await CollectionTurbo.collection_Save(
+          args.document,
+          args.blobs,
+          args.id,
+          args.name,
+          args.scopeName,
+          args.collectionName,
+          concurrencyControl
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo collection_Save completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo collection_Save failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: collection_Save');
     this.debugLog(
       `::DEBUG:: collection_Save: ${args.document} ${args.blobs} ${args.id} ${args.name} ${args.scopeName} ${args.collectionName} ${concurrencyControl}`
     );
@@ -709,6 +970,11 @@ export class CblReactNativeEngine implements ICoreEngine {
         concurrencyControl
       ).then(
         (resultsData: CollectionDocumentSaveResult) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy collection_Save completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
+
           if (this.debugConsole) {
             console.log(
               `::DEBUG:: collection_Save completed with result: ${JSON.stringify(resultsData)}`
@@ -762,21 +1028,52 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  database_Close(args: DatabaseArgs): Promise<void> {
-    this.debugLog(`::DEBUG:: database_Close: ${args.name}`);
-    return new Promise((resolve, reject) => {
-      this.CblReactNative.database_Close(args.name).then(
-        () => {
-          this.debugLog(`::DEBUG:: database_Close completed`);
-          resolve();
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error: any) => {
-          this.debugLog(`::DEBUG:: database_Close Error: ${error}`);
-          reject(error);
-        }
-      );
-    });
+  // database_Close(args: DatabaseArgs): Promise<void> {
+  //   this.debugLog(`::DEBUG:: database_Close: ${args.name}`);
+  //   return new Promise((resolve, reject) => {
+  //     this.CblReactNative.database_Close(args.name).then(
+  //       () => {
+  //         this.debugLog(`::DEBUG:: database_Close completed`);
+  //         resolve();
+  //       },
+  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //       (error: any) => {
+  //         this.debugLog(`::DEBUG:: database_Close Error: ${error}`);
+  //         reject(error);
+  //       }
+  //     );
+  //   });
+  // }
+
+  /**
+   * Closes a database with smart routing
+   */
+  async database_Close(args: DatabaseArgs): Promise<void> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && DatabaseTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: database_Close');
+
+      try {
+        await DatabaseTurbo.database_Close(args.name);
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo database_Close completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo database_Close failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: database_Close');
+    await this.CblReactNative.database_Close(args.name);
+
+    const endTime = performance.now();
+    console.log(
+      `[CBL] ✅ Legacy database_Close completed in ${(endTime - startTime).toFixed(2)}ms`
+    );
   }
 
   database_Copy(args: DatabaseCopyArgs): Promise<void> {
@@ -881,13 +1178,47 @@ export class CblReactNativeEngine implements ICoreEngine {
     return this.collection_DeleteIndex(colArgs);
   }
 
-  database_Exists(args: DatabaseExistsArgs): Promise<{ exists: boolean }> {
+  async database_Exists(
+    args: DatabaseExistsArgs
+  ): Promise<{ exists: boolean }> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && DatabaseTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: database_Exists');
+
+      try {
+        const result = await DatabaseTurbo.database_Exists(
+          args.databaseName,
+          args.directory
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo database_Exists completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return { exists: result };
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo database_Exists failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: database_Exists');
+
     return new Promise((resolve, reject) => {
       this.CblReactNative.database_Exists(
         args.databaseName,
         args.directory
       ).then(
-        (result: boolean) => resolve({ exists: result }),
+        (result: boolean) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy database_Exists completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
+          resolve({ exists: result });
+        },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (error: any) => {
           reject(error);
@@ -933,41 +1264,124 @@ export class CblReactNativeEngine implements ICoreEngine {
     return this.collection_GetIndexes(colArgs);
   }
 
-  database_GetPath(args: DatabaseArgs): Promise<{ path: string }> {
-    return new Promise((resolve, reject) => {
-      this.CblReactNative.database_GetPath(args.name).then(
-        (result: string) => resolve({ path: result }),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error: any) => {
-          reject(error);
-        }
-      );
-    });
+  // database_GetPath(args: DatabaseArgs): Promise<{ path: string }> {
+  //   return new Promise((resolve, reject) => {
+  //     this.CblReactNative.database_GetPath(args.name).then(
+  //       (result: string) => resolve({ path: result }),
+  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //       (error: any) => {
+  //         reject(error);
+  //       }
+  //     );
+  //   });
+  // }
+
+  /**
+   * Gets database path with smart routing
+   */
+  async database_GetPath(args: DatabaseArgs): Promise<{ path: string }> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && DatabaseTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: database_GetPath');
+
+      try {
+        const path = await DatabaseTurbo.database_GetPath(args.name);
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo database_GetPath completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return { path };
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo database_GetPath failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: database_GetPath');
+    const result = await this.CblReactNative.database_GetPath(args.name);
+
+    const endTime = performance.now();
+    console.log(
+      `[CBL] ✅ Legacy database_GetPath completed in ${(endTime - startTime).toFixed(2)}ms`
+    );
+
+    return result;
   }
 
-  database_Open(
+  // database_Open(
+  //   args: DatabaseOpenArgs
+  // ): Promise<{ databaseUniqueName: string }> {
+  //   this.debugLog(
+  //     `::DEBUG:: database_Open: ${args.name} ${args.config.directory} ${args.config.encryptionKey}`
+  //   );
+  //   return new Promise((resolve, reject) => {
+  //     this.CblReactNative.database_Open(
+  //       args.name,
+  //       args.config.directory,
+  //       args.config.encryptionKey
+  //     ).then(
+  //       (databaseUniqueName) => {
+  //         this.debugLog(`::DEBUG:: database_Open completed`);
+  //         resolve(databaseUniqueName);
+  //       },
+  //       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //       (error: any) => {
+  //         this.debugLog(`::DEBUG:: database_Open Error: ${error}`);
+  //         reject(error);
+  //       }
+  //     );
+  //   });
+  // }
+
+  /**
+   * Opens a database with smart routing between Turbo and Legacy
+   */
+  async database_Open(
     args: DatabaseOpenArgs
   ): Promise<{ databaseUniqueName: string }> {
-    this.debugLog(
-      `::DEBUG:: database_Open: ${args.name} ${args.config.directory} ${args.config.encryptionKey}`
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && DatabaseTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: database_Open');
+
+      try {
+        const result = await DatabaseTurbo.database_Open(
+          args.name,
+          args?.config?.directory || null,
+          args?.config.encryptionKey || null
+        );
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo database_Open completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo database_Open failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: database_Open');
+
+    const result = await this.CblReactNative.database_Open(
+      args.name,
+      args.config.directory,
+      args.config.encryptionKey
     );
-    return new Promise((resolve, reject) => {
-      this.CblReactNative.database_Open(
-        args.name,
-        args.config.directory,
-        args.config.encryptionKey
-      ).then(
-        (databaseUniqueName) => {
-          this.debugLog(`::DEBUG:: database_Open completed`);
-          resolve(databaseUniqueName);
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error: any) => {
-          this.debugLog(`::DEBUG:: database_Open Error: ${error}`);
-          reject(error);
-        }
-      );
-    });
+
+    const endTime = performance.now();
+    console.log(
+      `[CBL] ✅ Legacy database_Open completed in ${(endTime - startTime).toFixed(2)}ms`
+    );
+
+    return result;
   }
 
   database_PerformMaintenance(
@@ -1551,10 +1965,37 @@ export class CblReactNativeEngine implements ICoreEngine {
     });
   }
 
-  scope_GetScopes(args: DatabaseArgs): Promise<ScopesResult> {
+  async scope_GetScopes(args: DatabaseArgs): Promise<ScopesResult> {
+    const startTime = performance.now();
+
+    if (USE_TURBO_MODULES && DatabaseTurbo) {
+      console.log('[CBL] 🚀 Using Turbo: scope_GetScopes');
+
+      try {
+        const result = await DatabaseTurbo.scope_GetScopes(args.name);
+
+        const endTime = performance.now();
+        console.log(
+          `[CBL] ✅ Turbo scope_GetScopes completed in ${(endTime - startTime).toFixed(2)}ms`
+        );
+
+        return result;
+      } catch (error) {
+        console.error('[CBL] ❌ Turbo scope_GetScopes failed:', error);
+        throw error;
+      }
+    }
+
+    // Fallback to legacy
+    console.log('[CBL] 🐌 Using Legacy: scope_GetScopes');
+
     return new Promise((resolve, reject) => {
       this.CblReactNative.scope_GetScopes(args.name).then(
         (result: ScopesResult) => {
+          const endTime = performance.now();
+          console.log(
+            `[CBL] ✅ Legacy scope_GetScopes completed in ${(endTime - startTime).toFixed(2)}ms`
+          );
           resolve(result);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

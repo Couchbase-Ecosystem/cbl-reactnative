@@ -854,6 +854,85 @@ class CblReactnative: RCTEventEmitter {
     }
   }
   
+  /**
+   * Echo method for measuring pure bridge overhead - LEGACY PATTERN
+   * 
+   * LEGACY BRIDGE CHARACTERISTICS:
+   * - Goes through async message queue (adds latency)
+   * - Dispatches to background queue (thread hop)
+   * - Uses traditional React Native bridge serialization
+   * 
+   * This represents the TRADITIONAL way native modules work.
+   */
+  @objc(collection_Echo:withResolver:withRejecter:)
+  func collection_Echo(
+    data: NSString,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    // LEGACY: Dispatch to background queue - this adds overhead!
+    // The message goes: JS -> Bridge Queue -> Native -> BG Queue -> Bridge -> JS
+    backgroundQueue.async {
+      let resultDict: NSDictionary = ["data": data]
+      resolve(resultDict)
+    }
+  }
+  
+  /**
+   * Legacy performance check with FULL async dispatch pattern
+   * 
+   * This uses the traditional pattern that ALL legacy operations use:
+   * 1. Receive call from JS via async bridge
+   * 2. Dispatch to background queue
+   * 3. Do work on background thread
+   * 4. Resolve promise (goes back through bridge)
+   * 
+   * Each step adds latency that Turbo Modules can avoid!
+   */
+  @objc(collection_PerformanceCheckLegacy:withResolver:withRejecter:)
+  func collection_PerformanceCheckLegacy(
+    iterations: NSNumber,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    let count = iterations.intValue
+    
+    // LEGACY PATTERN: Dispatch to background queue (thread scheduling overhead)
+    backgroundQueue.async {
+      let startTime = CFAbsoluteTimeGetCurrent()
+      
+      var sum: Int = 0
+      for i in 0..<count {
+        sum += i
+      }
+      
+      let endTime = CFAbsoluteTimeGetCurrent()
+      let timeMs = (endTime - startTime) * 1000.0
+      
+      let resultDict: NSDictionary = [
+        "timeMs": timeMs,
+        "iterations": count,
+        "checksum": sum
+      ]
+      resolve(resultDict)
+    }
+  }
+
+  /**
+   * Batch echo for Legacy - still uses async dispatch
+   */
+  @objc(collection_BatchEchoLegacy:withResolver:withRejecter:)
+  func collection_BatchEchoLegacy(
+    count: NSNumber,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) -> Void {
+    // LEGACY: Goes through async queue even for simple operations
+    backgroundQueue.async {
+      resolve(count.intValue)
+    }
+  }
+  
   // MARK: - Database Functions
   
   @objc(database_ChangeEncryptionKey:withDatabaseName:withResolver:withRejecter:)
@@ -1901,6 +1980,43 @@ func replicator_AddDocumentChangeListener(
     }
 
   ////////// LOG SINKS END
+
+
+  ////////// DEBUG METHODS
+
+  /**
+   * Debug method: Get native memory usage statistics
+   * Used for performance testing and memory profiling
+   */
+  @objc(debug_GetMemoryUsage:withRejecter:)
+  func debug_GetMemoryUsage(
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    // Get memory info from mach task
+    var info = mach_task_basic_info()
+    var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
+    
+    let kerr: kern_return_t = withUnsafeMutablePointer(to: &info) {
+      $0.withMemoryRebound(to: integer_t.self, capacity: 1) {
+        task_info(mach_task_self_, task_flavor_t(MACH_TASK_BASIC_INFO), $0, &count)
+      }
+    }
+    
+    if kerr == KERN_SUCCESS {
+      let result: [String: Any] = [
+        "usedMemory": info.resident_size,
+        "totalMemory": info.resident_size,
+        "maxMemory": info.virtual_size,
+        "virtualSize": info.virtual_size
+      ]
+      resolve(result)
+    } else {
+      reject("MEMORY_ERROR", "Failed to get memory info", nil)
+    }
+  }
+
+  ////////// DEBUG METHODS END
 
 }
 

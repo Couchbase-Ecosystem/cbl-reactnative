@@ -1,0 +1,1076 @@
+==================================================
+=== Suite: 10KB ===
+Started: 2026-02-16T05:41:52.227Z
+Completed: 2026-02-16T06:16:55.764Z
+Status: complete
+==================================================
+
+--- single lifecycle | 10KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:55ms get:12ms upd:102ms del:29ms (total:198ms)
+    C:     save:51ms get:12ms upd:80ms del:36ms (total:178ms)
+  Iter 1 [Swift first]:
+    Swift: save:78ms get:8ms upd:97ms del:32ms (total:215ms)
+    C:     save:64ms get:21ms upd:85ms del:19ms (total:188ms)
+  Iter 2 [C first]:
+    C:     save:63ms get:7ms upd:100ms del:36ms (total:206ms)
+    Swift: save:74ms get:21ms upd:107ms del:34ms (total:237ms)
+  Iter 3 [Swift first]:
+    Swift: save:76ms get:21ms upd:77ms del:39ms (total:212ms)
+    C:     save:60ms get:16ms upd:97ms del:35ms (total:208ms)
+  Iter 4 [C first]:
+    C:     save:62ms get:21ms upd:78ms del:47ms (total:208ms)
+    Swift: save:63ms get:21ms upd:102ms del:34ms (total:220ms)
+  Iter 5 [Swift first]:
+    Swift: save:76ms get:21ms upd:105ms del:38ms (total:240ms)
+    C:     save:63ms get:20ms upd:91ms del:36ms (total:210ms)
+
+--- batch lifecycle | 10KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:59ms get:12ms upd:97ms del:6ms (total:173ms)
+    C:     save:60ms get:20ms upd:75ms del:8ms (total:163ms)
+  Iter 1 [Swift first]:
+    Swift: save:74ms get:19ms upd:94ms del:8ms (total:195ms)
+    C:     save:59ms get:19ms upd:46ms del:5ms (total:129ms)
+  Iter 2 [C first]:
+    C:     save:44ms get:20ms upd:75ms del:6ms (total:145ms)
+    Swift: save:73ms get:21ms upd:95ms del:6ms (total:195ms)
+  Iter 3 [Swift first]:
+    Swift: save:72ms get:8ms upd:94ms del:9ms (total:185ms)
+    C:     save:60ms get:19ms upd:75ms del:7ms (total:161ms)
+  Iter 4 [C first]:
+    C:     save:60ms get:9ms upd:73ms del:1ms (total:144ms)
+    Swift: save:74ms get:13ms upd:76ms del:5ms (total:168ms)
+  Iter 5 [Swift first]:
+    Swift: save:62ms get:14ms upd:93ms del:6ms (total:175ms)
+    C:     save:46ms get:16ms upd:76ms del:6ms (total:144ms)
+
+--- query lifecycle | 10KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 6ms (100 rows)
+    C:     6ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 5ms (100 rows)
+    C:     7ms (100 rows)
+  Iter 2 [C first]:
+    C:     6ms (100 rows)
+    Swift: 5ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 5ms (100 rows)
+    C:     6ms (100 rows)
+  Iter 4 [C first]:
+    C:     6ms (100 rows)
+    Swift: 6ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 5ms (100 rows)
+    C:     6ms (100 rows)
+
+--- single lifecycle | 10KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:558ms get:96ms upd:673ms del:166ms (total:1493ms)
+    C:     save:469ms get:72ms upd:569ms del:164ms (total:1274ms)
+  Iter 1 [Swift first]:
+    Swift: save:570ms get:96ms upd:675ms del:168ms (total:1509ms)
+    C:     save:437ms get:95ms upd:530ms del:183ms (total:1246ms)
+  Iter 2 [C first]:
+    C:     save:431ms get:69ms upd:529ms del:169ms (total:1199ms)
+    Swift: save:544ms get:98ms upd:679ms del:175ms (total:1497ms)
+  Iter 3 [Swift first]:
+    Swift: save:588ms get:96ms upd:696ms del:175ms (total:1555ms)
+    C:     save:426ms get:95ms upd:559ms del:178ms (total:1257ms)
+  Iter 4 [C first]:
+    C:     save:432ms get:65ms upd:527ms del:169ms (total:1194ms)
+    Swift: save:578ms get:107ms upd:682ms del:154ms (total:1520ms)
+  Iter 5 [Swift first]:
+    Swift: save:561ms get:96ms upd:682ms del:172ms (total:1511ms)
+    C:     save:410ms get:74ms upd:516ms del:171ms (total:1171ms)
+
+--- batch lifecycle | 10KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:542ms get:94ms upd:672ms del:30ms (total:1339ms)
+    C:     save:417ms get:79ms upd:522ms del:25ms (total:1042ms)
+  Iter 1 [Swift first]:
+    Swift: save:559ms get:96ms upd:673ms del:36ms (total:1365ms)
+    C:     save:422ms get:93ms upd:485ms del:19ms (total:1020ms)
+  Iter 2 [C first]:
+    C:     save:415ms get:94ms upd:511ms del:18ms (total:1038ms)
+    Swift: save:529ms get:92ms upd:658ms del:37ms (total:1316ms)
+  Iter 3 [Swift first]:
+    Swift: save:547ms get:96ms upd:679ms del:36ms (total:1358ms)
+    C:     save:415ms get:70ms upd:502ms del:23ms (total:1011ms)
+  Iter 4 [C first]:
+    C:     save:419ms get:72ms upd:505ms del:27ms (total:1023ms)
+    Swift: save:546ms get:71ms upd:664ms del:37ms (total:1318ms)
+  Iter 5 [Swift first]:
+    Swift: save:548ms get:95ms upd:666ms del:30ms (total:1339ms)
+    C:     save:422ms get:88ms upd:501ms del:26ms (total:1038ms)
+
+--- query lifecycle | 10KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: 5ms (100 rows)
+    C:     5ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 5ms (100 rows)
+    C:     5ms (100 rows)
+  Iter 2 [C first]:
+    C:     5ms (100 rows)
+    Swift: 5ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 5ms (100 rows)
+    C:     5ms (100 rows)
+  Iter 4 [C first]:
+    C:     6ms (100 rows)
+    Swift: 5ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 6ms (100 rows)
+    C:     5ms (100 rows)
+
+--- single lifecycle | 10KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: save:5338ms get:736ms upd:6661ms del:1591ms (total:14326ms)
+    C:     save:4108ms get:735ms upd:5189ms del:1435ms (total:11467ms)
+  Iter 1 [Swift first]:
+    Swift: save:5339ms get:705ms upd:6727ms del:1471ms (total:14243ms)
+    C:     save:4262ms get:758ms upd:5141ms del:1478ms (total:11639ms)
+  Iter 2 [C first]:
+    C:     save:4184ms get:731ms upd:5180ms del:1473ms (total:11569ms)
+    Swift: save:5494ms get:753ms upd:7014ms del:1505ms (total:14766ms)
+  Iter 3 [Swift first]:
+    Swift: save:5479ms get:660ms upd:6921ms del:1725ms (total:14784ms)
+    C:     save:4145ms get:710ms upd:5138ms del:1521ms (total:11513ms)
+  Iter 4 [C first]:
+    C:     save:4190ms get:674ms upd:5312ms del:1530ms (total:11706ms)
+    Swift: save:5469ms get:678ms upd:6792ms del:1511ms (total:14449ms)
+  Iter 5 [Swift first]:
+    Swift: save:5331ms get:734ms upd:6719ms del:1563ms (total:14347ms)
+    C:     save:4134ms get:724ms upd:5130ms del:1453ms (total:11442ms)
+
+--- batch lifecycle | 10KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: save:5506ms get:726ms upd:6822ms del:203ms (total:13257ms)
+    C:     save:4129ms get:681ms upd:5001ms del:139ms (total:9950ms)
+  Iter 1 [Swift first]:
+    Swift: save:5446ms get:715ms upd:6778ms del:202ms (total:13141ms)
+    C:     save:4113ms get:705ms upd:4996ms del:144ms (total:9957ms)
+  Iter 2 [C first]:
+    C:     save:4169ms get:706ms upd:5019ms del:143ms (total:10038ms)
+    Swift: save:5423ms get:708ms upd:6722ms del:207ms (total:13061ms)
+  Iter 3 [Swift first]:
+    Swift: save:5451ms get:739ms upd:6741ms del:200ms (total:13130ms)
+    C:     save:4142ms get:706ms upd:4991ms del:141ms (total:9981ms)
+  Iter 4 [C first]:
+    C:     save:4122ms get:684ms upd:4975ms del:140ms (total:9920ms)
+    Swift: save:5421ms get:757ms upd:6703ms del:200ms (total:13081ms)
+  Iter 5 [Swift first]:
+    Swift: save:5385ms get:712ms upd:6722ms del:199ms (total:13018ms)
+    C:     save:4149ms get:700ms upd:4976ms del:130ms (total:9955ms)
+
+--- query lifecycle | 10KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: 6ms (100 rows)
+    C:     5ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 6ms (100 rows)
+    C:     5ms (100 rows)
+  Iter 2 [C first]:
+    C:     5ms (100 rows)
+    Swift: 5ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 5ms (100 rows)
+    C:     6ms (100 rows)
+  Iter 4 [C first]:
+    C:     5ms (100 rows)
+    Swift: 6ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 6ms (100 rows)
+    C:     6ms (100 rows)
+
+--- batch lifecycle | 10KB x 100K | 3 iterations ---
+  Warmup:
+    Swift: save:54439ms get:7142ms upd:67822ms del:1877ms (total:131279ms)
+    C:     save:41293ms get:6952ms upd:50626ms del:1223ms (total:100093ms)
+  Iter 1 [Swift first]:
+    Swift: save:54942ms get:7151ms upd:67953ms del:1852ms (total:131899ms)
+    C:     save:41427ms get:6872ms upd:50043ms del:1207ms (total:99550ms)
+  Iter 2 [C first]:
+    C:     save:41619ms get:7058ms upd:50212ms del:1216ms (total:100106ms)
+    Swift: save:54771ms get:7126ms upd:67828ms del:1878ms (total:131603ms)
+  Iter 3 [Swift first]:
+    Swift: save:54851ms get:7218ms upd:68407ms del:1933ms (total:132409ms)
+    C:     save:41398ms get:6923ms upd:50126ms del:1208ms (total:99655ms)
+
+--- query lifecycle | 10KB x 100K | 3 iterations ---
+  Warmup:
+    Swift: 6ms (100 rows)
+    C:     5ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 6ms (100 rows)
+    C:     6ms (100 rows)
+  Iter 2 [C first]:
+    C:     7ms (100 rows)
+    Swift: 6ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 7ms (100 rows)
+    C:     5ms (100 rows)
+
+==================================================
+=== Suite: 100B ===
+Started: 2026-02-16T05:20:47.063Z
+Completed: 2026-02-16T05:29:55.500Z
+Status: complete
+==================================================
+
+--- single lifecycle | 100B x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:12ms get:15ms upd:27ms del:54ms (total:108ms)
+    C:     save:17ms get:16ms upd:27ms del:22ms (total:83ms)
+  Iter 1 [Swift first]:
+    Swift: save:12ms get:14ms upd:11ms del:30ms (total:66ms)
+    C:     save:9ms get:4ms upd:20ms del:43ms (total:77ms)
+  Iter 2 [C first]:
+    C:     save:19ms get:18ms upd:12ms del:65ms (total:113ms)
+    Swift: save:18ms get:16ms upd:28ms del:35ms (total:96ms)
+  Iter 3 [Swift first]:
+    Swift: save:19ms get:15ms upd:30ms del:22ms (total:86ms)
+    C:     save:19ms get:16ms upd:28ms del:37ms (total:99ms)
+  Iter 4 [C first]:
+    C:     save:16ms get:18ms upd:26ms del:36ms (total:96ms)
+    Swift: save:10ms get:8ms upd:42ms del:24ms (total:83ms)
+  Iter 5 [Swift first]:
+    Swift: save:18ms get:11ms upd:25ms del:38ms (total:92ms)
+    C:     save:9ms get:18ms upd:27ms del:19ms (total:72ms)
+
+--- batch lifecycle | 100B x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:2ms get:4ms upd:8ms del:9ms (total:23ms)
+    C:     save:3ms get:7ms upd:10ms del:6ms (total:27ms)
+  Iter 1 [Swift first]:
+    Swift: save:4ms get:2ms upd:9ms del:7ms (total:21ms)
+    C:     save:3ms get:7ms upd:7ms del:3ms (total:20ms)
+  Iter 2 [C first]:
+    C:     save:3ms get:6ms upd:3ms del:4ms (total:17ms)
+    Swift: save:2ms get:4ms upd:8ms del:5ms (total:19ms)
+  Iter 3 [Swift first]:
+    Swift: save:4ms get:7ms upd:13ms del:8ms (total:32ms)
+    C:     save:4ms get:5ms upd:3ms del:4ms (total:16ms)
+  Iter 4 [C first]:
+    C:     save:4ms get:6ms upd:9ms del:5ms (total:23ms)
+    Swift: save:5ms get:6ms upd:3ms del:6ms (total:20ms)
+  Iter 5 [Swift first]:
+    Swift: save:4ms get:6ms upd:11ms del:7ms (total:29ms)
+    C:     save:4ms get:5ms upd:9ms del:4ms (total:22ms)
+
+--- query lifecycle | 100B x 100 | 5 iterations ---
+  Warmup:
+    Swift: 2ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 0ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     0ms (100 rows)
+
+--- single lifecycle | 100B x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:104ms get:70ms upd:145ms del:140ms (total:460ms)
+    C:     save:128ms get:70ms upd:136ms del:134ms (total:469ms)
+  Iter 1 [Swift first]:
+    Swift: save:106ms get:69ms upd:127ms del:145ms (total:446ms)
+    C:     save:138ms get:71ms upd:141ms del:110ms (total:461ms)
+  Iter 2 [C first]:
+    C:     save:97ms get:48ms upd:149ms del:124ms (total:418ms)
+    Swift: save:110ms get:70ms upd:145ms del:127ms (total:453ms)
+  Iter 3 [Swift first]:
+    Swift: save:88ms get:69ms upd:125ms del:149ms (total:431ms)
+    C:     save:100ms get:46ms upd:148ms del:128ms (total:423ms)
+  Iter 4 [C first]:
+    C:     save:121ms get:33ms upd:125ms del:109ms (total:388ms)
+    Swift: save:112ms get:70ms upd:151ms del:141ms (total:474ms)
+  Iter 5 [Swift first]:
+    Swift: save:112ms get:70ms upd:115ms del:137ms (total:434ms)
+    C:     save:97ms get:70ms upd:141ms del:121ms (total:429ms)
+
+--- batch lifecycle | 100B x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:20ms get:25ms upd:54ms del:17ms (total:117ms)
+    C:     save:23ms get:20ms upd:46ms del:12ms (total:102ms)
+  Iter 1 [Swift first]:
+    Swift: save:28ms get:24ms upd:45ms del:19ms (total:116ms)
+    C:     save:25ms get:14ms upd:45ms del:7ms (total:92ms)
+  Iter 2 [C first]:
+    C:     save:14ms get:14ms upd:31ms del:13ms (total:72ms)
+    Swift: save:16ms get:16ms upd:39ms del:15ms (total:86ms)
+  Iter 3 [Swift first]:
+    Swift: save:28ms get:26ms upd:39ms del:31ms (total:124ms)
+    C:     save:23ms get:22ms upd:45ms del:22ms (total:111ms)
+  Iter 4 [C first]:
+    C:     save:14ms get:22ms upd:46ms del:22ms (total:104ms)
+    Swift: save:34ms get:26ms upd:55ms del:15ms (total:130ms)
+  Iter 5 [Swift first]:
+    Swift: save:20ms get:10ms upd:54ms del:28ms (total:111ms)
+    C:     save:16ms get:23ms upd:46ms del:21ms (total:107ms)
+
+--- query lifecycle | 100B x 1K | 5 iterations ---
+  Warmup:
+    Swift: 0ms (100 rows)
+    C:     0ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 0ms (100 rows)
+    C:     0ms (100 rows)
+  Iter 2 [C first]:
+    C:     0ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 0ms (100 rows)
+    C:     0ms (100 rows)
+  Iter 4 [C first]:
+    C:     0ms (100 rows)
+    Swift: 0ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 0ms (100 rows)
+    C:     0ms (100 rows)
+
+--- single lifecycle | 100B x 10K | 5 iterations ---
+  Warmup:
+    Swift: save:923ms get:422ms upd:1207ms del:1347ms (total:3900ms)
+    C:     save:897ms get:441ms upd:1128ms del:1589ms (total:4056ms)
+  Iter 1 [Swift first]:
+    Swift: save:1010ms get:341ms upd:1209ms del:1336ms (total:3896ms)
+    C:     save:944ms get:375ms upd:1472ms del:1158ms (total:3950ms)
+  Iter 2 [C first]:
+    C:     save:870ms get:397ms upd:1203ms del:1091ms (total:3561ms)
+    Swift: save:899ms get:457ms upd:1179ms del:1138ms (total:3673ms)
+  Iter 3 [Swift first]:
+    Swift: save:898ms get:420ms upd:1159ms del:1185ms (total:3662ms)
+    C:     save:940ms get:443ms upd:1150ms del:1135ms (total:3668ms)
+  Iter 4 [C first]:
+    C:     save:887ms get:395ms upd:1182ms del:1088ms (total:3552ms)
+    Swift: save:908ms get:408ms upd:1154ms del:1167ms (total:3637ms)
+  Iter 5 [Swift first]:
+    Swift: save:918ms get:421ms upd:1147ms del:1139ms (total:3626ms)
+    C:     save:869ms get:441ms upd:1109ms del:1067ms (total:3486ms)
+
+--- batch lifecycle | 100B x 10K | 5 iterations ---
+  Warmup:
+    Swift: save:170ms get:112ms upd:303ms del:156ms (total:742ms)
+    C:     save:136ms get:102ms upd:238ms del:113ms (total:589ms)
+  Iter 1 [Swift first]:
+    Swift: save:150ms get:108ms upd:309ms del:142ms (total:709ms)
+    C:     save:138ms get:103ms upd:239ms del:116ms (total:596ms)
+  Iter 2 [C first]:
+    C:     save:135ms get:84ms upd:245ms del:141ms (total:604ms)
+    Swift: save:167ms get:107ms upd:320ms del:140ms (total:734ms)
+  Iter 3 [Swift first]:
+    Swift: save:161ms get:89ms upd:299ms del:163ms (total:712ms)
+    C:     save:138ms get:107ms upd:240ms del:121ms (total:606ms)
+  Iter 4 [C first]:
+    C:     save:137ms get:80ms upd:224ms del:109ms (total:548ms)
+    Swift: save:165ms get:102ms upd:308ms del:180ms (total:754ms)
+  Iter 5 [Swift first]:
+    Swift: save:164ms get:107ms upd:305ms del:156ms (total:731ms)
+    C:     save:148ms get:104ms upd:241ms del:117ms (total:611ms)
+
+--- query lifecycle | 100B x 10K | 5 iterations ---
+  Warmup:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     0ms (100 rows)
+    Swift: 0ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 0ms (100 rows)
+    C:     0ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 0ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 0ms (100 rows)
+    C:     1ms (100 rows)
+
+--- batch lifecycle | 100B x 100K | 5 iterations ---
+  Warmup:
+    Swift: save:1614ms get:900ms upd:2891ms del:1398ms (total:6803ms)
+    C:     save:1256ms get:745ms upd:2329ms del:866ms (total:5196ms)
+  Iter 1 [Swift first]:
+    Swift: save:1628ms get:907ms upd:2966ms del:1385ms (total:6885ms)
+    C:     save:1258ms get:759ms upd:2299ms del:862ms (total:5178ms)
+  Iter 2 [C first]:
+    C:     save:1229ms get:756ms upd:2306ms del:832ms (total:5123ms)
+    Swift: save:1593ms get:893ms upd:2897ms del:1423ms (total:6805ms)
+  Iter 3 [Swift first]:
+    Swift: save:1565ms get:899ms upd:2915ms del:1475ms (total:6854ms)
+    C:     save:1257ms get:776ms upd:2352ms del:839ms (total:5224ms)
+  Iter 4 [C first]:
+    C:     save:1308ms get:735ms upd:2276ms del:842ms (total:5162ms)
+    Swift: save:1561ms get:918ms upd:2949ms del:1413ms (total:6841ms)
+  Iter 5 [Swift first]:
+    Swift: save:1552ms get:907ms upd:2945ms del:1492ms (total:6896ms)
+    C:     save:1226ms get:747ms upd:2300ms del:857ms (total:5130ms)
+
+--- query lifecycle | 100B x 100K | 5 iterations ---
+  Warmup:
+    Swift: 1ms (100 rows)
+    C:     0ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     0ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+
+==================================================
+=== Suite: 1MB ===
+Started: 2026-02-16T07:04:59.153Z
+Status: partial
+==================================================
+
+--- single lifecycle | 1MB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:4939ms get:305ms upd:6085ms del:45ms (total:11374ms)
+    C:     save:3599ms get:293ms upd:4384ms del:62ms (total:8337ms)
+  Iter 1 [Swift first]:
+    Swift: save:4848ms get:295ms upd:6077ms del:62ms (total:11283ms)
+    C:     save:3608ms get:283ms upd:4364ms del:49ms (total:8304ms)
+  Iter 2 [C first]:
+    C:     save:3646ms get:284ms upd:4380ms del:59ms (total:8370ms)
+    Swift: save:4823ms get:285ms upd:6017ms del:74ms (total:11199ms)
+  Iter 3 [Swift first]:
+    Swift: save:4803ms get:291ms upd:6015ms del:63ms (total:11171ms)
+    C:     save:3570ms get:275ms upd:4372ms del:58ms (total:8275ms)
+  Iter 4 [C first]:
+    C:     save:3562ms get:277ms upd:4321ms del:58ms (total:8218ms)
+    Swift: save:4811ms get:268ms upd:6013ms del:63ms (total:11156ms)
+  Iter 5 [Swift first]:
+    Swift: save:4861ms get:301ms upd:6005ms del:48ms (total:11216ms)
+    C:     save:3593ms get:275ms upd:4344ms del:63ms (total:8275ms)
+
+--- batch lifecycle | 1MB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:5380ms get:639ms upd:6532ms del:44ms (total:12596ms)
+    C:     save:4026ms get:632ms upd:4782ms del:47ms (total:9487ms)
+  Iter 1 [Swift first]:
+    Swift: save:5382ms get:668ms upd:6560ms del:43ms (total:12653ms)
+    C:     save:4016ms get:638ms upd:4801ms del:41ms (total:9497ms)
+  Iter 2 [C first]:
+    C:     save:4090ms get:650ms upd:4800ms del:46ms (total:9585ms)
+    Swift: save:5383ms get:640ms upd:6538ms del:48ms (total:12609ms)
+  Iter 3 [Swift first]:
+    Swift: save:5325ms get:644ms upd:6543ms del:45ms (total:12558ms)
+    C:     save:4091ms get:619ms upd:4809ms del:47ms (total:9566ms)
+  Iter 4 [C first]:
+    C:     save:4059ms get:637ms upd:4767ms del:42ms (total:9505ms)
+    Swift: save:5353ms get:638ms upd:6568ms del:45ms (total:12603ms)
+  Iter 5 [Swift first]:
+    Swift: save:5395ms get:662ms upd:6553ms del:36ms (total:12645ms)
+    C:     save:4108ms get:630ms upd:4790ms del:43ms (total:9571ms)
+
+--- query lifecycle | 1MB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 550ms (100 rows)
+    C:     552ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 558ms (100 rows)
+    C:     569ms (100 rows)
+  Iter 2 [C first]:
+    C:     563ms (100 rows)
+    Swift: 551ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 541ms (100 rows)
+    C:     567ms (100 rows)
+  Iter 4 [C first]:
+    C:     564ms (100 rows)
+    Swift: 541ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 539ms (100 rows)
+    C:     544ms (100 rows)
+
+--- single lifecycle | 1MB x 1K | 3 iterations ---
+  Warmup:
+    Swift: save:48959ms get:2875ms upd:60903ms del:353ms (total:113089ms)
+    C:     save:35852ms get:2650ms upd:43866ms del:319ms (total:82686ms)
+  Iter 1 [Swift first]:
+    Swift: save:49364ms get:2823ms upd:61142ms del:414ms (total:113742ms)
+    C:     save:36137ms get:2699ms upd:43748ms del:341ms (total:82926ms)
+  Iter 2 [C first]:
+    C:     save:35566ms get:2815ms upd:43940ms del:347ms (total:82668ms)
+    Swift: save:49418ms get:2847ms upd:60825ms del:369ms (total:113458ms)
+  Iter 3 [Swift first]:
+    Swift: save:48999ms get:2762ms upd:60621ms del:363ms (total:112746ms)
+    C:     save:35668ms get:2688ms upd:43311ms del:331ms (total:81998ms)
+
+--- batch lifecycle | 1MB x 1K | 3 iterations ---
+  Warmup:
+    Swift: save:53846ms get:6365ms upd:66021ms del:219ms (total:126451ms)
+    C:     save:40405ms get:6285ms upd:48567ms del:204ms (total:95461ms)
+  Iter 1 [Swift first]:
+    Swift: save:54353ms get:6423ms upd:66136ms del:228ms (total:127140ms)
+    C:     save:40699ms get:6305ms upd:48349ms del:210ms (total:95564ms)
+  Iter 2 [C first]:
+    C:     save:40545ms get:6201ms upd:48641ms del:224ms (total:95611ms)
+    Swift: save:54224ms get:6467ms upd:65961ms del:214ms (total:126866ms)
+  Iter 3 [Swift first]:
+    Swift: save:54105ms get:6386ms upd:66091ms del:208ms (total:126790ms)
+    C:     save:40853ms get:6439ms upd:48573ms del:189ms (total:96053ms)
+
+==================================================
+=== Suite: 100KB ===
+Started: 2026-02-16T06:16:55.834Z
+Completed: 2026-02-16T07:02:11.354Z
+Status: complete
+==================================================
+
+--- single lifecycle | 100KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:470ms get:32ms upd:640ms del:39ms (total:1182ms)
+    C:     save:363ms get:54ms upd:447ms del:32ms (total:896ms)
+  Iter 1 [Swift first]:
+    Swift: save:482ms get:33ms upd:629ms del:38ms (total:1183ms)
+    C:     save:357ms get:46ms upd:443ms del:27ms (total:874ms)
+  Iter 2 [C first]:
+    C:     save:367ms get:28ms upd:476ms del:47ms (total:918ms)
+    Swift: save:494ms get:37ms upd:618ms del:41ms (total:1190ms)
+  Iter 3 [Swift first]:
+    Swift: save:499ms get:54ms upd:631ms del:22ms (total:1207ms)
+    C:     save:362ms get:54ms upd:437ms del:19ms (total:872ms)
+  Iter 4 [C first]:
+    C:     save:353ms get:53ms upd:449ms del:31ms (total:886ms)
+    Swift: save:458ms get:55ms upd:632ms del:46ms (total:1190ms)
+  Iter 5 [Swift first]:
+    Swift: save:481ms get:38ms upd:606ms del:43ms (total:1169ms)
+    C:     save:375ms get:53ms upd:441ms del:30ms (total:898ms)
+
+--- batch lifecycle | 100KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:572ms get:73ms upd:677ms del:18ms (total:1340ms)
+    C:     save:402ms get:87ms upd:491ms del:8ms (total:989ms)
+  Iter 1 [Swift first]:
+    Swift: save:532ms get:68ms upd:671ms del:12ms (total:1283ms)
+    C:     save:413ms get:86ms upd:489ms del:12ms (total:1001ms)
+  Iter 2 [C first]:
+    C:     save:397ms get:64ms upd:486ms del:11ms (total:958ms)
+    Swift: save:547ms get:85ms upd:667ms del:14ms (total:1313ms)
+  Iter 3 [Swift first]:
+    Swift: save:532ms get:87ms upd:664ms del:12ms (total:1296ms)
+    C:     save:415ms get:85ms upd:498ms del:6ms (total:1004ms)
+  Iter 4 [C first]:
+    C:     save:394ms get:88ms upd:483ms del:12ms (total:977ms)
+    Swift: save:549ms get:63ms upd:647ms del:9ms (total:1268ms)
+  Iter 5 [Swift first]:
+    Swift: save:563ms get:86ms upd:650ms del:13ms (total:1312ms)
+    C:     save:407ms get:88ms upd:483ms del:8ms (total:985ms)
+
+--- query lifecycle | 100KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 56ms (100 rows)
+    C:     56ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 56ms (100 rows)
+    C:     55ms (100 rows)
+  Iter 2 [C first]:
+    C:     57ms (100 rows)
+    Swift: 57ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 60ms (100 rows)
+    C:     56ms (100 rows)
+  Iter 4 [C first]:
+    C:     55ms (100 rows)
+    Swift: 56ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 55ms (100 rows)
+    C:     58ms (100 rows)
+
+--- single lifecycle | 100KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:4639ms get:309ms upd:5978ms del:198ms (total:11123ms)
+    C:     save:3460ms get:277ms upd:4205ms del:191ms (total:8133ms)
+  Iter 1 [Swift first]:
+    Swift: save:4709ms get:306ms upd:6000ms del:182ms (total:11197ms)
+    C:     save:3422ms get:273ms upd:4258ms del:182ms (total:8136ms)
+  Iter 2 [C first]:
+    C:     save:3462ms get:284ms upd:4277ms del:169ms (total:8192ms)
+    Swift: save:4756ms get:309ms upd:5937ms del:199ms (total:11201ms)
+  Iter 3 [Swift first]:
+    Swift: save:4739ms get:312ms upd:5897ms del:192ms (total:11140ms)
+    C:     save:3492ms get:310ms upd:4209ms del:178ms (total:8189ms)
+  Iter 4 [C first]:
+    C:     save:3492ms get:310ms upd:4211ms del:184ms (total:8197ms)
+    Swift: save:4707ms get:306ms upd:6109ms del:198ms (total:11321ms)
+  Iter 5 [Swift first]:
+    Swift: save:4788ms get:310ms upd:5880ms del:200ms (total:11178ms)
+    C:     save:3451ms get:309ms upd:4272ms del:181ms (total:8213ms)
+
+--- batch lifecycle | 100KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:5297ms get:645ms upd:6491ms del:63ms (total:12496ms)
+    C:     save:3965ms get:654ms upd:4756ms del:62ms (total:9436ms)
+  Iter 1 [Swift first]:
+    Swift: save:5335ms get:636ms upd:6490ms del:63ms (total:12524ms)
+    C:     save:3991ms get:651ms upd:4721ms del:61ms (total:9425ms)
+  Iter 2 [C first]:
+    C:     save:3961ms get:627ms upd:4732ms del:60ms (total:9380ms)
+    Swift: save:5338ms get:613ms upd:6520ms del:73ms (total:12545ms)
+  Iter 3 [Swift first]:
+    Swift: save:5352ms get:624ms upd:6508ms del:48ms (total:12532ms)
+    C:     save:3971ms get:652ms upd:4732ms del:64ms (total:9420ms)
+  Iter 4 [C first]:
+    C:     save:3987ms get:610ms upd:4740ms del:77ms (total:9415ms)
+    Swift: save:5341ms get:632ms upd:6562ms del:75ms (total:12610ms)
+  Iter 5 [Swift first]:
+    Swift: save:5366ms get:630ms upd:6532ms del:74ms (total:12602ms)
+    C:     save:3972ms get:648ms upd:4711ms del:74ms (total:9404ms)
+
+--- query lifecycle | 100KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: 57ms (100 rows)
+    C:     56ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 58ms (100 rows)
+    C:     57ms (100 rows)
+  Iter 2 [C first]:
+    C:     60ms (100 rows)
+    Swift: 58ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 54ms (100 rows)
+    C:     58ms (100 rows)
+  Iter 4 [C first]:
+    C:     62ms (100 rows)
+    Swift: 59ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 58ms (100 rows)
+    C:     60ms (100 rows)
+
+--- single lifecycle | 100KB x 10K | 3 iterations ---
+  Warmup:
+    Swift: save:47857ms get:3031ms upd:60535ms del:1811ms (total:113234ms)
+    C:     save:35512ms get:2871ms upd:43413ms del:1686ms (total:83482ms)
+  Iter 1 [Swift first]:
+    Swift: save:48722ms get:2971ms upd:60761ms del:1786ms (total:114240ms)
+    C:     save:36046ms get:3080ms upd:43537ms del:1753ms (total:84416ms)
+  Iter 2 [C first]:
+    C:     save:35655ms get:2919ms upd:43559ms del:1738ms (total:83871ms)
+    Swift: save:48672ms get:2963ms upd:60935ms del:1783ms (total:114353ms)
+  Iter 3 [Swift first]:
+    Swift: save:48691ms get:2950ms upd:61382ms del:1769ms (total:114792ms)
+    C:     save:35683ms get:2850ms upd:43432ms del:1753ms (total:83718ms)
+
+--- batch lifecycle | 100KB x 10K | 3 iterations ---
+  Warmup:
+    Swift: save:53603ms get:6261ms upd:65287ms del:443ms (total:125593ms)
+    C:     save:39425ms get:6171ms upd:47118ms del:368ms (total:93081ms)
+  Iter 1 [Swift first]:
+    Swift: save:53523ms get:6321ms upd:65759ms del:443ms (total:126045ms)
+    C:     save:39836ms get:6271ms upd:48149ms del:470ms (total:94725ms)
+  Iter 2 [C first]:
+    C:     save:40094ms get:6243ms upd:47883ms del:368ms (total:94587ms)
+    Swift: save:54211ms get:6385ms upd:66165ms del:451ms (total:127212ms)
+  Iter 3 [Swift first]:
+    Swift: save:54064ms get:6348ms upd:66365ms del:442ms (total:127219ms)
+    C:     save:39970ms get:6334ms upd:47759ms del:355ms (total:94419ms)
+
+--- query lifecycle | 100KB x 10K | 3 iterations ---
+  Warmup:
+    Swift: 59ms (100 rows)
+    C:     62ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 60ms (100 rows)
+    C:     55ms (100 rows)
+  Iter 2 [C first]:
+    C:     54ms (100 rows)
+    Swift: 60ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 64ms (100 rows)
+    C:     63ms (100 rows)
+
+==================================================
+=== Suite: 1KB ===
+Started: 2026-02-16T05:29:55.535Z
+Completed: 2026-02-16T05:41:52.168Z
+Status: complete
+==================================================
+
+--- single lifecycle | 1KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:15ms get:10ms upd:33ms del:43ms (total:101ms)
+    C:     save:22ms get:14ms upd:34ms del:42ms (total:111ms)
+  Iter 1 [Swift first]:
+    Swift: save:24ms get:17ms upd:21ms del:22ms (total:84ms)
+    C:     save:21ms get:11ms upd:23ms del:30ms (total:85ms)
+  Iter 2 [C first]:
+    C:     save:24ms get:17ms upd:35ms del:15ms (total:91ms)
+    Swift: save:22ms get:6ms upd:33ms del:41ms (total:103ms)
+  Iter 3 [Swift first]:
+    Swift: save:25ms get:14ms upd:32ms del:34ms (total:105ms)
+    C:     save:22ms get:17ms upd:20ms del:49ms (total:108ms)
+  Iter 4 [C first]:
+    C:     save:23ms get:15ms upd:21ms del:45ms (total:103ms)
+    Swift: save:14ms get:17ms upd:33ms del:21ms (total:84ms)
+  Iter 5 [Swift first]:
+    Swift: save:25ms get:17ms upd:33ms del:43ms (total:117ms)
+    C:     save:13ms get:17ms upd:29ms del:41ms (total:99ms)
+
+--- batch lifecycle | 1KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: save:6ms get:8ms upd:9ms del:7ms (total:30ms)
+    C:     save:9ms get:7ms upd:17ms del:6ms (total:40ms)
+  Iter 1 [Swift first]:
+    Swift: save:11ms get:6ms upd:21ms del:9ms (total:47ms)
+    C:     save:10ms get:7ms upd:18ms del:6ms (total:41ms)
+  Iter 2 [C first]:
+    C:     save:9ms get:8ms upd:17ms del:7ms (total:42ms)
+    Swift: save:12ms get:2ms upd:14ms del:8ms (total:35ms)
+  Iter 3 [Swift first]:
+    Swift: save:6ms get:7ms upd:22ms del:9ms (total:44ms)
+    C:     save:9ms get:2ms upd:7ms del:1ms (total:19ms)
+  Iter 4 [C first]:
+    C:     save:8ms get:7ms upd:17ms del:6ms (total:38ms)
+    Swift: save:11ms get:8ms upd:20ms del:2ms (total:42ms)
+  Iter 5 [Swift first]:
+    Swift: save:6ms get:6ms upd:14ms del:6ms (total:32ms)
+    C:     save:8ms get:27ms upd:18ms del:5ms (total:58ms)
+
+--- query lifecycle | 1KB x 100 | 5 iterations ---
+  Warmup:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+
+--- single lifecycle | 1KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:147ms get:73ms upd:195ms del:155ms (total:571ms)
+    C:     save:135ms get:60ms upd:159ms del:149ms (total:502ms)
+  Iter 1 [Swift first]:
+    Swift: save:134ms get:70ms upd:190ms del:152ms (total:545ms)
+    C:     save:133ms get:71ms upd:183ms del:151ms (total:537ms)
+  Iter 2 [C first]:
+    C:     save:127ms get:56ms upd:164ms del:129ms (total:477ms)
+    Swift: save:146ms get:52ms upd:207ms del:140ms (total:545ms)
+  Iter 3 [Swift first]:
+    Swift: save:157ms get:68ms upd:191ms del:161ms (total:577ms)
+    C:     save:134ms get:77ms upd:205ms del:135ms (total:552ms)
+  Iter 4 [C first]:
+    C:     save:136ms get:73ms upd:193ms del:128ms (total:529ms)
+    Swift: save:146ms get:43ms upd:214ms del:147ms (total:551ms)
+  Iter 5 [Swift first]:
+    Swift: save:149ms get:61ms upd:189ms del:124ms (total:524ms)
+    C:     save:126ms get:71ms upd:187ms del:144ms (total:528ms)
+
+--- batch lifecycle | 1KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: save:59ms get:34ms upd:103ms del:33ms (total:230ms)
+    C:     save:43ms get:14ms upd:84ms del:22ms (total:164ms)
+  Iter 1 [Swift first]:
+    Swift: save:73ms get:34ms upd:102ms del:33ms (total:242ms)
+    C:     save:59ms get:21ms upd:75ms del:24ms (total:179ms)
+  Iter 2 [C first]:
+    C:     save:60ms get:40ms upd:85ms del:21ms (total:207ms)
+    Swift: save:72ms get:35ms upd:78ms del:24ms (total:209ms)
+  Iter 3 [Swift first]:
+    Swift: save:75ms get:21ms upd:104ms del:34ms (total:234ms)
+    C:     save:60ms get:33ms upd:85ms del:8ms (total:186ms)
+  Iter 4 [C first]:
+    C:     save:43ms get:14ms upd:84ms del:22ms (total:163ms)
+    Swift: save:74ms get:33ms upd:103ms del:21ms (total:232ms)
+  Iter 5 [Swift first]:
+    Swift: save:74ms get:28ms upd:103ms del:33ms (total:237ms)
+    C:     save:44ms get:30ms upd:86ms del:13ms (total:172ms)
+
+--- query lifecycle | 1KB x 1K | 5 iterations ---
+  Warmup:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+
+--- single lifecycle | 1KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: save:1363ms get:417ms upd:1677ms del:1210ms (total:4668ms)
+    C:     save:1165ms get:480ms upd:1487ms del:1163ms (total:4294ms)
+  Iter 1 [Swift first]:
+    Swift: save:1271ms get:454ms upd:1533ms del:1413ms (total:4672ms)
+    C:     save:1190ms get:426ms upd:1531ms del:1184ms (total:4331ms)
+  Iter 2 [C first]:
+    C:     save:1161ms get:422ms upd:1556ms del:1206ms (total:4345ms)
+    Swift: save:1263ms get:453ms upd:1521ms del:1264ms (total:4502ms)
+  Iter 3 [Swift first]:
+    Swift: save:1309ms get:462ms upd:1496ms del:1245ms (total:4512ms)
+    C:     save:1154ms get:397ms upd:1486ms del:1172ms (total:4209ms)
+  Iter 4 [C first]:
+    C:     save:1141ms get:428ms upd:1516ms del:1173ms (total:4258ms)
+    Swift: save:1271ms get:463ms upd:1567ms del:1278ms (total:4580ms)
+  Iter 5 [Swift first]:
+    Swift: save:1270ms get:452ms upd:1572ms del:1278ms (total:4572ms)
+    C:     save:1177ms get:454ms upd:1537ms del:1250ms (total:4417ms)
+
+--- batch lifecycle | 1KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: save:558ms get:165ms upd:762ms del:171ms (total:1655ms)
+    C:     save:435ms get:148ms upd:598ms del:124ms (total:1305ms)
+  Iter 1 [Swift first]:
+    Swift: save:542ms get:176ms upd:757ms del:164ms (total:1639ms)
+    C:     save:452ms get:148ms upd:604ms del:122ms (total:1326ms)
+  Iter 2 [C first]:
+    C:     save:431ms get:148ms upd:566ms del:121ms (total:1265ms)
+    Swift: save:553ms get:143ms upd:771ms del:172ms (total:1639ms)
+  Iter 3 [Swift first]:
+    Swift: save:553ms get:162ms upd:765ms del:159ms (total:1639ms)
+    C:     save:427ms get:150ms upd:591ms del:110ms (total:1277ms)
+  Iter 4 [C first]:
+    C:     save:420ms get:147ms upd:583ms del:122ms (total:1272ms)
+    Swift: save:571ms get:162ms upd:757ms del:173ms (total:1663ms)
+  Iter 5 [Swift first]:
+    Swift: save:534ms get:160ms upd:763ms del:178ms (total:1636ms)
+    C:     save:424ms get:145ms upd:597ms del:109ms (total:1275ms)
+
+--- query lifecycle | 1KB x 10K | 5 iterations ---
+  Warmup:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 2ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 2 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 2ms (100 rows)
+    C:     1ms (100 rows)
+
+--- batch lifecycle | 1KB x 100K | 5 iterations ---
+  Warmup:
+    Swift: save:5223ms get:1426ms upd:7542ms del:1538ms (total:15730ms)
+    C:     save:4208ms get:1316ms upd:5826ms del:985ms (total:12335ms)
+  Iter 1 [Swift first]:
+    Swift: save:5286ms get:1451ms upd:7608ms del:1581ms (total:15927ms)
+    C:     save:4527ms get:1268ms upd:5906ms del:989ms (total:12690ms)
+  Iter 2 [C first]:
+    C:     save:4197ms get:1244ms upd:5868ms del:994ms (total:12302ms)
+    Swift: save:5375ms get:1417ms upd:7656ms del:1563ms (total:16010ms)
+  Iter 3 [Swift first]:
+    Swift: save:5352ms get:1416ms upd:7600ms del:1566ms (total:15933ms)
+    C:     save:4199ms get:1290ms upd:5875ms del:1008ms (total:12372ms)
+  Iter 4 [C first]:
+    C:     save:4223ms get:1254ms upd:5925ms del:1004ms (total:12406ms)
+    Swift: save:5391ms get:1426ms upd:7734ms del:1574ms (total:16126ms)
+  Iter 5 [Swift first]:
+    Swift: save:5350ms get:1433ms upd:7684ms del:1569ms (total:16036ms)
+    C:     save:4232ms get:1261ms upd:5906ms del:991ms (total:12390ms)
+
+--- query lifecycle | 1KB x 100K | 5 iterations ---
+  Warmup:
+    Swift: 2ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 1 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     2ms (100 rows)
+  Iter 2 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 3 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+  Iter 4 [C first]:
+    C:     1ms (100 rows)
+    Swift: 1ms (100 rows)
+  Iter 5 [Swift first]:
+    Swift: 1ms (100 rows)
+    C:     1ms (100 rows)
+
+==================================================
+=== SUMMARY (median comparison) ===
+==================================================
+
+10KB x 100 | single | single_save: Swift 76ms vs C 63ms -> C wins by 16.9%
+10KB x 100 | single | single_get: Swift 21ms vs C 20ms -> C wins by 2.7%
+10KB x 100 | single | single_update: Swift 102ms vs C 91ms -> C wins by 10.8%
+10KB x 100 | single | single_delete: Swift 34ms vs C 36ms -> SWIFT wins by 3.4%
+10KB x 100 | batch | batch_save: Swift 73ms vs C 59ms -> C wins by 19.6%
+10KB x 100 | batch | batch_get: Swift 14ms vs C 19ms -> SWIFT wins by 28.5%
+10KB x 100 | batch | batch_update: Swift 94ms vs C 75ms -> C wins by 20.3%
+10KB x 100 | batch | batch_delete: Swift 6ms vs C 6ms -> C wins by 10.9%
+10KB x 100 | query | query: Swift 5ms vs C 6ms -> SWIFT wins by 8.7%
+10KB x 1K | single | single_save: Swift 570ms vs C 431ms -> C wins by 24.3%
+10KB x 1K | single | single_get: Swift 96ms vs C 74ms -> C wins by 23.2%
+10KB x 1K | single | single_update: Swift 682ms vs C 529ms -> C wins by 22.4%
+10KB x 1K | single | single_delete: Swift 172ms vs C 171ms -> C wins by 0.3%
+10KB x 1K | batch | batch_save: Swift 547ms vs C 419ms -> C wins by 23.3%
+10KB x 1K | batch | batch_get: Swift 95ms vs C 88ms -> C wins by 7.2%
+10KB x 1K | batch | batch_update: Swift 666ms vs C 502ms -> C wins by 24.6%
+10KB x 1K | batch | batch_delete: Swift 36ms vs C 23ms -> C wins by 37.4%
+10KB x 1K | query | query: Swift 5ms vs C 5ms -> TIE
+10KB x 10K | single | single_save: Swift 5469ms vs C 4184ms -> C wins by 23.5%
+10KB x 10K | single | single_get: Swift 705ms vs C 724ms -> SWIFT wins by 2.6%
+10KB x 10K | single | single_update: Swift 6792ms vs C 5141ms -> C wins by 24.3%
+10KB x 10K | single | single_delete: Swift 1511ms vs C 1478ms -> C wins by 2.1%
+10KB x 10K | batch | batch_save: Swift 5423ms vs C 4142ms -> C wins by 23.6%
+10KB x 10K | batch | batch_get: Swift 715ms vs C 705ms -> C wins by 1.5%
+10KB x 10K | batch | batch_update: Swift 6722ms vs C 4991ms -> C wins by 25.8%
+10KB x 10K | batch | batch_delete: Swift 200ms vs C 141ms -> C wins by 29.6%
+10KB x 10K | query | query: Swift 6ms vs C 5ms -> TIE
+10KB x 100K | batch | batch_save: Swift 54851ms vs C 41427ms -> C wins by 24.5%
+10KB x 100K | batch | batch_get: Swift 7151ms vs C 6923ms -> C wins by 3.2%
+10KB x 100K | batch | batch_update: Swift 67953ms vs C 50126ms -> C wins by 26.2%
+10KB x 100K | batch | batch_delete: Swift 1878ms vs C 1208ms -> C wins by 35.6%
+10KB x 100K | query | query: Swift 6ms vs C 6ms -> TIE
+100B x 100 | single | single_save: Swift 18ms vs C 16ms -> C wins by 7.3%
+100B x 100 | single | single_get: Swift 14ms vs C 18ms -> SWIFT wins by 19.3%
+100B x 100 | single | single_update: Swift 28ms vs C 26ms -> C wins by 8.1%
+100B x 100 | single | single_delete: Swift 30ms vs C 37ms -> SWIFT wins by 18.9%
+100B x 100 | batch | batch_save: Swift 4ms vs C 4ms -> C wins by 13.8%
+100B x 100 | batch | batch_get: Swift 6ms vs C 6ms -> TIE
+100B x 100 | batch | batch_update: Swift 9ms vs C 7ms -> C wins by 24.9%
+100B x 100 | batch | batch_delete: Swift 7ms vs C 4ms -> C wins by 36.6%
+100B x 100 | query | query: Swift 1ms vs C 1ms -> TIE
+100B x 1K | single | single_save: Swift 110ms vs C 100ms -> C wins by 8.8%
+100B x 1K | single | single_get: Swift 70ms vs C 48ms -> C wins by 31.5%
+100B x 1K | single | single_update: Swift 127ms vs C 141ms -> SWIFT wins by 10.3%
+100B x 1K | single | single_delete: Swift 141ms vs C 121ms -> C wins by 14.3%
+100B x 1K | batch | batch_save: Swift 28ms vs C 16ms -> C wins by 40.7%
+100B x 1K | batch | batch_get: Swift 24ms vs C 22ms -> C wins by 7.4%
+100B x 1K | batch | batch_update: Swift 45ms vs C 45ms -> SWIFT wins by 1.3%
+100B x 1K | batch | batch_delete: Swift 19ms vs C 21ms -> SWIFT wins by 11.5%
+100B x 1K | query | query: Swift 0ms vs C 0ms -> TIE
+100B x 10K | single | single_save: Swift 908ms vs C 887ms -> C wins by 2.3%
+100B x 10K | single | single_get: Swift 420ms vs C 397ms -> C wins by 5.5%
+100B x 10K | single | single_update: Swift 1159ms vs C 1182ms -> SWIFT wins by 1.9%
+100B x 10K | single | single_delete: Swift 1167ms vs C 1091ms -> C wins by 6.5%
+100B x 10K | batch | batch_save: Swift 164ms vs C 138ms -> C wins by 15.7%
+100B x 10K | batch | batch_get: Swift 107ms vs C 103ms -> C wins by 3.1%
+100B x 10K | batch | batch_update: Swift 308ms vs C 240ms -> C wins by 21.9%
+100B x 10K | batch | batch_delete: Swift 156ms vs C 117ms -> C wins by 25.2%
+100B x 10K | query | query: Swift 0ms vs C 1ms -> TIE
+100B x 100K | batch | batch_save: Swift 1565ms vs C 1257ms -> C wins by 19.7%
+100B x 100K | batch | batch_get: Swift 907ms vs C 756ms -> C wins by 16.6%
+100B x 100K | batch | batch_update: Swift 2945ms vs C 2300ms -> C wins by 21.9%
+100B x 100K | batch | batch_delete: Swift 1423ms vs C 842ms -> C wins by 40.8%
+100B x 100K | query | query: Swift 1ms vs C 1ms -> TIE
+1MB x 100 | single | single_save: Swift 4823ms vs C 3593ms -> C wins by 25.5%
+1MB x 100 | single | single_get: Swift 291ms vs C 277ms -> C wins by 4.6%
+1MB x 100 | single | single_update: Swift 6015ms vs C 4364ms -> C wins by 27.4%
+1MB x 100 | single | single_delete: Swift 63ms vs C 58ms -> C wins by 7.3%
+1MB x 100 | batch | batch_save: Swift 5382ms vs C 4090ms -> C wins by 24%
+1MB x 100 | batch | batch_get: Swift 644ms vs C 637ms -> C wins by 1%
+1MB x 100 | batch | batch_update: Swift 6553ms vs C 4800ms -> C wins by 26.8%
+1MB x 100 | batch | batch_delete: Swift 45ms vs C 43ms -> C wins by 4.9%
+1MB x 100 | query | query: Swift 541ms vs C 564ms -> SWIFT wins by 4.1%
+1MB x 1K | single | single_save: Swift 49364ms vs C 35668ms -> C wins by 27.7%
+1MB x 1K | single | single_get: Swift 2823ms vs C 2699ms -> C wins by 4.4%
+1MB x 1K | single | single_update: Swift 60825ms vs C 43748ms -> C wins by 28.1%
+1MB x 1K | single | single_delete: Swift 369ms vs C 341ms -> C wins by 7.5%
+1MB x 1K | batch | batch_save: Swift 54224ms vs C 40699ms -> C wins by 24.9%
+1MB x 1K | batch | batch_get: Swift 6423ms vs C 6305ms -> C wins by 1.8%
+1MB x 1K | batch | batch_update: Swift 66091ms vs C 48573ms -> C wins by 26.5%
+1MB x 1K | batch | batch_delete: Swift 214ms vs C 210ms -> C wins by 1.9%
+100KB x 100 | single | single_save: Swift 482ms vs C 362ms -> C wins by 24.8%
+100KB x 100 | single | single_get: Swift 38ms vs C 53ms -> SWIFT wins by 28.8%
+100KB x 100 | single | single_update: Swift 629ms vs C 443ms -> C wins by 29.6%
+100KB x 100 | single | single_delete: Swift 41ms vs C 30ms -> C wins by 28.5%
+100KB x 100 | batch | batch_save: Swift 547ms vs C 407ms -> C wins by 25.6%
+100KB x 100 | batch | batch_get: Swift 85ms vs C 86ms -> SWIFT wins by 1.4%
+100KB x 100 | batch | batch_update: Swift 664ms vs C 486ms -> C wins by 26.7%
+100KB x 100 | batch | batch_delete: Swift 12ms vs C 11ms -> C wins by 13.1%
+100KB x 100 | query | query: Swift 56ms vs C 56ms -> C wins by 0.9%
+100KB x 1K | single | single_save: Swift 4739ms vs C 3462ms -> C wins by 26.9%
+100KB x 1K | single | single_get: Swift 309ms vs C 309ms -> TIE
+100KB x 1K | single | single_update: Swift 5937ms vs C 4258ms -> C wins by 28.3%
+100KB x 1K | single | single_delete: Swift 198ms vs C 181ms -> C wins by 8.9%
+100KB x 1K | batch | batch_save: Swift 5341ms vs C 3972ms -> C wins by 25.6%
+100KB x 1K | batch | batch_get: Swift 630ms vs C 648ms -> SWIFT wins by 2.7%
+100KB x 1K | batch | batch_update: Swift 6520ms vs C 4732ms -> C wins by 27.4%
+100KB x 1K | batch | batch_delete: Swift 73ms vs C 64ms -> C wins by 12.2%
+100KB x 1K | query | query: Swift 58ms vs C 60ms -> SWIFT wins by 2.9%
+100KB x 10K | single | single_save: Swift 48691ms vs C 35683ms -> C wins by 26.7%
+100KB x 10K | single | single_get: Swift 2963ms vs C 2919ms -> C wins by 1.5%
+100KB x 10K | single | single_update: Swift 60935ms vs C 43537ms -> C wins by 28.6%
+100KB x 10K | single | single_delete: Swift 1783ms vs C 1753ms -> C wins by 1.7%
+100KB x 10K | batch | batch_save: Swift 54064ms vs C 39970ms -> C wins by 26.1%
+100KB x 10K | batch | batch_get: Swift 6348ms vs C 6271ms -> C wins by 1.2%
+100KB x 10K | batch | batch_update: Swift 66165ms vs C 47883ms -> C wins by 27.6%
+100KB x 10K | batch | batch_delete: Swift 443ms vs C 368ms -> C wins by 17.1%
+100KB x 10K | query | query: Swift 60ms vs C 55ms -> C wins by 9.6%
+1KB x 100 | single | single_save: Swift 24ms vs C 22ms -> C wins by 9.7%
+1KB x 100 | single | single_get: Swift 17ms vs C 17ms -> TIE
+1KB x 100 | single | single_update: Swift 33ms vs C 23ms -> C wins by 28.5%
+1KB x 100 | single | single_delete: Swift 34ms vs C 41ms -> SWIFT wins by 16.3%
+1KB x 100 | batch | batch_save: Swift 11ms vs C 9ms -> C wins by 16%
+1KB x 100 | batch | batch_get: Swift 6ms vs C 7ms -> SWIFT wins by 14.4%
+1KB x 100 | batch | batch_update: Swift 20ms vs C 17ms -> C wins by 16.1%
+1KB x 100 | batch | batch_delete: Swift 8ms vs C 6ms -> C wins by 26%
+1KB x 100 | query | query: Swift 1ms vs C 1ms -> TIE
+1KB x 1K | single | single_save: Swift 146ms vs C 133ms -> C wins by 9.3%
+1KB x 1K | single | single_get: Swift 61ms vs C 71ms -> SWIFT wins by 14.4%
+1KB x 1K | single | single_update: Swift 191ms vs C 187ms -> C wins by 2%
+1KB x 1K | single | single_delete: Swift 147ms vs C 135ms -> C wins by 8.1%
+1KB x 1K | batch | batch_save: Swift 74ms vs C 59ms -> C wins by 19.8%
+1KB x 1K | batch | batch_get: Swift 33ms vs C 30ms -> C wins by 9.3%
+1KB x 1K | batch | batch_update: Swift 103ms vs C 85ms -> C wins by 17.7%
+1KB x 1K | batch | batch_delete: Swift 33ms vs C 21ms -> C wins by 34.6%
+1KB x 1K | query | query: Swift 1ms vs C 1ms -> TIE
+1KB x 10K | single | single_save: Swift 1271ms vs C 1161ms -> C wins by 8.6%
+1KB x 10K | single | single_get: Swift 454ms vs C 426ms -> C wins by 6.3%
+1KB x 10K | single | single_update: Swift 1533ms vs C 1531ms -> C wins by 0.2%
+1KB x 10K | single | single_delete: Swift 1278ms vs C 1184ms -> C wins by 7.4%
+1KB x 10K | batch | batch_save: Swift 553ms vs C 427ms -> C wins by 22.8%
+1KB x 10K | batch | batch_get: Swift 162ms vs C 148ms -> C wins by 8.9%
+1KB x 10K | batch | batch_update: Swift 763ms vs C 591ms -> C wins by 22.6%
+1KB x 10K | batch | batch_delete: Swift 172ms vs C 121ms -> C wins by 29.6%
+1KB x 10K | query | query: Swift 1ms vs C 1ms -> TIE
+1KB x 100K | batch | batch_save: Swift 5352ms vs C 4223ms -> C wins by 21.1%
+1KB x 100K | batch | batch_get: Swift 1426ms vs C 1261ms -> C wins by 11.6%
+1KB x 100K | batch | batch_update: Swift 7656ms vs C 5906ms -> C wins by 22.9%
+1KB x 100K | batch | batch_delete: Swift 1569ms vs C 994ms -> C wins by 36.7%
+1KB x 100K | query | query: Swift 1ms vs C 1ms -> TIE

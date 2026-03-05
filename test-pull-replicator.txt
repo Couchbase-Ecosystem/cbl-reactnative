@@ -1,0 +1,161 @@
+BENCHMARK SUMMARY: SWIFT VS C (PULL)
+ 100 BYTE - PULL
+100 DOCS
+
+⏱ Swift pull: 3126ms — 100 docs in DB 
+
+⏱ C pull: 2615ms — 100 docs in DB 
+
+⏱ C pull: 1051ms — 100 docs in DB 
+
+⏱ Swift pull: 1060ms — 100 docs in DB 
+
+1000 DOCS
+
+⏱ Swift pull: 2602ms — 1000 docs in DB 
+
+⏱ C pull: 3126ms — 1000 docs in DB 
+
+⏱ C pull: 1052ms — 1000 docs in DB 
+
+⏱ Swift pull: 1051ms — 1000 docs in DB 
+
+10,000 DOCS
+
+⏱ Swift pull: 3630ms — 10000 docs in DB 
+
+⏱ C pull: 3628ms — 10000 docs in DB 
+
+⏱ C pull: 1552ms — 10000 docs in DB 
+
+⏱ Swift pull: 1568ms — 10000 docs in DB 
+
+100,000 DOCS
+
+⏱ Swift pull: 11313ms — 100000 docs in DB 
+
+⏱ C pull: 10777ms — 100000 docs in DB 
+
+⏱ C pull: 12897ms — 100000 docs in DB 
+
+⏱ Swift pull: 14871ms — 100000 docs in DB 
+
+ 1 KB - PULL
+100 DOCS
+
+⏱ Swift pull: 1579ms — 100 docs in DB 
+
+⏱ C pull: 1583ms — 100 docs in DB 
+
+⏱ C pull: 1062ms — 100 docs in DB 
+
+⏱ Swift pull: 1049ms — 100 docs in DB 
+
+1000 DOCS
+
+⏱ Swift pull: 1562ms — 1000 docs in DB 
+
+⏱ C pull: 1565ms — 1000 docs in DB 
+
+⏱ C pull: 1051ms — 1000 docs in DB 
+
+⏱ Swift pull: 1062ms — 1000 docs in DB 
+
+10,000 DOCS
+
+⏱ Swift pull: 4117ms — 10000 docs in DB 
+
+⏱ C pull: 3130ms — 10000 docs in DB 
+
+⏱ C pull: 2081ms — 10000 docs in DB 
+
+⏱ Swift pull: 2597ms — 10000 docs in DB 
+
+100,000 DOCS
+
+⏱ Swift pull: 10801ms — 100000 docs in DB 
+
+⏱ C pull: 9783ms — 100000 docs in DB 
+
+⏱ C pull: 9292ms — 100000 docs in DB 
+
+⏱ Swift pull: 9297ms — 100000 docs in DB 
+
+ 10 KB - PULL
+100 DOCS
+
+⏱ Swift pull: 1046ms — 100 docs in DB 
+
+⏱ C pull: 1051ms — 100 docs in DB 
+
+⏱ C pull: 1050ms — 100 docs in DB 
+
+⏱ Swift pull: 1030ms — 100 docs in DB 
+
+1000 DOCS
+
+⏱ Swift pull: 1047ms — 1000 docs in DB 
+
+⏱ C pull: 1048ms — 1000 docs in DB 
+
+⏱ C pull: 1066ms — 1000 docs in DB 
+
+⏱ Swift pull: 1049ms — 1000 docs in DB 
+
+10,000 DOCS
+
+⏱ Swift pull: 2081ms — 10000 docs in DB 
+
+⏱ C pull: 2090ms — 10000 docs in DB 
+
+⏱ C pull: 2082ms — 10000 docs in DB 
+
+⏱ Swift pull: 2078ms — 10000 docs in DB 
+
+100,000 DOCS
+
+⏱ C pull: 17455ms — 100000 docs in DB 
+
+⏱ Swift pull: 13872ms — 100000 docs in DB 
+
+ 100 KB - PULL
+100 DOCS
+
+⏱ Swift pull: 530ms — 100 docs in DB 
+
+⏱ C pull: 531ms — 100 docs in DB 
+
+⏱ C pull: 548ms — 100 docs in DB 
+
+⏱ Swift pull: 538ms — 100 docs in DB 
+
+1000 DOCS
+
+⏱ Swift pull: 1575ms — 1000 docs in DB 
+
+⏱ C pull: 1569ms — 1000 docs in DB 
+
+⏱ C pull: 1580ms — 1000 docs in DB 
+
+⏱ Swift pull: 1059ms — 1000 docs in DB 
+
+10,000 DOCS
+
+⏱ Swift pull: 8248ms — 10000 docs in DB 
+
+⏱ C pull: 11314ms — 10000 docs in DB 
+
+⏱ C pull: 12349ms — 10000 docs in DB 
+
+⏱ Swift pull: 9738ms — 10000 docs in DB 
+
+ 1 MB - PULL
+100 DOCS
+
+⏱ Swift pull: 1570ms — 100 docs in DB 
+
+⏱ C pull: 1550ms — 100 docs in DB 
+
+⏱ C pull: 1563ms — 100 docs in DB 
+
+⏱ Swift pull: 1559ms — 100 docs in DB

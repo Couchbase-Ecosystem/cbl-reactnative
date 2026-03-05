@@ -665,6 +665,78 @@ class CblReactnativeModule(reactContext: ReactApplicationContext) :
       }
     }
   }
+  
+  /**
+   * Echo method for measuring pure bridge overhead - LEGACY PATTERN
+   * 
+   * LEGACY BRIDGE CHARACTERISTICS:
+   * - Goes through async message queue (adds latency)
+   * - Dispatches to UI thread for resolution (thread hop)
+   * - Uses traditional React Native bridge serialization
+   * 
+   * This represents the TRADITIONAL way native modules work.
+   */
+  @ReactMethod
+  fun collection_Echo(data: String, promise: Promise) {
+    // LEGACY: Dispatch to UI queue - this adds overhead!
+    // The message goes: JS -> Bridge Queue -> Native -> UI Queue -> Bridge -> JS
+    context.runOnUiQueueThread {
+      val result = Arguments.createMap()
+      result.putString("data", data)
+      promise.resolve(result)
+    }
+  }
+
+  /**
+   * Legacy performance check with FULL async dispatch pattern
+   * 
+   * This uses the traditional pattern that ALL legacy operations use:
+   * 1. Receive call from JS via async bridge
+   * 2. Dispatch to IO thread via GlobalScope.launch
+   * 3. Do work on IO thread
+   * 4. Dispatch back to UI thread
+   * 5. Resolve promise (goes back through bridge)
+   * 
+   * Each step adds latency that Turbo Modules can avoid!
+   */
+  @ReactMethod
+  fun collection_PerformanceCheckLegacy(iterations: Double, promise: Promise) {
+    val count = iterations.toInt()
+    
+    // LEGACY PATTERN: Dispatch to IO thread (thread scheduling overhead)
+    GlobalScope.launch(Dispatchers.IO) {
+      val startTime = System.nanoTime()
+      
+      var sum: Long = 0
+      for (i in 0 until count) {
+        sum += i.toLong()
+      }
+      
+      val endTime = System.nanoTime()
+      val timeMs = (endTime - startTime) / 1_000_000.0
+      
+      // LEGACY PATTERN: Dispatch back to UI thread (another thread hop!)
+      context.runOnUiQueueThread {
+        val result = Arguments.createMap()
+        result.putDouble("timeMs", timeMs)
+        result.putInt("iterations", count)
+        result.putDouble("checksum", sum.toDouble())
+        promise.resolve(result)
+      }
+    }
+  }
+
+  /**
+   * Batch echo for Legacy - still uses async dispatch
+   */
+  @ReactMethod
+  fun collection_BatchEchoLegacy(count: Double, promise: Promise) {
+    // LEGACY: Goes through async queue even for simple operations
+    context.runOnUiQueueThread {
+      promise.resolve(count.toInt())
+    }
+  }
+  
   @ReactMethod
 fun collection_AddChangeListener(
   changeListenerToken: String,
@@ -1732,6 +1804,30 @@ fun replicator_RemoveChangeListener(
           promise.reject("LOGSINKS_ERROR", e.message)
         }
       }
+    }
+  }
+
+  /**
+   * Debug method: Get native memory usage statistics
+   * Used for performance testing and memory profiling
+   */
+  @ReactMethod
+  fun debug_GetMemoryUsage(promise: Promise) {
+    try {
+      val runtime = Runtime.getRuntime()
+      val usedMemory = runtime.totalMemory() - runtime.freeMemory()
+      val totalMemory = runtime.totalMemory()
+      val maxMemory = runtime.maxMemory()
+      
+      val result = Arguments.createMap()
+      result.putDouble("usedMemory", usedMemory.toDouble())
+      result.putDouble("totalMemory", totalMemory.toDouble())
+      result.putDouble("maxMemory", maxMemory.toDouble())
+      result.putDouble("freeMemory", runtime.freeMemory().toDouble())
+      
+      promise.resolve(result)
+    } catch (e: Throwable) {
+      promise.reject("MEMORY_ERROR", e.message)
     }
   }
 

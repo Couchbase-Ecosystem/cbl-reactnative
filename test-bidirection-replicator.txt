@@ -1,0 +1,165 @@
+BENCHMARK SUMMARY: SWIFT VS C (BIDIRECTIONAL)
+100 BYTE - BI
+100 DOCS
+
+⏱ Swift bidirectional: 298ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 297ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 314ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ Swift bidirectional: 311ms — local docs before: 50, after: 100 (50 pulled) 
+
+1000 DOCS
+
+⏱ Swift bidirectional: 300ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 317ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 303ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ Swift bidirectional: 310ms — local docs before: 500, after: 1000 (500 pulled) 
+
+10,000 DOCS
+
+⏱ Swift bidirectional: 1592ms — 10000 total docs 
+
+⏱ C bidirectional: 1617ms — 10000 total docs 
+
+⏱ C bidirectional: 1608ms — 10000 total docs 
+
+⏱ Swift bidirectional: 1620ms — 10000 total docs 
+
+100,000 DOCS
+
+⏱ Swift bidirectional: 13413ms — 100000 total docs 
+
+⏱ C bidirectional: 13024ms — 100000 total docs 
+
+⏱ C bidirectional: 12793ms — 100000 total docs 
+
+⏱ Swift bidirectional: 13225ms — 100000 total docs 
+
+1 KB - BI
+100 DOCS
+
+⏱ Swift bidirectional: 315ms — 100 total docs 
+
+⏱ C bidirectional: 302ms — 100 total docs 
+
+⏱ C bidirectional: 317ms — 100 total docs 
+
+⏱ Swift bidirectional: 323ms — 100 total docs 
+
+1000 DOCS
+
+⏱ Swift bidirectional: 307ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 296ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 310ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ Swift bidirectional: 302ms — local docs before: 500, after: 1000 (500 pulled) 
+
+10,000 DOCS
+
+⏱ Swift bidirectional: 1667ms — 10000 total docs 
+
+⏱ C bidirectional: 1611ms — 10000 total docs 
+
+⏱ C bidirectional: 1582ms — 10000 total docs 
+
+⏱ Swift bidirectional: 1596ms — 10000 total docs 
+
+100,000 DOCS
+
+⏱ Swift bidirectional: 13698ms — 100000 total docs 
+
+⏱ C bidirectional: 13515ms — 100000 total docs 
+
+⏱ C bidirectional: 13556ms — 100000 total docs 
+
+⏱ Swift bidirectional: 14049ms — 100000 total docs 
+
+10 KB - BI
+100 DOCS
+
+⏱ Swift bidirectional: 307ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 314ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 310ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ Swift bidirectional: 311ms — local docs before: 50, after: 100 (50 pulled) 
+
+1000 DOCS
+
+⏱ Swift bidirectional: 547ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 540ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 564ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ Swift bidirectional: 534ms — local docs before: 500, after: 1000 (500 pulled) 
+
+10,000 DOCS
+
+⏱ Swift bidirectional: 2408ms — 10000 total docs 
+
+⏱ C bidirectional: 2377ms — 10000 total docs 
+
+⏱ C bidirectional: 2384ms — 10000 total docs 
+
+⏱ Swift bidirectional: 2385ms — 10000 total docs 
+
+100,000 DOCS
+
+⏱ Swift bidirectional: 21332ms — 100000 total docs 
+
+⏱ C bidirectional: 22868ms — 100000 total docs 
+
+⏱ Swift bidirectional: 21160ms — 100000 total docs 
+
+⏱ C bidirectional: 22458ms — 100000 total docs 
+
+100 KB - BI
+100 DOCS
+
+⏱ Swift bidirectional: 7395ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 7686ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 8199ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ Swift bidirectional: 8332ms — local docs before: 50, after: 100 (50 pulled) 
+
+1000 DOCS
+
+⏱ Swift bidirectional: 1233ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 1132ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ C bidirectional: 1108ms — local docs before: 500, after: 1000 (500 pulled) 
+
+⏱ Swift bidirectional: 1549ms — local docs before: 500, after: 1000 (500 pulled) 
+
+10,000 DOCS
+
+⏱ Swift bidirectional: 9514ms — 10000 total docs 
+
+⏱ C bidirectional: 10712ms — 10000 total docs 
+
+⏱ C bidirectional: 9678ms — 10000 total docs 
+
+⏱ Swift bidirectional: 12520ms — 10000 total docs 
+
+1 MB - BI
+100 DOCS
+
+⏱ Swift bidirectional: 1431ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 1689ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ C bidirectional: 2021ms — local docs before: 50, after: 100 (50 pulled) 
+
+⏱ Swift bidirectional: 2081ms — local docs before: 50, after: 100 (50 pulled)
