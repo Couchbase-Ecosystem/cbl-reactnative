@@ -62,7 +62,8 @@
     "!src/cblite-js/cblite-tests"
   ],
   "dependencies": {
-    "react-native-uuid": "^2.0.2"
+    "react-native-uuid": "^2.0.2",
+    "reo-census": "^1.2.8"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.8.1",
