@@ -1,3 +1,8 @@
+## 1.0.1 (2026-03-13)
+
+### Features
+* feat: add reo-census for npm install tracking (#92)
+
 
 ## 1.0.0 (2026-01-12)
 
