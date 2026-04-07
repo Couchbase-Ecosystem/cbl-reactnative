@@ -82,3 +82,6 @@ cbl-reactnative-docs/
 couchbase-lite-ios/
 couchbase-lite-java-common-android-release-*/
 ios-swift-quickstart/
+
+# Local planning notes (not for version control)
+TURBO_MIGRATION_PLAN.md

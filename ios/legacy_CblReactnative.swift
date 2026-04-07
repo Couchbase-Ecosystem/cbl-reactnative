@@ -1,3 +1,23 @@
+/**
+ * LEGACY FILE — DO NOT USE
+ *
+ * This monolithic RCTEventEmitter class has been replaced by 8 domain-specific
+ * Turbo Module Swift implementation classes as part of Phase 3 of the Turbo
+ * Module migration.
+ *
+ * Replacement files:
+ *   ios/CblDatabaseModule.swift    ios/CblCollectionModule.swift
+ *   ios/CblDocumentModule.swift    ios/CblQueryModule.swift
+ *   ios/CblReplicatorModule.swift  ios/CblScopeModule.swift
+ *   ios/CblLoggingModule.swift     ios/CblEngineModule.swift
+ *
+ * Shared state extracted to: ios/ListenerTokenStore.swift
+ *
+ * Original file: ios/CblReactnative.swift
+ * Renamed as part of: Turbo Module Migration — Phase 3
+ */
+
+/*
 import Foundation
 import CouchbaseLiteSwift
 import os
@@ -1912,3 +1932,4 @@ extension Notification.Name {
   static let replicatorStatusChange = Notification.Name("replicatorStatusChange")
   static let replicatorDocumentChange = Notification.Name("replicatorDocumentChange")
 }
+*/ // END LEGACY FILE

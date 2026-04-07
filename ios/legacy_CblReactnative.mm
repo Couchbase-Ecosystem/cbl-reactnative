@@ -1,3 +1,20 @@
+/**
+ * LEGACY FILE — DO NOT USE
+ *
+ * This RCT_EXTERN_MODULE bridge file has been replaced by 8 domain-specific
+ * Obj-C++ adapter files as part of Phase 3 of the Turbo Module migration.
+ *
+ * Replacement files:
+ *   ios/RCTCblDatabase.mm    ios/RCTCblCollection.mm
+ *   ios/RCTCblDocument.mm    ios/RCTCblQuery.mm
+ *   ios/RCTCblReplicator.mm  ios/RCTCblScope.mm
+ *   ios/RCTCblLogging.mm     ios/RCTCblEngine.mm
+ *
+ * Original file: ios/CblReactnative.mm
+ * Renamed as part of: Turbo Module Migration — Phase 3
+ */
+
+#if 0  // ---- LEGACY CONTENT START (inactive) ----
 #import <React/RCTBridgeModule.h>
 #import <React/RCTEventEmitter.h>
 
@@ -386,3 +403,4 @@ RCT_EXTERN_METHOD(scope_GetScopes:(NSString *)name
 }
 
 @end
+#endif // ---- LEGACY CONTENT END ----

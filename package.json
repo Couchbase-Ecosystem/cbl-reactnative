@@ -47,7 +47,6 @@
     "lib",
     "android",
     "ios",
-    "cpp",
     "*.podspec",
     "!ios/build",
     "!android/build",
@@ -194,8 +193,28 @@
     ]
   },
   "create-react-native-library": {
-    "type": "module-legacy",
+    "type": "module-new",
     "languages": "kotlin-swift",
     "version": "0.38.1"
+  },
+  "codegenConfig": {
+    "name": "CblReactnativeSpecs",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.cblreactnative"
+    },
+    "ios": {
+      "modulesProvider": {
+        "CblDatabase": "RCTCblDatabase",
+        "CblCollection": "RCTCblCollection",
+        "CblDocument": "RCTCblDocument",
+        "CblQuery": "RCTCblQuery",
+        "CblReplicator": "RCTCblReplicator",
+        "CblScope": "RCTCblScope",
+        "CblLogging": "RCTCblLogging",
+        "CblEngine": "RCTCblEngine"
+      }
+    }
   }
 }
