@@ -1,5 +1,9 @@
 # Contributing
 
+> **This repository is deprecated.** We are not accepting new contributions here. Please use the [Couchbase Lite React Native](https://github.com/couchbase/couchbase-lite-react-native) repository and follow its contributing guide instead.
+
+The instructions below are retained for historical reference only.
+
 Whether you have a fix for a typo in a component, a bugfix, or a new feature, we'd love to collaborate.
 
 We want this community to be friendly and respectful to each other. Please follow it in all your interactions with the project. Before contributing, please read the [code of conduct](./CODE_OF_CONDUCT.md).

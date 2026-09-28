@@ -2,10 +2,11 @@
   "name": "cbl-reactnative",
   "version": "1.0.1",
   "description": "Couchbase Lite Enterprise for React Native",
+  "deprecated": "This package is no longer maintained or supported. Please migrate to @couchbase/couchbase-lite-react-native instead: https://www.npmjs.com/package/@couchbase/couchbase-lite-react-native",
   "author": "Dev Experience/Ecosystem Team @ Couchbase",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Couchbase-Ecosystem/cbl-reactnative/issues"
+    "url": "https://github.com/couchbase/couchbase-lite-react-native/issues"
   },
   "homepage": "https://cbl-reactnative.dev/",
   "publishConfig": {
