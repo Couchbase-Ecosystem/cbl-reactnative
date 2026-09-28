@@ -6,7 +6,7 @@
   "author": "Dev Experience/Ecosystem Team @ Couchbase",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/couchbase/couchbase-lite-react-native/issues"
+    "url": "https://github.com/Couchbase-Ecosystem/cbl-reactnative/issues"
   },
   "homepage": "https://cbl-reactnative.dev/",
   "publishConfig": {

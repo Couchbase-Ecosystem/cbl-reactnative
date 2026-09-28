@@ -1,6 +1,6 @@
 # Contributing
 
-> **This repository is deprecated.** We are not accepting new contributions here. Please use the [Couchbase Lite React Native](https://github.com/couchbase/couchbase-lite-react-native) repository and follow its contributing guide instead.
+> **This repository is deprecated.** We are not accepting new contributions here.
 
 The instructions below are retained for historical reference only.
 

@@ -6,7 +6,6 @@
 >
 > - **Install and setup:** [cbl-reactnative.dev → Install](https://cbl-reactnative.dev/StartHere/install)
 > - **Migration from `cbl-reactnative`:** [Version 1.1 Migration Guide](https://cbl-reactnative.dev/Guides/Migration/migration-guide-v1-1)
-> - **Issues and contributions:** use the [Couchbase Lite React Native](https://github.com/couchbase/couchbase-lite-react-native) repository
 
 # React Native - Native Module for Couchbase Lite Enterprise
 
